@@ -1,4 +1,4 @@
-package com.myapp.warmwave.common;
+package com.myapp.warmwave.common.exception;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
         Map<String, String> errorMap = new HashMap<>();
 
-        if(e.hasErrors()){
+        if (e.hasErrors()) {
 
             BindingResult bindingResult = e.getBindingResult();
 
@@ -49,14 +49,14 @@ public class GlobalExceptionHandler {
 
         Map<String, String> errorMap = new HashMap<>();
 
-        errorMap.put("time", ""+System.currentTimeMillis());
-        errorMap.put("msg",  "constraint fails");
+        errorMap.put("time", "" + System.currentTimeMillis());
+        errorMap.put("msg", "constraint fails");
         return ResponseEntity.badRequest().body(errorMap);
     }
 
     @ExceptionHandler({
             NoSuchElementException.class,
-            EmptyResultDataAccessException.class }) //추가
+            EmptyResultDataAccessException.class}) //추가
     @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     public ResponseEntity<Map<String, String>> handleNoSuchElement(Exception e) {
         // 해당 데이터가 존재하지 않는 경우의 예외 처리
@@ -65,8 +65,8 @@ public class GlobalExceptionHandler {
 
         Map<String, String> errorMap = new HashMap<>();
 
-        errorMap.put("time", ""+System.currentTimeMillis());
-        errorMap.put("msg",  "No Such Element Exception");
+        errorMap.put("time", "" + System.currentTimeMillis());
+        errorMap.put("msg", "No Such Element Exception");
         return ResponseEntity.badRequest().body(errorMap);
     }
 
