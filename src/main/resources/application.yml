@@ -14,3 +14,9 @@ spring:
       enabled: true
     restart:
       enabled: true
+
+image:
+  upload:
+    path: /Users/wook/upload/article-images
+
+

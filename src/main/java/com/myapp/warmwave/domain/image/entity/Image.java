@@ -1,14 +1,17 @@
 package com.myapp.warmwave.domain.image.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myapp.warmwave.domain.article.entity.Article;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -22,11 +25,13 @@ public class Image {
 
     private String imgUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ARTICLE_ID")
+    @JsonIgnore
     private Article article;
 
     @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     public void update(String imgName, String imgUrl) {
