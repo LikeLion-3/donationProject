@@ -29,7 +29,7 @@ private String imageStorePath = "/Users/wook/upload/article-images";
         this.imageRepository = imageRepository;
     }
 
-    public List<Image> upload(Article article, List<MultipartFile> imageFiles) throws IOException {
+    public List<Image> uploadImages(Article article, List<MultipartFile> imageFiles) throws IOException {
         List<Image> images = new ArrayList<>();
 
         File directory = new File(imageStorePath);
