@@ -4,10 +4,22 @@ import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ProductCategory;
+import com.myapp.warmwave.domain.article.entity.Status;
+import com.myapp.warmwave.domain.article.entity.Type;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ArticleMapper {
+
+    public Article articlePostDtoToArticle(ArticlePostDto articlePostDto) {
+        return Article.builder()
+                .title(articlePostDto.getTitle())
+                .content(articlePostDto.getContent())
+                .articleType(Type.DONATION)
+                .articleStatus(Status.DEFAULT)
+                .prodCategory(ProductCategory.ETC)
+                .build();
+    }
 
     public ArticleResponseDto articleToArticleResponseDto(Article article) {
         return ArticleResponseDto.builder()
