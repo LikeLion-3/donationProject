@@ -38,7 +38,7 @@ public class ArticleService {
         Article findArticle = articleRepository.findById(articleId);
 
         findArticle.applyPatch(article);
-        findArticle.setArticleImages(imageService.uploadImages(article, imageFiles));
+        findArticle.setArticleImages(imageService.uploadImages(findArticle, imageFiles));
 
         return articleRepository.save(findArticle);
     }

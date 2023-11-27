@@ -38,7 +38,7 @@ public class Article extends BaseEntity {
 
     private Long hit;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Image> articleImages = new ArrayList<>();
 
@@ -47,6 +47,9 @@ public class Article extends BaseEntity {
     private User user;
 
     public void setArticleImages(List<Image> articleImages) {
+        if (this.articleImages != null) {
+            this.articleImages.clear();
+        }
         this.articleImages = articleImages;
     }
 
