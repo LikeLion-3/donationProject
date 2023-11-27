@@ -1,10 +1,6 @@
 package com.myapp.warmwave.domain.article.service;
 
-import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.entity.Article;
-import com.myapp.warmwave.domain.article.entity.Status;
-import com.myapp.warmwave.domain.article.entity.Type;
-import com.myapp.warmwave.domain.article.entity.ProductCategory;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,24 +22,25 @@ public class ArticleService {
         this.imageService = imageService;
     }
 
-    public Article create (ArticlePostDto articlePostDto, List<MultipartFile> imageFiles) throws IOException {
-
-        Article article = Article.builder()
-                .title(articlePostDto.getTitle())
-                .content(articlePostDto.getContent())
-                .articleType(Type.DONATION)
-                .articleStatus(Status.DEFAULT)
-                .prodCategory(ProductCategory.ETC)
-                .build();
+    public Article createArticle(Article article, List<MultipartFile> imageFiles) throws IOException {
 
         //추후 세터를 삭제하는 방향을 생각해보아야함
-        article.setArticleImages(imageService.upload(article, imageFiles));
+        article.setArticleImages(imageService.uploadImages(article, imageFiles));
 
         return articleRepository.save(article);
     }
 
     public Article getArticleByArticleId(long articleId) {
         return articleRepository.findById(articleId);
+    }
+
+    public Article updateArticle(long articleId, Article article, List<MultipartFile> imageFiles) throws IOException {
+        Article findArticle = articleRepository.findById(articleId);
+
+        findArticle.applyPatch(article);
+        findArticle.setArticleImages(imageService.uploadImages(article, imageFiles));
+
+        return articleRepository.save(findArticle);
     }
 
 

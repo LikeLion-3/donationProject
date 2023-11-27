@@ -49,4 +49,10 @@ public class Article extends BaseEntity {
     public void setArticleImages(List<Image> articleImages) {
         this.articleImages = articleImages;
     }
+
+    public void applyPatch(Article article) {
+            this.title = article.getTitle();
+            this.content = article.getContent();
+    }
+
 }

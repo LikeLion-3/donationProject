@@ -2,7 +2,6 @@ package com.myapp.warmwave.domain.article.controller;
 
 
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
-import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.service.ArticleService;
@@ -33,15 +32,27 @@ public class ArticleController {
     public ResponseEntity postArticle(@Validated @RequestPart ArticlePostDto dto,
                                       @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
-        Article article = articleService.create(dto, imageFiles);
+        Article article = articleService.createArticle(articleMapper.articlePostDtoToArticle(dto)
+                ,imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
-    @GetMapping("/{article-id}")
-    public ResponseEntity getArticle(@PathVariable("article-id") long articleId) {
+    @GetMapping("/{articleId}")
+    public ResponseEntity getArticle(@PathVariable("articleId") long articleId) {
 
         Article article = articleService.getArticleByArticleId(articleId);
+
+        return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
+    }
+
+    @PatchMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity patchArticle(@PathVariable("articleId") Long articleId,
+                                       @RequestPart ArticlePostDto dto,
+                                       @RequestPart List<MultipartFile> imageFiles) throws IOException {
+
+        Article article = articleService.updateArticle(articleId
+                ,articleMapper.articlePostDtoToArticle(dto), imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
