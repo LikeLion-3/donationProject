@@ -1,6 +1,8 @@
 package com.myapp.warmwave.domain.article.service;
 
+import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
+    private final ArticleMapper articleMapper;
     private final ImageService imageService;
 
-    public Article createArticle(Article article, List<MultipartFile> imageFiles) throws IOException {
+    public Article createArticle(ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
 
+        Article article = articleMapper.articlePostDtoToArticle(dto);
         //추후 세터를 삭제하는 방향을 생각해보아야함
         article.setArticleImages(imageService.uploadImages(article, imageFiles));
 
@@ -38,7 +42,8 @@ public class ArticleService {
         return articleRepository.findAll(pageRequest);
     }
 
-    public Article updateArticle(long articleId, Article article, List<MultipartFile> imageFiles) throws IOException {
+    public Article updateArticle(long articleId, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
+        Article article = articleMapper.articlePostDtoToArticle(dto);
         Article findArticle = articleRepository.findById(articleId);
 
         findArticle.applyPatch(article);

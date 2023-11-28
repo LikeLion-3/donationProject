@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/article")
+@RequestMapping("/api/article")
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;
@@ -31,8 +31,7 @@ public class ArticleController {
     public ResponseEntity postArticle(@Validated @RequestPart ArticlePostDto dto,
                                       @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
-        Article article = articleService.createArticle(articleMapper.articlePostDtoToArticle(dto)
-                , imageFiles);
+        Article article = articleService.createArticle(dto, imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
@@ -50,6 +49,7 @@ public class ArticleController {
                                                         @Positive @RequestParam("size") int size) {
 
         Page<Article> articles = articleService.getAllArticles(page, size);
+
         return ResponseEntity.ok(articles);
     }
 
@@ -58,8 +58,7 @@ public class ArticleController {
                                        @RequestPart ArticlePostDto dto,
                                        @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
-        Article article = articleService.updateArticle(articleId
-                , articleMapper.articlePostDtoToArticle(dto), imageFiles);
+        Article article = articleService.updateArticle(articleId, dto, imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
