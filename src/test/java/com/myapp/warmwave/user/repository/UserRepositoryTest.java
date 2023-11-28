@@ -4,11 +4,8 @@ import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.repository.AddressRepository;
-import com.myapp.warmwave.domain.image.entity.Image;
-import com.myapp.warmwave.domain.image.repository.ImageRepository;
-import com.myapp.warmwave.domain.temperture.entity.Temperature;
-import com.myapp.warmwave.domain.temperture.repository.TemperatureRepository;
 import com.myapp.warmwave.domain.user.entity.Institution;
+import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,20 +25,12 @@ import static org.assertj.core.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository<User> userRepository;
 
     @Autowired
     private AddressRepository addressRepository;
 
-    @Autowired
-    private ImageRepository imageRepository;
-
-    @Autowired
-    private TemperatureRepository temperatureRepository;
-
     private Address savedAddress;
-    private Image savedImage;
-    private Temperature savedTemperature;
 
     private Institution institution() {
         return Institution.builder()
@@ -51,11 +39,11 @@ public class UserRepositoryTest {
                 .password("1234")
                 .role(Role.INSTITUTION)
                 .address(savedAddress)
-                .profileImg(savedImage)
+                .temperature(0F)
+                .profileImg("이미지1")
                 .isApprove(false)
                 .institutionName("기관1")
                 .registerNum("123456789")
-                .temperature(savedTemperature)
                 .build();
     }
 
@@ -69,18 +57,6 @@ public class UserRepositoryTest {
                 .sggName("강남구")
                 .fullAddr("서울 강남구 삼성동")
                 .build());
-
-        savedImage = imageRepository.save(Image.builder()
-                .id(1L)
-                .createdAt(LocalDateTime.now())
-                .imgName("이미지1")
-                .imgUrl("이미지주소1")
-                .build());
-
-        savedTemperature = temperatureRepository.save(Temperature.builder()
-                .id(1L)
-                .celsius(36.5)
-                .build());
     }
 
     @DisplayName("기관 사용자 회원가입")
@@ -90,10 +66,13 @@ public class UserRepositoryTest {
         Institution user = institution();
 
         // when
-        Institution savedUser = (Institution) userRepository.save(user);
+        Institution savedUser = userRepository.save(user);
 
         // then
-        assertThat(savedUser).isEqualTo(user);
+        assertThat(user).isEqualTo(savedUser);
+        assertThat(user.getEmail()).isEqualTo(savedUser.getEmail());
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(userRepository.count()).isEqualTo(1);
     }
 
     @DisplayName("기관 사용자 조회 (전체)")
@@ -103,13 +82,17 @@ public class UserRepositoryTest {
         userRepository.save(institution());
 
         // when
-        List<Institution> institutionList = userRepository.findAll();
+        List<Institution> institutionList = userRepository.findAll()
+                .stream()
+                .filter(user -> user instanceof Institution)
+                .map(user -> (Institution) user)
+                .toList();
 
         // then
         assertThat(institutionList.size()).isEqualTo(1);
     }
 
-    @DisplayName("기관 사용자 조회 (승인 O)")
+    @DisplayName("기관 사용자 전체 조회 (승인 O)")
     @Test
     void findUserByIsApproveTrue() {
         // given
@@ -125,7 +108,7 @@ public class UserRepositoryTest {
         assertThat(institutionList.size()).isEqualTo(1);
     }
 
-    @DisplayName("기관 사용자 조회 (승인 X)")
+    @DisplayName("기관 사용자 전체 조회 (승인 X)")
     @Test
     void findUserByIsApproveFalse() {
         // given
@@ -138,6 +121,38 @@ public class UserRepositoryTest {
         assertThat(institutionList.size()).isEqualTo(1);
     }
 
+    @DisplayName("기관 사용자 단일 조회 (존재 O -> 승인 O)")
+    @Test
+    void findUserApprove() {
+        // given
+        Institution user = institution();
+        user.approve();
+        Institution savedUser = userRepository.save(user);
+
+        // when
+        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail());
+
+        // then
+        assertThat(foundUser).isPresent();
+        assertThat(foundUser.get()).isEqualTo(savedUser);
+        assertThat(foundUser.get().getIsApprove()).isTrue();
+    }
+
+    @DisplayName("기관 사용자 단일 조회 (존재 O -> 승인 X)")
+    @Test
+    void findUserNotApprove() {
+        // given
+        Institution savedUser = userRepository.save(institution());
+
+        // when
+        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail());
+
+        // then
+        assertThat(foundUser).isPresent();
+        assertThat(foundUser.get()).isEqualTo(savedUser);
+        assertThat(foundUser.get().getIsApprove()).isFalse();
+    }
+
     @DisplayName("기관 사용자 가입 승인")
     @Test
     void approveUser() {
@@ -146,42 +161,44 @@ public class UserRepositoryTest {
 
         // when
         savedUser.approve();
-        userRepository.save(savedUser);
+        Institution foundUser = userRepository.save(savedUser);
 
         // then
-        assertThat(savedUser.getIsApprove()).isTrue();
+        assertThat(foundUser.getIsApprove()).isTrue();
     }
 
     @DisplayName("기관 사용자 정보 수정")
     @Test
     void updateUserInfo() {
         // given
-        Institution savedUser = institution();
+        Institution savedUser = userRepository.save(institution());
 
         // when
-        savedAddress.update("서울 강남구 OO동", "서울", "강남구", "상세주소2");
-        addressRepository.save(savedAddress);
-        savedImage.update("이미지2", "이미지주소2");
-        imageRepository.save(savedImage);
+        String originalPassword = savedUser.getPassword();
+        String originalFullAddress = savedUser.getAddress().getFullAddr();
 
-        savedUser.updateUserInfo("12345", savedAddress, savedImage);
-        userRepository.save(savedUser);
+        savedUser.getAddress().update("서울 강남구 OO동", "서울", "강남구", "상세주소2");
+        savedUser.updateUserInfo("12345", addressRepository.save(savedUser.getAddress()));
+
+        Institution updatedUser = userRepository.save(savedUser);
 
         // then
-        assertThat(savedUser).isNotEqualTo(institution());
+        assertThat(updatedUser.getPassword()).isNotEqualTo(originalPassword);
+        assertThat(updatedUser.getAddress().getFullAddr()).isNotEqualTo(originalFullAddress);
     }
 
     @DisplayName("기관 사용자 정보 삭제")
     @Test
     void deleteUser() {
         // given
-        Institution user = (Institution) userRepository.save(institution());
+        Institution savedUser = userRepository.save(institution());
 
         // when
-        userRepository.delete(user);
+        userRepository.delete(savedUser);
+
+        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail());
 
         // then
-        Optional<Institution> optionalInstitution = userRepository.findById(user.getId());
-        assertThat(optionalInstitution).isEmpty();
+        assertThat(foundUser).isEmpty();
     }
 }

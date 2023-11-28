@@ -6,8 +6,6 @@ import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.chat.entity.ChatMessage;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
-import com.myapp.warmwave.domain.image.entity.Image;
-import com.myapp.warmwave.domain.temperture.entity.Temperature;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -35,17 +33,13 @@ public abstract class User extends BaseEntity {
 
     private Role role;
 
+    private String profileImg;
+
+    private Float temperature = 0F;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID")
     private Address address;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PROFILE_IMAGE_ID")
-    private Image profileImg;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEMPERATURE_ID")
-    private Temperature temperature;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Article> articles = new ArrayList<>();
@@ -56,9 +50,9 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "individualUser", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<FavoriteInst> favoriteList = new ArrayList<>();
 
-    public void updateUserInfo(String password, Address address, Image profileImg) {
+    public void updateUserInfo(String password, Address address) {
         this.password = password;
         this.address = address;
-        this.profileImg = profileImg;
+//        this.profileImg = profileImg;
     }
 }
