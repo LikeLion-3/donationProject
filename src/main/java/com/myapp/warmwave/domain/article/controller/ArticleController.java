@@ -5,7 +5,10 @@ import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.service.ArticleService;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,25 +18,21 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
+@Validated
 @RestController
 @RequestMapping("/article")
-@Validated
-@Slf4j
+@RequiredArgsConstructor
 public class ArticleController {
-    private ArticleService articleService;
-    private ArticleMapper articleMapper;
-
-    public ArticleController(ArticleService articleService, ArticleMapper articleMapper) {
-        this.articleService = articleService;
-        this.articleMapper = articleMapper;
-    }
+    private final ArticleService articleService;
+    private final ArticleMapper articleMapper;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity postArticle(@Validated @RequestPart ArticlePostDto dto,
                                       @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
         Article article = articleService.createArticle(articleMapper.articlePostDtoToArticle(dto)
-                ,imageFiles);
+                , imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
@@ -46,13 +45,21 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
+    @GetMapping
+    public ResponseEntity<Page<Article>> getAllArticles(@Positive @RequestParam("page") int page,
+                                                        @Positive @RequestParam("size") int size) {
+
+        Page<Article> articles = articleService.getAllArticles(page, size);
+        return ResponseEntity.ok(articles);
+    }
+
     @PatchMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity patchArticle(@PathVariable("articleId") Long articleId,
                                        @RequestPart ArticlePostDto dto,
                                        @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
         Article article = articleService.updateArticle(articleId
-                ,articleMapper.articlePostDtoToArticle(dto), imageFiles);
+                , articleMapper.articlePostDtoToArticle(dto), imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }

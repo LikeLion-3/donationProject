@@ -3,24 +3,22 @@ package com.myapp.warmwave.domain.article.service;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.image.service.ImageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
-@Service
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ImageService imageService;
-
-    public ArticleService (ArticleRepository articleRepository,
-                           ImageService imageService) {
-        this.articleRepository = articleRepository;
-        this.imageService = imageService;
-    }
 
     public Article createArticle(Article article, List<MultipartFile> imageFiles) throws IOException {
 
@@ -32,6 +30,12 @@ public class ArticleService {
 
     public Article getArticleByArticleId(long articleId) {
         return articleRepository.findById(articleId);
+    }
+
+    public Page<Article> getAllArticles(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+
+        return articleRepository.findAll(pageRequest);
     }
 
     public Article updateArticle(long articleId, Article article, List<MultipartFile> imageFiles) throws IOException {
