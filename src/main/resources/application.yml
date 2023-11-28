@@ -6,7 +6,7 @@ spring:
     include: secret
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
   devtools:
@@ -22,6 +22,6 @@ kakao:
 
 image:
   upload:
-    path: /Users/wook/upload/article-images
+    path: src/main/upload/article-images
 
 
