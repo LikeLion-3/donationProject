@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
     // 공통
-    Boolean existByEmail(String email);
+    Boolean existsByEmail(String email);
 
     // 개인
 

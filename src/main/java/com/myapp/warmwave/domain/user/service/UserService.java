@@ -29,7 +29,7 @@ public class UserService {
     // 기관 회원가입
     @Transactional
     public Long joinInstitution(RequestInstitutionJoinDto dto) {
-        if (userRepository.existByEmail(dto.getEmail())) throw new IllegalArgumentException("이미 존재하는 회원");
+        if (userRepository.existsByEmail(dto.getEmail())) throw new IllegalArgumentException("이미 존재하는 회원");
 
         Optional<Address> address = addressService.findAddress(dto.getFullAddr());
 
