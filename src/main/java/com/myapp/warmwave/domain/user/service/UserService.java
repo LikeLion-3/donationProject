@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,13 +29,15 @@ public class UserService {
     // 기관 회원가입
     @Transactional
     public Long joinInstitution(RequestInstitutionJoinDto dto) {
-        Address address = addressService.findAddress(dto.getFullAddr());
+        if (userRepository.existByEmail(dto.getEmail())) throw new IllegalArgumentException("이미 존재하는 회원");
 
-        if (address == null) {
-            address = addressService.createAddress(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails());
+        Optional<Address> address = addressService.findAddress(dto.getFullAddr());
+
+        if (address.isEmpty()) {
+            address = Optional.of(addressService.createAddress(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails()));
         }
 
-        Institution institution = dto.toEntity(passwordEncoder, address);
+        Institution institution = dto.toEntity(passwordEncoder, address.get());
 
         return userRepository.save(institution).getId();
     }
@@ -45,7 +47,7 @@ public class UserService {
         return userRepository.findAllByIsApproveFalse()
                 .stream()
                 .map(ResponseUserDto::FromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 승인한 기관 회원 조회
@@ -53,7 +55,7 @@ public class UserService {
         return userRepository.findAllByIsApproveTrue()
                 .stream()
                 .map(ResponseUserDto::FromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 기관 단일 조회 -> 승인한 기관만 조회 가능
@@ -67,19 +69,20 @@ public class UserService {
     public List<ResponseUserDto> findAllByRoleInstitution() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> (Institution) user)
+                .map(Institution.class::cast)
 //                .filter(Institution::getIsApprove) -> 승인 여부에 따라 다른데 우선 전체로 기준 잡고 조회함.
                 .map(ResponseUserDto::FromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 기관 회원 정보 수정
     @Transactional
     public Long updateInfo(RequestInstitutionUpdateDto dto, Long userId) {
-        Address address = addressService.findAddress(dto.getFullAddr());
+        Address address = addressService.findAddress(dto.getFullAddr())
+                .orElseThrow(() -> new IllegalArgumentException("주소 검색 오류"));
 
         Institution savedInstitution = userRepository.findById(userId)
-                .map(user -> (Institution) user)
+                .map(Institution.class::cast)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
 
         addressService.updateAddress(dto, savedInstitution);
@@ -92,7 +95,7 @@ public class UserService {
     @Transactional
     public void changeStatus(Long userId) {
         Institution savedUser = userRepository.findById(userId)
-                .map(user -> (Institution) user)
+                .map(Institution.class::cast)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
 
         savedUser.approve();

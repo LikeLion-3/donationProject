@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,9 +28,8 @@ public class AddressService {
         return addressRepository.save(address);
     }
 
-    public Address findAddress(String fullAddr) {
-        return addressRepository.findByFullAddr(fullAddr)
-                .orElseThrow(() -> new IllegalArgumentException("주소 검색 오류"));
+    public Optional<Address> findAddress(String fullAddr) {
+        return addressRepository.findByFullAddr(fullAddr);
     }
 
     public void updateAddress(RequestInstitutionUpdateDto dto, Institution institution) {
