@@ -6,7 +6,7 @@ spring:
     include: secret
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
   devtools:
