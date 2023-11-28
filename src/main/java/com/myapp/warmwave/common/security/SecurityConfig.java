@@ -25,7 +25,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .securityMatcher("/api/**")
+                .securityMatcher("/api")
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers("/", "/login/**", "/register/**").permitAll()
