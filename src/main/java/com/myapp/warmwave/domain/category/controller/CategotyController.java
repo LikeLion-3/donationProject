@@ -5,6 +5,7 @@ import com.myapp.warmwave.domain.category.dto.CategoryDto;
 import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/category")
+@RequiredArgsConstructor
 @Validated
 @Slf4j
 public class CategotyController {
-    private CategoryService categoryService;
-
-    public CategotyController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
+    private final CategoryService categoryService;
 
     @PostMapping
     public ResponseEntity postCategory(@RequestBody CategoryDto dto) {
@@ -38,7 +36,7 @@ public class CategotyController {
     }
 
     @PostMapping("/init")
-    public ResponseEntity postAllCategory(@RequestBody @Valid CategoryAllPostDto categoryAllPostDto){
+    public ResponseEntity postAllCategory(@RequestBody @Valid CategoryAllPostDto categoryAllPostDto) {
         List<Category> categories = categoryService.createAllCategory(categoryAllPostDto);
         return new ResponseEntity(categories, HttpStatus.CREATED);
     }
