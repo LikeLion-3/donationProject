@@ -19,6 +19,4 @@ public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
     List<Institution> findAllByIsApproveFalse();
 
     Optional<Institution> findByEmail(String email);
-
-    Optional<Institution> findByIdAndIsApproveTrue(Long userId);
 }

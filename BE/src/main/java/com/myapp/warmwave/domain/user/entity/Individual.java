@@ -11,9 +11,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @DiscriminatorValue("individual")
 public class Individual extends User {
-    @Id
-    @GeneratedValue
-    private Long id;
-
     private String nickname;
 }

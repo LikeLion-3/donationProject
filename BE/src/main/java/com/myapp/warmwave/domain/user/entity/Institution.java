@@ -11,10 +11,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @DiscriminatorValue("institution")
 public class Institution extends User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(unique = true)
     private String institutionName;
 

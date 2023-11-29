@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.address.service;
 
+import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.repository.AddressRepository;
 import com.myapp.warmwave.domain.user.dto.RequestInstitutionUpdateDto;
@@ -23,6 +24,7 @@ public class AddressService {
                 .sdName(sdName)
                 .sggName(sggName)
                 .details(details)
+                .userType(Role.INSTITUTION)
                 .build();
 
         return addressRepository.save(address);

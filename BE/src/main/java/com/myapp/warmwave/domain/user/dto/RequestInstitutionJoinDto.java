@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.user.dto;
 
+import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.service.UserService;
@@ -39,8 +40,12 @@ public class RequestInstitutionJoinDto {
                 .email(getEmail())
                 .password(passwordEncoder.encode(getPassword()))
                 .registerNum(getRegisterNum())
+                .institutionName(getInstitutionName())
                 .address(address)
+                .temperature(0F)
                 .profileImg(UserService.DEFAULT_PROFILE_IMG_INST)
+                .role(Role.INSTITUTION)
+                .isApprove(Boolean.FALSE)
                 .build();
     }
 }

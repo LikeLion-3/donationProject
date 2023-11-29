@@ -35,7 +35,7 @@ public abstract class User extends BaseEntity {
 
     private String profileImg;
 
-    private Float temperature = 0F;
+    private Float temperature;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID")
