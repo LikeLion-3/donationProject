@@ -7,7 +7,10 @@ import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.chat.entity.ChatMessage;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
