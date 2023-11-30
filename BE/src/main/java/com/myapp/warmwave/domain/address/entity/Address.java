@@ -26,6 +26,7 @@ public class Address {
     // 상세주소
     private String details;
 
+    @Enumerated(EnumType.STRING)
     private Role userType;
 
     public void update(String fullAddr, String sdName, String sggName, String details) {

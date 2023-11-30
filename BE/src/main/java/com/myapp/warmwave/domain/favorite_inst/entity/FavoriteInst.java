@@ -1,8 +1,11 @@
 package com.myapp.warmwave.domain.favorite_inst.entity;
 
-import com.myapp.warmwave.domain.user.entity.User;
+import com.myapp.warmwave.domain.user.entity.Individual;
+import com.myapp.warmwave.domain.user.entity.Institution;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -17,9 +20,11 @@ public class FavoriteInst {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INDIVIDUAL_USER_ID")
-    private User individualUser;
+    private Individual individualUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INSTITUTION_USER_ID")
-    private User institutionUser;
+    private Institution institutionUser;
+
+    private LocalDateTime createdAt;
 }

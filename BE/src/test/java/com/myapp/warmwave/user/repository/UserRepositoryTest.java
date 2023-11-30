@@ -130,7 +130,8 @@ public class UserRepositoryTest {
         Institution savedUser = userRepository.save(user);
 
         // when
-        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail());
+        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail())
+                .map(Institution.class::cast);
 
         // then
         assertThat(foundUser).isPresent();
@@ -145,7 +146,8 @@ public class UserRepositoryTest {
         Institution savedUser = userRepository.save(institution());
 
         // when
-        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail());
+        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail())
+                .map(Institution.class::cast);
 
         // then
         assertThat(foundUser).isPresent();
@@ -196,7 +198,8 @@ public class UserRepositoryTest {
         // when
         userRepository.delete(savedUser);
 
-        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail());
+        Optional<Institution> foundUser = userRepository.findByEmail(savedUser.getEmail())
+                .map(Institution.class::cast);
 
         // then
         assertThat(foundUser).isEmpty();

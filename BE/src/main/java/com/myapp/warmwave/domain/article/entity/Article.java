@@ -26,9 +26,11 @@ public class Article extends BaseEntity {
     private String content;
 
     //기부해요, 기부할래요, 인증할래요
+    @Enumerated(EnumType.STRING)
     private Type articleType;
 
     //게시글 상태(기본, 진행중, 완료)
+    @Enumerated(EnumType.STRING)
     private Status articleStatus;
 
     //기부물품 카테고리
