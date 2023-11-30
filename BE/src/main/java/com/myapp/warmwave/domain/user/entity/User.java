@@ -39,11 +39,11 @@ public abstract class User extends BaseEntity {
 
     private Float temperature;
 
-//    private Boolean emailAuth;  // 이메일 인증 여부(회원가입 후 진행)
+    private Boolean emailAuth;  // 이메일 인증 여부(회원가입 후 진행)
 
-//    public void emailVerified() {
-//        this.emailAuth = true;
-//    }
+    public void emailVerified() {
+        this.emailAuth = true;
+    }
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID")
