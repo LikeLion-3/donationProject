@@ -1,6 +1,5 @@
-package com.myapp.warmwave.common.security.service;
+package com.myapp.warmwave.config.oauth.service;
 
-import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<Institution> optUser = userRepository.findByEmail(email);
+        Optional<User> optUser = userRepository.findByEmail(email);
         User user = optUser.orElseThrow(() -> new UsernameNotFoundException(email));
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getGrantedAuthorities());
     }
