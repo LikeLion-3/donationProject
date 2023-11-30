@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.user.controller;
 
+import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.service.UserService;
 import jakarta.validation.Valid;
@@ -20,15 +21,29 @@ public class UserController {
 
     // 기관회원가입
     @PostMapping("/register/institution")
-    public ResponseEntity<Long> register(@RequestBody RequestInstitutionJoinDto dto) {
+    public ResponseEntity<ResponseUserJoinDto> register(@RequestBody RequestInstitutionJoinDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.joinInstitution(dto));
     }
 
     // 개인회원가입
     @PostMapping("/register/individual")
-    public ResponseEntity<Long> signup(@Valid @RequestBody RequestIndividualJoinDto dto) {
+    public ResponseEntity<ResponseUserJoinDto> signup(@Valid @RequestBody RequestIndividualJoinDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.joinIndividual(dto));
     }
+
+    // 이메일 인증
+    @GetMapping("/confirm-email")   //인증 URL이 담긴 이메일을 전송받은 사용자가 URL 클릭 시 해당 URI로 매핑
+    public ResponseEntity<String> confirmEmail(@ModelAttribute RequestEmailAuthDto requestDto) {
+        userService.confirmEmail(requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body("인증이 완료되었습니다.");
+    }
+
+//    // 일반 로그인
+//    @PostMapping("/login")
+//    public ResponseEntity<ResponseUserLoginDto> login(@RequestBody RequestUserLoginDto requestDto) {
+//        ResponseUserLoginDto responseDto = userService.loginUser(requestDto);
+//        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+//    }
 
     // 전체 기관 회원 조회
     @GetMapping("/institution")
