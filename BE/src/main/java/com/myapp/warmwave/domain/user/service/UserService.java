@@ -1,21 +1,31 @@
 package com.myapp.warmwave.domain.user.service;
 
 import com.myapp.warmwave.common.Role;
+import com.myapp.warmwave.common.exception.CustomException;
+import com.myapp.warmwave.common.exception.CustomExceptionCode;
+import com.myapp.warmwave.common.jwt.JwtProvider;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.service.AddressService;
+import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
+import com.myapp.warmwave.domain.email.entity.EmailAuth;
+import com.myapp.warmwave.domain.email.repository.EmailAuthRepository;
+import com.myapp.warmwave.domain.email.service.EmailService;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.IndividualRepository;
+import com.myapp.warmwave.domain.user.repository.InstitutionRepository;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +33,23 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository<User> userRepository;
     private final IndividualRepository individualRepository;
+    private final InstitutionRepository institutionRepository;
+    private final EmailAuthRepository emailAuthRepository;
     private final AddressService addressService;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public static final String DEFAULT_PROFILE_IMG_INST = "/static/profile/default_inst.jpg";
-
+    public static final String DEFAULT_PROFILE_IMG_INDI = "/static/profile/default_indi.jpg";
 
     // 기관 회원가입
     @Transactional
-    public Long joinInstitution(RequestInstitutionJoinDto dto) {
-        if (Boolean.TRUE.equals(userRepository.existsByEmail(dto.getEmail()))) throw new IllegalArgumentException("이미 존재하는 회원");
+    public ResponseUserJoinDto joinInstitution(RequestInstitutionJoinDto dto) {
+
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new CustomException(CustomExceptionCode.ALREADY_EXIST_USER);
+        }
 
         Optional<Address> address = addressService.findAddress(dto.getFullAddr());
 
@@ -40,27 +57,86 @@ public class UserService {
             address = Optional.of(addressService.createAddress(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails()));
         }
 
-        Institution institution = dto.toEntity(passwordEncoder, address.get());
+        // 이메일 인증 로직 추가
+        EmailAuth emailAuth = emailAuthRepository.save(
+                EmailAuth.builder()
+                        .email(dto.getEmail())
+                        .authToken(UUID.randomUUID().toString())
+                        .expired(false)
+                        .build());
 
-        return userRepository.save(institution).getId();
+        Institution institution = dto.toEntity(passwordEncoder, address.get());
+        userRepository.save(institution);
+
+        emailService.send(emailAuth.getEmail(), emailAuth.getAuthToken());
+        return ResponseUserJoinDto.builder()
+                .id(institution.getId())
+                .email(institution.getEmail())
+                .authToken(emailAuth.getAuthToken())
+                .build();
     }
 
     // 개인 회원가입
     @Transactional
-    public Long joinIndividual(RequestIndividualJoinDto dto) {
+    public ResponseUserJoinDto joinIndividual(RequestIndividualJoinDto dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException(("이미 존재하는 회원"));
+            throw new CustomException(CustomExceptionCode.ALREADY_EXIST_USER);
         }
 
-        Individual individual = Individual.builder()
-                .email(dto.getEmail())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .nickname(dto.getNickname())
-                .address(addressService.createAddress(dto.getFullAddr(),dto.getSdName(),dto.getSggName(), dto.getDetails()))
-                .role(Role.INDIVIDUAL)
+        EmailAuth emailAuth = emailAuthRepository.save(
+                EmailAuth.builder()
+                        .email(dto.getEmail())
+                        .authToken(UUID.randomUUID().toString())
+                        .expired(false)
+                        .build());
+
+        Individual individual = individualRepository.save(
+                Individual.builder()
+                        .email(dto.getEmail())
+                        .password(passwordEncoder.encode(dto.getPassword()))
+                        .nickname(dto.getNickname())
+                        .address(addressService.createAddress(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails()))
+                        .temperature(0F)
+                        .profileImg(UserService.DEFAULT_PROFILE_IMG_INDI)
+                        .role(Role.INDIVIDUAL)
+                        .emailAuth(false)
+                        .build());
+
+        emailService.send(emailAuth.getEmail(), emailAuth.getAuthToken());
+        return ResponseUserJoinDto.builder()
+                .id(individual.getId())
+                .email(individual.getEmail())
+                .authToken(emailAuth.getAuthToken())
                 .build();
-        return userRepository.save(individual).getId();
     }
+
+    // 이메일 인증 성공
+    @Transactional
+    public void confirmEmail(RequestEmailAuthDto requestDto) {
+        EmailAuth emailAuth = emailAuthRepository
+                .findValidAuthByEmail(requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now())
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.INVALID_JNT));
+
+        User user = userRepository
+                .findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.NOT_FOUND_USER));
+
+        emailAuth.usedToken();
+        user.emailVerified();
+    }
+
+    // 로그인
+//    @Transactional
+//    public ResponseUserLoginDto loginUser(RequestUserLoginDto requestDto) {
+//        User user = userRepository.findByEmail(requestDto.getEmail())
+//                .orElseThrow(() -> new CustomException(CustomExceptionCode.USER_NOT_MATCH));
+//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword()))
+//            throw new CustomException(CustomExceptionCode.PASSWORD_NOT_MATCH);
+//        if (!user.getEmailAuth())
+//            throw new CustomException(CustomExceptionCode.EXPIRED_JWT);
+//        user.updateRefreshToken(jwtProvider.createRefreshToken());
+//        return new ResponseUserLoginDto(user.getId(), jwtProvider.genToken(requestDto.getEmail()), user.getRefreshToken());
+//    }
 
     // 승인하지 않은 기관 회원 조회
     public List<ResponseUserDto> findAllByIsApproveFalse() {
