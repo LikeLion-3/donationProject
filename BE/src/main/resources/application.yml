@@ -15,6 +15,17 @@ spring:
       enabled: true
     restart:
       enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_ADDRESS}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
 
 kakao:
   rest:
