@@ -1,37 +1,37 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-function Banner() {
-    const [activeBanner, setActiveBanner] = useState("banner1");
-    const [progress, setProgress] = useState(0);
+function Top() {
+    const [bannerTimer, setBannerTimer] = useState(null);
 
-    const handleBannerChange = (bannerId) => {
-        setActiveBanner(bannerId);
-    };
+    let current = 0;
+    const bannerSwitcher = () => {
+        current++;
+        console.log(current);
 
-    const autoChangeBanner = () => {
-        const bannerIds = ["banner1", "banner2", "banner3", "banner4"];
-        const currentIndex = bannerIds.indexOf(activeBanner);
-        const nextIndex = (currentIndex + 1) % bannerIds.length;
-        const nextBanner = bannerIds[nextIndex];
-        handleBannerChange(nextBanner);
+        const nextInput = document.querySelector(`#banner${current + 1}`);
+        if (nextInput) {
+            nextInput.checked = true;
+        } else {
+            window.document.querySelector('#banner1').checked = true;
+            current=0;
+        }
     };
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            autoChangeBanner();
-        }, 5000);
+        const timer = setInterval(bannerSwitcher, 5000);
 
-        return () => clearInterval(intervalId);
-    }, [activeBanner]);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setProgress((prevProgress) => (prevProgress + 1) % 101);
-        }, 50);
-
-        return () => clearInterval(intervalId);
+        return () => clearInterval(timer);
     }, []);
+
+    const handleControlClick = (bannerNumber) => {
+        
+        current = bannerNumber;
+        console.log("**", current, bannerNumber);
+        clearInterval(bannerTimer);
+        const newBannerTimer = setInterval(bannerSwitcher, 5000);
+        setBannerTimer(newBannerTimer);
+    };
 
     return (
         < section id="section-1" >
@@ -44,10 +44,11 @@ function Banner() {
                     <div id="top-banner-1" className="banner">
                         <div className="banner-inner-wrapper header-text">
                             <div className="main-caption">
-                                <h2>Take a Glimpse Into The Beautiful Country Of:</h2>
-                                <h1>Caribbean</h1>
-                                <div className="border-button"><Link to="about.html">Go There</Link></div>
+                                <h2>누군가에게 도움을 주고 싶으신가요?</h2>
+                                <h1>WarmWave에서 기부 한번 어떠세요?</h1>
+                                <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
+                            {/* 이 부분 어떻게 처리할지 생각 -> 통계 자료 보여주는 용도? 일단은 킵 */}
                             <div className="container">
                                 <div className="row">
                                     <div className="col-lg-12">
@@ -80,9 +81,9 @@ function Banner() {
                     <div id="top-banner-2" className="banner">
                         <div className="banner-inner-wrapper header-text">
                             <div className="main-caption">
-                                <h2>Take a Glimpse Into The Beautiful Country Of:</h2>
-                                <h1>Switzerland</h1>
-                                <div className="border-button"><Link to="about.html">Go There</Link></div>
+                                <h2>기부, 그렇게 어렵지 않아요.</h2>
+                                <h1>쉽고 빠르게 할 수 있는 기부, 해보시겠어요?</h1>
+                                <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
                             <div className="container">
                                 <div className="row">
@@ -116,9 +117,9 @@ function Banner() {
                     <div id="top-banner-3" className="banner">
                         <div className="banner-inner-wrapper header-text">
                             <div className="main-caption">
-                                <h2>Take a Glimpse Into The Beautiful Country Of:</h2>
-                                <h1>France</h1>
-                                <div className="border-button"><Link to="about.html">Go There</Link></div>
+                                <h2>사소한 물건이라도 좋아요.</h2>
+                                <h1>그게 누군가에게는 꼭 필요한 물건일지도 모르니까요.</h1>
+                                <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
                             <div className="container">
                                 <div className="row">
@@ -152,9 +153,9 @@ function Banner() {
                     <div id="top-banner-4" className="banner">
                         <div className="banner-inner-wrapper header-text">
                             <div className="main-caption">
-                                <h2>Take a Glimpse Into The Beautiful Country Of:</h2>
-                                <h1>Thailand</h1>
-                                <div className="border-button"><Link to="about.html">Go There</Link></div>
+                                <h2>혹여 기부한 물품이 제대로 쓰일까 망설이시나요?</h2>
+                                <h1>안심하세요. 인증된 기관만이 우리와 함께하니까요.</h1>
+                                <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
                             <div className="container">
                                 <div className="row">
@@ -188,10 +189,15 @@ function Banner() {
                 </div>
                 <nav>
                     <div className="controls">
-                        <label htmlFor="banner1"><span className="progressbar"><span className="progressbar-fill" style={{ width: `${progress}` }}/></span><span className="text">1</span></label>
-                        <label htmlFor="banner2"><span className="progressbar"><span className="progressbar-fill" style={{ width: `${progress}` }}/></span><span className="text">2</span></label>
-                        <label htmlFor="banner3"><span className="progressbar"><span className="progressbar-fill" style={{ width: `${progress}` }}/></span><span className="text">3</span></label>
-                        <label htmlFor="banner4"><span className="progressbar"><span className="progressbar-fill" style={{ width: `${progress}` }}/></span><span className="text">4</span></label>
+                        {[1, 2, 3, 4].map((bannerNumber) => (
+                            <label key={bannerNumber} htmlFor={`banner${bannerNumber}`}>
+                                <span
+                                    className={`progressbar ${bannerNumber === current ? 'active' : ''}`}>
+                                    <span className="progressbar-fill" />
+                                </span>
+                                <span className="text" onClick={() => handleControlClick(bannerNumber)}>{bannerNumber}</span>
+                            </label>
+                        ))}
                     </div>
                 </nav>
             </div>
@@ -200,4 +206,4 @@ function Banner() {
     )
 }
 
-export default Banner;
+export default Top;
