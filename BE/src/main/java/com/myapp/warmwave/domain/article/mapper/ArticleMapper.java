@@ -24,13 +24,15 @@ public class ArticleMapper {
     public ArticleResponseDto articleToArticleResponseDto(Article article) {
         return ArticleResponseDto.builder()
                 .articleId(article.getId())
-                .writer("작성자") // 멤버 구현 후 리팩토링 필요
+                .writer(article.getUser().getEmail()) // 멤버 구현 후 리팩토링 필요
                 .title(article.getTitle())
                 .content(article.getContent())
-                .articleType(article.getArticleType())
-                .articleStatus(article.getArticleStatus())
+                .prodCategory(article.getProdCategory().toString())
+                .articleType(article.getArticleType().toString())
+                .articleStatus(article.getArticleStatus().toString())
                 .images(article.getArticleImages())
                 .createdAt(article.getCreatedAt())
+                .modifiedAt(article.getModifiedAt())
                 .build();
     }
 }

@@ -2,13 +2,15 @@ import './styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 function ArticleDetails() {
   const [article, setArticle] = useState(null);
+  const params = useParams();
 
   useEffect(() => {
     // 백엔드 API 엔드포인트로부터 데이터를 가져옵니다.
-    axios.get('http://localhost:8080/api/article/8')
+    axios.get(`http://localhost:8080/api/articles/${params.articleId}`)
       .then(response => {
         // 가져온 데이터를 상태에 설정합니다.
         setArticle(response.data);
@@ -16,7 +18,7 @@ function ArticleDetails() {
       .catch(error => {
         console.error('Error fetching article:', error);
       });
-  }, []); // 빈 배열은 한 번만 실행되도록 보장합니다.
+  }, [params]); // 빈 배열은 한 번만 실행되도록 보장합니다.
 
   // createdAt이 유효하면 해당 날짜를 포맷팅합니다.
   const formattedDate = article?.createdAt
@@ -62,7 +64,7 @@ function ArticleDetails() {
               <img
                 className="card-img-top mb-5 mb-md-0"
                 src="https://dummyimage.com/600x700/dee2e6/6c757d.jpg"
-                alt="No Image"
+                alt="true"
                 style={{ maxHeight: '400px', width: '100%', objectFit: 'cover' }}
               />
             )}
@@ -72,12 +74,13 @@ function ArticleDetails() {
               <div className="badge bg-warning text-white me-2" style={{ top: '0.5rem', right: '0.5rem', padding: '0.5rem', fontSize: '1.5rem' }}>
                 {getArticleTypeText(article?.articleType)}
               </div>
-              <p></p>
+              <br/>
               <h1 className="fw-bolder display-5 ms-0.5 text-left" style={{ fontSize: '2rem' }}>{article?.title || '로딩 중...'}</h1>
             </div>
+            <br/>
             <div className="fs-5 mb-3 d-flex justify-content-between">
               <div className="d-flex">
-                <span className="btn btn-outline-dark" disabled style={{ fontSize: '16px' }}>상품태그</span>
+                <span className="btn btn-outline-dark" disabled style={{ fontSize: '16px' }}>{article?.prodCategory}</span>
               </div>
               <div>
                 <span className="me-3" style={{ fontSize: '18px' }}>조회수: 100</span>
@@ -91,7 +94,7 @@ function ArticleDetails() {
             
             <div className="d-flex justify-content-between align-items-center mb-3">
               <p className="mb-4" style={{ fontSize: '20px' }}>
-                <span className="fw-bolder me-2" style={{ fontSize: '20px' }}>기부지역:</span> 서울시 강남구
+                <span className="fw-bolder me-2" style={{ fontSize: '20px' }}>기부지역:</span> 지도로 보여줌
               </p>
               <button className="btn btn-outline-dark" type="button">
                 <i className="bi-cart-fill me-1"></i>

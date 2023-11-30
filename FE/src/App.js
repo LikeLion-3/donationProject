@@ -1,10 +1,12 @@
-import logo from "./logo.svg";
-import "./App.css";
-import { Routes, Route } from "react-router-dom";
-import Preloader from "./component/preloader/Preloader";
-import Nav from "./component/nav/Nav";
-import Home from "./component/main/home/Home";
-import Footer from "./component/footer/Footer";
+import logo from './logo.svg';
+import './App.css';
+import { Routes, Route } from 'react-router-dom';
+import Preloader from './component/preloader/Preloader';
+import Nav from './component/nav/Nav';
+import Home from './component/main/home/Home';
+import Footer from './component/footer/Footer';
+import ArticleList from './component/article/list/ArticleList';
+import ArticleDetails from './component/article/detail/ArticleDetails';
 import ChatMain from "./pages/chatMain";
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
         <Route path="/" element={<Nav />}>
           <Route index element={<Home />} />
           <Route path="/chat" element={<ChatMain />} />
+          <Route path="/donate" element={<ArticleList />} />
+          <Route path="/donate/:articleId" element={<ArticleDetails />} />
         </Route>
       </Routes>
 

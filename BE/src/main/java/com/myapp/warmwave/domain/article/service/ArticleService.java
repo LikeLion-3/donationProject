@@ -1,6 +1,8 @@
 package com.myapp.warmwave.domain.article.service;
 
+import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
+import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
@@ -8,12 +10,15 @@ import com.myapp.warmwave.domain.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 
 @Slf4j
 @Service
@@ -36,15 +41,22 @@ public class ArticleService {
         return articleRepository.findById(articleId);
     }
 
-    public Page<Article> getAllArticles(int page, int size) {
+    public Page<ArticleResponseDto> getAllArticles(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
 
-        return articleRepository.findAll(pageRequest);
+        List<ArticleResponseDto> articleResponseDtoList
+                = articleRepository.findAll(pageRequest)
+                .stream()
+                .map(articleMapper::articleToArticleResponseDto)
+                .toList();
+
+        return new PageImpl<>(articleResponseDtoList);
+
     }
 
-    public Article updateArticle(long articleId, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
+    public Article updateArticle(Long articleId, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
         Article article = articleMapper.articlePostDtoToArticle(dto);
-        Article findArticle = articleRepository.findById(articleId);
+        Article findArticle = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
 
         findArticle.applyPatch(article);
         findArticle.setArticleImages(imageService.uploadImages(findArticle, imageFiles));

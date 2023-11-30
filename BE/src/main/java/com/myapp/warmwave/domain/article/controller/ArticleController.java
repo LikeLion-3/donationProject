@@ -1,7 +1,7 @@
 package com.myapp.warmwave.domain.article.controller;
 
-
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
+import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.service.ArticleService;
@@ -21,15 +21,15 @@ import java.util.List;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/api/article")
+@RequestMapping("/api/articles")
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;
     private final ArticleMapper articleMapper;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity postArticle(@Validated @RequestPart ArticlePostDto dto,
-                                      @RequestPart List<MultipartFile> imageFiles) throws IOException {
+    public ResponseEntity<ArticleResponseDto> postArticle(@Validated @RequestPart ArticlePostDto dto,
+                                                          @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
         Article article = articleService.createArticle(dto, imageFiles);
 
@@ -37,7 +37,7 @@ public class ArticleController {
     }
 
     @GetMapping("/{articleId}")
-    public ResponseEntity getArticle(@PathVariable("articleId") long articleId) {
+    public ResponseEntity<ArticleResponseDto> getArticle(@PathVariable("articleId") Long articleId) {
 
         Article article = articleService.getArticleByArticleId(articleId);
 
@@ -45,16 +45,14 @@ public class ArticleController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Article>> getAllArticles(@Positive @RequestParam("page") int page,
-                                                        @Positive @RequestParam("size") int size) {
+    public ResponseEntity<Page<ArticleResponseDto>> getAllArticles(@Positive @RequestParam("page") Integer page,
+                                                        @Positive @RequestParam("size") Integer size) {
 
-        Page<Article> articles = articleService.getAllArticles(page, size);
-
-        return ResponseEntity.ok(articles);
+        return ResponseEntity.ok(articleService.getAllArticles(page, size));
     }
 
-    @PatchMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity patchArticle(@PathVariable("articleId") Long articleId,
+    @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ArticleResponseDto> patchArticle(@PathVariable("articleId") Long articleId,
                                        @RequestPart ArticlePostDto dto,
                                        @RequestPart List<MultipartFile> imageFiles) throws IOException {
 

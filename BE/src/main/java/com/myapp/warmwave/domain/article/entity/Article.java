@@ -34,6 +34,7 @@ public class Article extends BaseEntity {
     private Status articleStatus;
 
     //기부물품 카테고리
+    @Enumerated(EnumType.STRING)
     private ProductCategory prodCategory;
 
     private String userIp;

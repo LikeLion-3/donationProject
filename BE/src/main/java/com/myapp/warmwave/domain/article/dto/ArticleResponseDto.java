@@ -1,18 +1,17 @@
 package com.myapp.warmwave.domain.article.dto;
 
-import com.myapp.warmwave.domain.article.entity.Status;
-import com.myapp.warmwave.domain.article.entity.Type;
 import com.myapp.warmwave.domain.image.entity.Image;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleResponseDto {
-    private long articleId;
+    private Long articleId;
 
     //추후 멤버객체로 매핑예정
     private String writer;
@@ -21,9 +20,11 @@ public class ArticleResponseDto {
 
     private String content;
 
-    private Type articleType;
+    private String prodCategory;
 
-    private Status articleStatus;
+    private String articleType;
+
+    private String articleStatus;
 
     private List<Image> images;
 
