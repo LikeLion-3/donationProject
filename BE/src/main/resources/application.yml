@@ -6,10 +6,10 @@ spring:
       client:
         registration:
           kakao:
-            scope:
+            scope: account_email
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/api/users/{action}/oauth2/code/{registrationId}"
             client-authentication-method: post
         provider:
           kakao:
@@ -48,5 +48,11 @@ kakao:
 image:
   upload:
     path: src/main/upload/article-images
-
-
+custom:
+  jwt:
+    access:
+      expiration: 1800000 # 30분
+      header: Authorization
+    refresh:
+      expiration: 604800000 #  일주일
+      header: Authorization-refresh
