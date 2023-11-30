@@ -243,7 +243,7 @@ public class UserService {
     }
 
     public User whenSocialLogin(OAuth2User oAuth2User, String userEmail, String providerTypeCode) {
-        Optional<Institution> optUser = userRepository.findByEmail(userEmail);
+        Optional<User> optUser = userRepository.findByEmail(userEmail);
 
         if (optUser.isPresent()) return optUser.get();
 
