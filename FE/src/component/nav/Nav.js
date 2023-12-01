@@ -19,7 +19,7 @@ function Nav() {
                                     <li><NavLink to="/donate">Donate</NavLink></li>
                                     <li><NavLink to="/chat">Chat</NavLink></li>
                                     {/* 로그인 여부에 따라 회원가입 / 로그인 창으로 변경하기 */}
-                                    <li><NavLink to="#">SignUp / SignIn</NavLink></li>
+                                    <li><NavLink to="/signin">SignIn</NavLink></li>
                                 </ul>
                                 <NavLink className="menu-trigger">
                                     <span>Menu</span>
@@ -31,7 +31,7 @@ function Nav() {
                 </div>
             </header>
 
-            <Outlet/>
+            <Outlet />
         </div>
     )
 }
