@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -128,17 +125,25 @@ public class UserService {
     }
 
     // 로그인
-//    @Transactional
-//    public ResponseUserLoginDto loginUser(RequestUserLoginDto requestDto) {
-//        User user = userRepository.findByEmail(requestDto.getEmail())
-//                .orElseThrow(() -> new CustomException(CustomExceptionCode.USER_NOT_MATCH));
-//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword()))
-//            throw new CustomException(CustomExceptionCode.PASSWORD_NOT_MATCH);
-//        if (!user.getEmailAuth())
-//            throw new CustomException(CustomExceptionCode.EXPIRED_JWT);
-//        user.updateRefreshToken(jwtProvider.createRefreshToken());
-//        return new ResponseUserLoginDto(user.getId(), jwtProvider.genToken(requestDto.getEmail()), user.getRefreshToken());
-//    }
+    @Transactional
+    public ResponseUserLoginDto loginUser(RequestUserLoginDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.USER_NOT_MATCH));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword()))
+            throw new CustomException(CustomExceptionCode.PASSWORD_NOT_MATCH);
+
+        if (!user.getEmailAuth())
+            throw new CustomException(CustomExceptionCode.EXPIRED_JWT);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(JwtProvider.EMAIL_CLAIM, user.getEmail());
+
+        String accessToken = jwtProvider.createAccessToken(claims);
+        String refreshToken = jwtProvider.createRefreshToken();
+
+        return new ResponseUserLoginDto(user.getId(), accessToken, refreshToken);
+    }
 
     // 승인하지 않은 기관 회원 조회
     public List<ResponseUserDto> findAllByIsApproveFalse() {
