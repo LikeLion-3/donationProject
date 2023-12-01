@@ -27,7 +27,7 @@ public class JwtProvider {
      */
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
-    private static final String EMAIL_CLAIM = "email";
+    public static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
     private final UserRepository userRepository;
     private SecretKey cachedSecretKey;
