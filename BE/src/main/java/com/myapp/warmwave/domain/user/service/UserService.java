@@ -19,11 +19,13 @@ import com.myapp.warmwave.domain.user.repository.InstitutionRepository;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -238,5 +240,36 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
 
         userRepository.delete(savedUser);
+    }
+
+    public User whenSocialLogin(OAuth2User oAuth2User, String userEmail, String providerTypeCode) {
+        Optional<User> optUser = userRepository.findByEmail(userEmail);
+
+        if (optUser.isPresent()) return optUser.get();
+
+        // optUser가 null 이면 Individual 객체를 생성하고 반환
+
+        String username = "";
+        String email = "";
+
+        switch (providerTypeCode) {
+            case "KAKAO" -> {
+                Map<String, String> oAuth2UserProperties = oAuth2User.getAttribute("properties");
+                Map<String, String> oAuth2UserKakaoAccount = oAuth2User.getAttribute("kakao_account");
+
+                if (oAuth2UserProperties != null) {
+                    username = oAuth2UserProperties.get("nickname");
+                }
+
+                if (oAuth2UserKakaoAccount != null) {
+                    email = oAuth2UserKakaoAccount.get("email");
+                }
+            }
+        }
+        return Individual.builder()
+                .role(Role.INDIVIDUAL)
+                .nickname(username)
+                .email(email)
+                .build();
     }
 }
