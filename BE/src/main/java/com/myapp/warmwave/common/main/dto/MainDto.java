@@ -2,20 +2,12 @@ package com.myapp.warmwave.common.main.dto;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 public class MainDto {
-    private int indivCount;
+    private int indivCount;// 전체 개인회원
 
-    private int instCount;
+    private int instCount;// 기관 전체 개수
 
     // totalArticleCountByTypeDonation;
-    private int totalDonationCount;
-
-    private List<MainInstDto> instDtoList = new ArrayList<>();
-
-    // 최신글 5개
-    private List<MainArticleDto> articleDtoList = new ArrayList<>();
+    private int totalDonationCount; //전체 기부개수
 }

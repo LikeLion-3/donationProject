@@ -12,6 +12,6 @@ public class MainRepositoryImpl implements MainRepository {
 
     @Override
     public MainDto getInfo() {
-        return sm.selectOne("Main_getInfo");
+        return sm.selectOne("Main_getCount");
     }
 }

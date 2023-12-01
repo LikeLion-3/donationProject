@@ -1,6 +1,7 @@
 package com.myapp.warmwave.domain.article.service;
 
 import com.myapp.warmwave.common.exception.CustomException;
+import com.myapp.warmwave.common.main.dto.MainArticleDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
@@ -64,5 +65,7 @@ public class ArticleService {
         return articleRepository.save(findArticle);
     }
 
-
+    public List<MainArticleDto> findTop5OrderByCreatedAt() {
+        return articleRepository.findTop5OrderByCreatedAtDesc();
+    }
 }

@@ -4,10 +4,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Main">
-    <select id="Main_getInfo"  resultType="MainDto" parameterType="Map">
-
+    <select id="Main_getCount" resultType="MainDto">
+        select
+            (
+                select count(*) from tb_user where role='individual'
+            ) as indivCount,
+            (
+                select count(*) from tb_user where role='institution'
+            ) as instCount,
+            (
+                select count(*) from tb_article where type = 'donation'
+            ) as totalDonationCount
     </select>
-
 </mapper>
 
 

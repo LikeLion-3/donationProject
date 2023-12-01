@@ -1,8 +1,14 @@
 package com.myapp.warmwave.common.main.dto;
 
-import lombok.Data;
+import com.myapp.warmwave.domain.article.entity.ProductCategory;
+import com.myapp.warmwave.domain.article.entity.Status;
+import com.myapp.warmwave.domain.article.entity.Type;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MainArticleDto {
     private Long articleId;
 
@@ -10,11 +16,21 @@ public class MainArticleDto {
 
     private String title;
 
-    private String content;
+    private Type type;
 
-    private String type;
+    private Status status;
 
-    private String status;
+    private ProductCategory category;
 
-    private String createdAt;
+    private LocalDateTime createdAt;
+
+    public MainArticleDto(Long articleId, String writer, String title, Type type, Status status, ProductCategory category, LocalDateTime createdAt) {
+        this.articleId = articleId;
+        this.writer = writer;
+        this.title = title;
+        this.type = type;
+        this.status = status;
+        this.category = category;
+        this.createdAt = createdAt;
+    }
 }

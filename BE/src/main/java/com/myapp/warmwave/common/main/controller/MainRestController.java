@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainRestController {
     private final MainService mainService;
 
-//    @GetMapping
-//    public MainDto getInfo() {
-//
-//    }
+    @GetMapping("/count")
+    public MainDto getCount() {
+        return mainService.getInfo();
+    }
 }
