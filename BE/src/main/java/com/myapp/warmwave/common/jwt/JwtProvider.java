@@ -1,6 +1,7 @@
 package com.myapp.warmwave.common.jwt;
 
 import com.myapp.warmwave.common.util.Utils;
+import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -29,7 +30,7 @@ public class JwtProvider {
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     public static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
-    private final UserRepository userRepository;
+    private final UserRepository<User> userRepository;
     private SecretKey cachedSecretKey;
     @Value("${custom.jwt.secretKey}")
     private String secretKeyPlain;
