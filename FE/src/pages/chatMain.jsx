@@ -20,13 +20,10 @@ import {
   MessageList,
 } from "@chatscope/chat-ui-kit-react";
 
-function ChatMain(params) {
+function ChatMain() {
   const [messageInputValue, setMessageInputValue] = useState("");
   const [conversations, setConversations] = useState([]);
-
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
-  const [nickname, setnickname] = useState("");
   const [stompClient, setStompClient] = useState(null);
 
   useEffect(() => {
@@ -39,7 +36,49 @@ function ChatMain(params) {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
+
+    // Connect to WebSocket
+    const socket = new SockJS("http://localhost:9000/ws"); // Adjust the URL based on your server setup
+    const stomp = Stomp.over(socket);
+
+    stomp.connect({}, () => {
+      setStompClient(stomp);
+    });
+
+    return () => {
+      // Disconnect on unmount
+      if (stomp.connected) {
+        stomp.disconnect();
+      }
+    };
   }, []);
+
+  useEffect(() => {
+    // Subscribe to the topic
+    if (stompClient) {
+      stompClient.subscribe("/topic/messages/123", (message) => {
+        // Handle the received message
+        const receivedMessage = JSON.parse(message.body);
+        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      });
+    }
+  }, [stompClient]);
+
+  const sendMessage = () => {
+    if (stompClient) {
+      const roomId = 123; // Replace with your room ID
+      const messageObject = {
+        content: messageInputValue,
+        roomId: roomId,
+      };
+
+      stompClient.send("/app/chat", {}, JSON.stringify(messageObject));
+      setMessageInputValue("");
+    } else {
+      console.error("WebSocket connection not yet established.");
+    }
+  };
+
   return (
     <div>
       <div
@@ -51,7 +90,7 @@ function ChatMain(params) {
         <MainContainer responsive>
           <Sidebar position="left" scrollable={false}>
             <Search placeholder="Search..." />
-            <ConversationList conversations={conversations}>
+            <ConversationList>
               {conversations.map((conversation) => {
                 return (
                   <Conversation key={conversation.id} name={conversation.recipientName} info={` 안녕하세요`}>
@@ -59,13 +98,6 @@ function ChatMain(params) {
                   </Conversation>
                 );
               })}
-
-              {/* <Conversation name="핫팩 기부" lastSenderName="서예린" info="안녕하세요ㅎㅎ" style={{ justifyContent: "start" }}>
-                <Avatar src={require("../assets/images/ram.png")} name="Lilly" status="available" />
-              </Conversation>
-              <Conversation name="목도리 기부" lastSenderName="홍길동" info="안녕하세요!">
-                <Avatar src={require("../assets/images/ram.png")} name="Joe" status="dnd" />
-              </Conversation> */}
             </ConversationList>
           </Sidebar>
 
@@ -81,30 +113,22 @@ function ChatMain(params) {
               </ConversationHeader.Actions>
             </ConversationHeader>
             <MessageList>
-              <Message
-                model={{
-                  message: "안녕하세요 기부 받고 싶습니다",
-                  sentTime: "15 mins ago",
-                  sender: "Zoe",
-                  direction: "incoming",
-                  position: "single",
-                }}
-              >
-                <Avatar src={require("../assets/images/ram.png")} name="Zoe" />
-              </Message>
-
-              <Message
-                model={{
-                  message: "안녕하세요",
-                  sentTime: "15 mins ago",
-                  sender: "Patrik",
-                  direction: "outgoing",
-                  position: "single",
-                }}
-                avatarSpacer
-              />
+              {messages.map((msg, index) => (
+                <Message
+                  key={index}
+                  model={{
+                    message: msg.content,
+                    sentTime: "just now",
+                    sender: msg.sender, // Assuming your message object has a 'sender' property
+                    direction: msg.sender === "current_user" ? "outgoing" : "incoming",
+                    position: "single",
+                  }}
+                >
+                  <Avatar src={require("../assets/images/ram.png")} name={msg.sender} />
+                </Message>
+              ))}
             </MessageList>
-            <MessageInput placeholder="Type message here" value={messageInputValue} onChange={(val) => setMessageInputValue(val)} onSend={() => setMessageInputValue("")} />
+            <MessageInput placeholder="Type message here" value={messageInputValue} onChange={(val) => setMessageInputValue(val)} onSend={() => sendMessage()} />
           </ChatContainer>
         </MainContainer>
       </div>
