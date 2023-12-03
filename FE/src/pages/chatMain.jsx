@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import axios from "axios";
 import Stomp from "stompjs";
@@ -26,6 +26,8 @@ function ChatMain() {
   const [messages, setMessages] = useState([]);
   const [stompClient, setStompClient] = useState(null);
 
+  const stompRef = useRef(null);
+
   useEffect(() => {
     // Fetch data using Axios when the component mounts
     axios
@@ -37,18 +39,22 @@ function ChatMain() {
         console.error("Error fetching data:", error);
       });
 
-    // Connect to WebSocket
-    const socket = new SockJS("http://localhost:9000/ws"); // Adjust the URL based on your server setup
-    const stomp = Stomp.over(socket);
+    // Connect to WebSocket if not already connected
+    if (!stompRef.current) {
+      const socket = new SockJS("http://localhost:9000/ws");
+      const stomp = Stomp.over(socket);
 
-    stomp.connect({}, () => {
-      setStompClient(stomp);
-    });
+      stomp.connect({}, () => {
+        setStompClient(stomp);
+      });
+
+      stompRef.current = stomp; // Store the stomp instance in the ref
+    }
 
     return () => {
       // Disconnect on unmount
-      if (stomp.connected) {
-        stomp.disconnect();
+      if (stompRef.current && stompRef.current.connected) {
+        stompRef.current.disconnect();
       }
     };
   }, []);
