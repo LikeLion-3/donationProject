@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,7 +66,8 @@ public class ArticleService {
         return articleRepository.save(findArticle);
     }
 
-    public List<MainArticleDto> findTop5OrderByCreatedAt() {
-        return articleRepository.findTop5OrderByCreatedAtDesc();
+    public Page<MainArticleDto> findTop5OrderByCreatedAt(int num) {
+        Pageable pageable = PageRequest.of(num, 5);
+        return articleRepository.findTop5OrderByCreatedAtDesc(pageable);
     }
 }

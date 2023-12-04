@@ -62,9 +62,11 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
-    // top5
-    @GetMapping("/top5")
-    public ResponseEntity<List<MainArticleDto>> readTop5() {
-        return ResponseEntity.ok(articleService.findTop5OrderByCreatedAt());
+    // 최신 게시글 5개 조회
+    @GetMapping("/today")
+    public ResponseEntity<Page<MainArticleDto>> readTop5(
+            @RequestParam(value = "num", defaultValue = "0") int pageNum
+    ) {
+        return ResponseEntity.ok(articleService.findTop5OrderByCreatedAt(pageNum));
     }
 }
