@@ -7,13 +7,23 @@ function KakaoMapDefault() {
             center: new kakao.maps.LatLng(37.5069494959122, 127.055596615858), // 지도 중심 좌표
             level: 3
         };
+
         const map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
 
         let markerPosition = new kakao.maps.LatLng(37.5069494959122, 127.055596615858);
 
         let marker = new kakao.maps.Marker({
-            position: markerPosition
+            position: markerPosition,
+            title: '애플트리타워'
         });
+
+        var infowindow = new kakao.maps.InfoWindow({
+            content: '<div style="width:150px;text-align:center;padding:6px 0;color:black;">애플트리타워</div>'
+        });
+
+        infowindow.open(map, marker);
+
+        map.setCenter(markerPosition);
 
         marker.setMap(map);
     })

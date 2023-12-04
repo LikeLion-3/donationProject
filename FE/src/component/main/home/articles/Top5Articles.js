@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 function Top5Articles({ data }) {
-    console.log(data)
     const getArticleTypeText = (type) => {
         switch (type) {
             case 'DONATION':

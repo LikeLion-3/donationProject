@@ -12,7 +12,7 @@ function MiddleArticle() {
             const response = await Axios.get('http://localhost:8080/api/articles/today');
             const fetchedData = response.data;
 
-            if (fetchedData) {
+            if (fetchedData.content.length > 0) {
                 // 데이터가 있다면 Inst 컴포넌트를 표시
                 setHasData(true);
                 setArticleList(fetchedData);
@@ -36,7 +36,7 @@ function MiddleArticle() {
                     <div className="col-lg-5">
                         <div className="section-heading">
                             <h2>최신 기부글</h2>
-                            <p>가장 최근에 등록된 기부글이에요. 이 사람들에게 기부해볼까요?</p>
+                            <p>가장 최근에 등록된 기부글이에요. 해당 기관에게 기부해 보는게 어떨까요?</p>
                         </div>
                     </div>
                 </div>
