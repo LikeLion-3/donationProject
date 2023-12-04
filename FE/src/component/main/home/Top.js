@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import MiddleBar from "./MiddleBar";
+import MiddleBar from "./middle/MiddleBar";
 
 function Top() {
     const [bannerTimer, setBannerTimer] = useState(null);
@@ -8,14 +8,13 @@ function Top() {
     let current = 0;
     const bannerSwitcher = () => {
         current++;
-        console.log(current);
 
         const nextInput = document.querySelector(`#banner${current + 1}`);
         if (nextInput) {
             nextInput.checked = true;
         } else {
             window.document.querySelector('#banner1').checked = true;
-            current=0;
+            current = 0;
         }
     };
 
@@ -26,15 +25,12 @@ function Top() {
     }, []);
 
     const handleControlClick = (bannerNumber) => {
-        
+
         current = bannerNumber;
-        console.log("**", current, bannerNumber);
         clearInterval(bannerTimer);
         const newBannerTimer = setInterval(bannerSwitcher, 5000);
         setBannerTimer(newBannerTimer);
     };
-
-
 
     return (
         < section id="section-1" >
@@ -52,7 +48,7 @@ function Top() {
                                 <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
                             {/* 이 부분 어떻게 처리할지 생각 -> 통계 자료 보여주는 용도? 일단은 킵 */}
-                            <MiddleBar/>
+                            <MiddleBar />
                         </div>
                     </div>
                     <div id="top-banner-2" className="banner">
@@ -62,7 +58,7 @@ function Top() {
                                 <h1>쉽고 빠르게 할 수 있는 기부, 해보시겠어요?</h1>
                                 <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
-                            <MiddleBar/>
+                            <MiddleBar />
                         </div>
                     </div>
                     <div id="top-banner-3" className="banner">
@@ -72,7 +68,7 @@ function Top() {
                                 <h1>그게 누군가에게는 꼭 필요한 물건일지도 모르니까요.</h1>
                                 <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
-                            <MiddleBar/>
+                            <MiddleBar />
                         </div>
                     </div>
                     <div id="top-banner-4" className="banner">
@@ -82,7 +78,7 @@ function Top() {
                                 <h1>안심하세요. 인증된 기관만이 우리와 함께하니까요.</h1>
                                 <div className="border-button"><Link to="/donate">기부하러 가기</Link></div>
                             </div>
-                            <MiddleBar/>
+                            <MiddleBar />
                         </div>
                     </div>
                 </div>
