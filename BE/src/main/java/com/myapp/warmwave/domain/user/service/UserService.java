@@ -130,13 +130,13 @@ public class UserService {
     @Transactional
     public ResponseUserLoginDto loginUser(RequestUserLoginDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new CustomException(CustomExceptionCode.USER_NOT_MATCH));
+                .orElseThrow(() -> new CustomException(USER_NOT_MATCH));
 
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword()))
-            throw new CustomException(CustomExceptionCode.PASSWORD_NOT_MATCH);
+            throw new CustomException(PASSWORD_NOT_MATCH);
 
         if (!user.getEmailAuth())
-            throw new CustomException(CustomExceptionCode.EXPIRED_JWT);
+            throw new CustomException(EXPIRED_JWT);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtProvider.EMAIL_CLAIM, user.getEmail());

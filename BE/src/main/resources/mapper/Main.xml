@@ -13,7 +13,7 @@
                 select count(*) from tb_user where role='institution'
             ) as instCount,
             (
-                select count(*) from tb_article where type = 'donation'
+                select count(*) from tb_article where article_type = 'donation'
             ) as totalDonationCount
     </select>
 </mapper>
