@@ -17,9 +17,9 @@ public class MainInstDto {
 
     private String sggName;
 
-    private int donationCount;
+    private Long donationCount;
 
-    public MainInstDto(Long id, String institutionName, String fullAddr, String sdName, String sggName, int donationCount) {
+    public MainInstDto(Long id, String institutionName, String fullAddr, String sdName, String sggName, Long donationCount) {
         this.id = id;
         this.institutionName = institutionName;
         this.fullAddr = fullAddr;

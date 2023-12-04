@@ -24,7 +24,7 @@ public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
     Optional<Institution> findByIdAndIsApproveTrue(Long userId);
 
     @Query("SELECT new com.myapp.warmwave.common.main.dto.MainInstDto(ins.id, ins.institutionName, ins.address.fullAddr, ins.address.sdName, ins.address.sggName, " +
-            "(SELECT COUNT(a) FROM ins.articles a WHERE a.articleType = 'CERTIFICATION'))" +
+            "(SELECT COUNT(a) FROM ins.articles a WHERE a.articleType = 'DONATION')) " +
             "FROM Institution ins " +
             "WHERE ins.address.sdName = :sdName AND ins.address.sggName = :sggName")
     Page<MainInstDto> findAllByLocation(@Param("sdName") String sdName, @Param("sggName") String sggName, Pageable pageable);
