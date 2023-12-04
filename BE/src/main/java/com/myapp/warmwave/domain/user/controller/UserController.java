@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,6 +47,14 @@ public class UserController {
     public ResponseEntity<ResponseUserLoginDto> login(@RequestBody RequestUserLoginDto requestDto) {
         ResponseUserLoginDto responseDto = userService.loginUser(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<Map<String, Object>> redirectLoginPage() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("result", "FAIL");
+        map.put("msg", "로그인 페이지로 이동해주세요.");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
     // 전체 기관 회원 조회
