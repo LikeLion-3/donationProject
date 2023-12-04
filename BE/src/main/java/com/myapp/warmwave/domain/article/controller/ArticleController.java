@@ -20,6 +20,7 @@ import java.util.List;
 
 @Slf4j
 @Validated
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
