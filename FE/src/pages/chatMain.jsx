@@ -25,8 +25,20 @@ function ChatMain() {
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
   const [stompClient, setStompClient] = useState(null);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
 
   const stompRef = useRef(null);
+
+  const subscribeToTopic = (id) => {
+    if (stompClient) {
+      stompClient.unsubscribe(`/topic/messages/${selectedConversationId}`);
+      stompClient.subscribe(`/topic/messages/${id}`, (message) => {
+        const receivedMessage = JSON.parse(message.body);
+        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      });
+      setSelectedConversationId(id);
+    }
+  };
 
   useEffect(() => {
     // Fetch data using Axios when the component mounts
@@ -59,23 +71,17 @@ function ChatMain() {
     };
   }, []);
 
-  useEffect(() => {
-    // Subscribe to the topic
-    if (stompClient) {
-      stompClient.subscribe("/topic/messages/123", (message) => {
-        // Handle the received message
-        const receivedMessage = JSON.parse(message.body);
-        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-      });
-    }
-  }, [stompClient]);
+  const handleConversationClick = (id) => {
+    // Set the selected conversation ID, subscribe to the corresponding topic, and send a message
+    subscribeToTopic(id);
+    sendMessage(id);
+  };
 
-  const sendMessage = () => {
+  const sendMessage = (id) => {
     if (stompClient) {
-      const roomId = 123; // Replace with your room ID
       const messageObject = {
         content: messageInputValue,
-        roomId: roomId,
+        roomId: id, // Use the clicked conversation's id as the roomId
       };
 
       stompClient.send("/app/chat", {}, JSON.stringify(messageObject));
@@ -99,7 +105,7 @@ function ChatMain() {
             <ConversationList>
               {conversations.map((conversation) => {
                 return (
-                  <Conversation key={conversation.id} name={conversation.recipientName} info={` 안녕하세요`}>
+                  <Conversation key={conversation.id} name={conversation.recipientName} onClick={() => handleConversationClick(conversation.id)}>
                     <Avatar src={require("../assets/images/ram.png")} name="Lilly" status="available" />
                   </Conversation>
                 );
@@ -125,7 +131,7 @@ function ChatMain() {
                   model={{
                     message: msg.content,
                     sentTime: "just now",
-                    sender: msg.sender, // Assuming your message object has a 'sender' property
+                    sender: msg.sender,
                     direction: msg.sender === "current_user" ? "outgoing" : "incoming",
                     position: "single",
                   }}
@@ -134,7 +140,7 @@ function ChatMain() {
                 </Message>
               ))}
             </MessageList>
-            <MessageInput placeholder="Type message here" value={messageInputValue} onChange={(val) => setMessageInputValue(val)} onSend={() => sendMessage()} />
+            <MessageInput placeholder="Type message here" value={messageInputValue} onChange={(val) => setMessageInputValue(val)} onSend={() => sendMessage(selectedConversationId)} />
           </ChatContainer>
         </MainContainer>
       </div>
