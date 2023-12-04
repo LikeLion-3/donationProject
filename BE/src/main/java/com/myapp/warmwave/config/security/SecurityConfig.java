@@ -31,7 +31,10 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
-                                .requestMatchers( "/", "/api/users/login", "/api/users/register/**").permitAll()
+                                .requestMatchers(
+                                        "/", "/api/users/login", "/api/users/register/**",
+                                        "/api/articles/today", "/api/main/count", "/api/users/adjacent"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(
