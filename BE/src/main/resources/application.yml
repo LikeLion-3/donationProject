@@ -48,7 +48,7 @@ kakao:
       key: ${KAKAO_REST_API_KEY}
 image:
   upload:
-    path: src/main/upload/article-images
+    path: file:/Users/wook/Desktop/project/donationProject/donationProject/FE/public/images
 custom:
   jwt:
     access:

@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +31,7 @@ private String imageStorePath;
     public List<Image> uploadImages(Article article, List<MultipartFile> imageFiles) throws IOException {
         List<Image> images = new ArrayList<>();
 
-        File directory = new File(imageStorePath);
+        File directory = ResourceUtils.getFile(imageStorePath);
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
             if (!created) {
@@ -44,7 +44,9 @@ private String imageStorePath;
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
             String fileName = UUID.randomUUID() + "." + fileExtension;
 
-            imageFile.transferTo(Paths.get(imageStorePath).resolve(fileName));
+            // 정확한 파일 시스템 경로를 얻기 위해 ResourceUtils.getFile() 사용
+            File destFile = new File(directory, fileName);
+            imageFile.transferTo(destFile);
 
             String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/images/")
