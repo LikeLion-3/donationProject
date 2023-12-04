@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.article.controller;
 
+import com.myapp.warmwave.common.main.dto.MainArticleDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
@@ -61,4 +62,9 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
+    // top5
+    @GetMapping("/top5")
+    public ResponseEntity<List<MainArticleDto>> readTop5() {
+        return ResponseEntity.ok(articleService.findTop5OrderByCreatedAt());
+    }
 }

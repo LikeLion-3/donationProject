@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.user.controller;
 
+import com.myapp.warmwave.common.main.dto.MainInstDto;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.service.UserService;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -111,5 +113,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 접속한 유저의 주소 근방의 기관 조회
+    @GetMapping("/adjacent")
+    public ResponseEntity<List<MainInstDto>> findAllInstByAdjLocation(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(userService.findAllByLocation(email));
     }
 }

@@ -2,8 +2,8 @@ package com.myapp.warmwave.domain.user.service;
 
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.common.exception.CustomException;
-import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.common.jwt.JwtProvider;
+import com.myapp.warmwave.common.main.dto.MainInstDto;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.service.AddressService;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -47,7 +49,7 @@ public class UserService {
     public ResponseUserJoinDto joinInstitution(RequestInstitutionJoinDto dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new CustomException(CustomExceptionCode.ALREADY_EXIST_USER);
+            throw new CustomException(ALREADY_EXIST_USER);
         }
 
         Optional<Address> address = addressService.findAddress(dto.getFullAddr());
@@ -79,7 +81,7 @@ public class UserService {
     @Transactional
     public ResponseUserJoinDto joinIndividual(RequestIndividualJoinDto dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new CustomException(CustomExceptionCode.ALREADY_EXIST_USER);
+            throw new CustomException(ALREADY_EXIST_USER);
         }
 
         EmailAuth emailAuth = emailAuthRepository.save(
@@ -114,11 +116,11 @@ public class UserService {
     public void confirmEmail(RequestEmailAuthDto requestDto) {
         EmailAuth emailAuth = emailAuthRepository
                 .findValidAuthByEmail(requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now())
-                .orElseThrow(() -> new CustomException(CustomExceptionCode.INVALID_JNT));
+                .orElseThrow(() -> new CustomException(INVALID_JNT));
 
         User user = userRepository
                 .findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new CustomException(CustomExceptionCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         emailAuth.usedToken();
         user.emailVerified();
@@ -128,13 +130,13 @@ public class UserService {
     @Transactional
     public ResponseUserLoginDto loginUser(RequestUserLoginDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new CustomException(CustomExceptionCode.USER_NOT_MATCH));
+                .orElseThrow(() -> new CustomException(USER_NOT_MATCH));
 
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword()))
-            throw new CustomException(CustomExceptionCode.PASSWORD_NOT_MATCH);
+            throw new CustomException(PASSWORD_NOT_MATCH);
 
         if (!user.getEmailAuth())
-            throw new CustomException(CustomExceptionCode.EXPIRED_JWT);
+            throw new CustomException(EXPIRED_JWT);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtProvider.EMAIL_CLAIM, user.getEmail());
@@ -245,6 +247,14 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
 
         userRepository.delete(savedUser);
+    }
+
+    public List<MainInstDto> findAllByLocation(String email) {
+        Individual individual = userRepository.findByEmail(email)
+                .map(Individual.class::cast)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+
+        return userRepository.findAllByLocation(individual.getAddress().getSdName(), individual.getAddress().getSggName());
     }
 
     public User whenSocialLogin(OAuth2User oAuth2User, String userEmail, String providerTypeCode) {
