@@ -133,9 +133,9 @@ public class JwtProvider {
     public Map<String, Object> getClaims(String accessToken) {
         try {
             return Jwts.parser()
-                    .verifyWith(cachedSecretKey)
+                    .verifyWith(getSecretKey())
                     .build()
-                    .parseUnsecuredClaims(accessToken)
+                    .parseSignedClaims(accessToken)
                     .getPayload();
         } catch (Exception e) {
             return Collections.emptyMap();
