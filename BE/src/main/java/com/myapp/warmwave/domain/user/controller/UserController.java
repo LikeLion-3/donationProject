@@ -7,6 +7,7 @@ import com.myapp.warmwave.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -127,8 +128,11 @@ public class UserController {
 
     // 접속한 유저의 주소 근방의 기관 조회
     @GetMapping("/adjacent")
-    public ResponseEntity<List<MainInstDto>> findAllInstByAdjLocation(Authentication authentication) {
+    public ResponseEntity<Page<MainInstDto>> findAllInstByAdjLocation(
+            Authentication authentication,
+            @RequestParam(value = "num", defaultValue = "0") int num
+    ) {
         String email = authentication.getName();
-        return ResponseEntity.ok(userService.findAllByLocation(email));
+        return ResponseEntity.ok(userService.findAllByLocation(email, num));
     }
 }
