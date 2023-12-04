@@ -62,7 +62,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .subject(ACCESS_TOKEN_SUBJECT)
-                .claim("body", Utils.json.toStr(claims))
+                .claim("body", claims)
                 .expiration(new Date(now.getTime() + accessTokenExpirationPeriod))
                 .signWith(getSecretKey(), Jwts.SIG.HS512)
                 .compact();
