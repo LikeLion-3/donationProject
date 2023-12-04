@@ -7,10 +7,12 @@ import Home from './component/main/home/Home';
 import Footer from './component/footer/Footer';
 import ArticleList from './component/article/list/ArticleList';
 import ArticleDetails from './component/article/detail/ArticleDetails';
+import SignIn from './component/user/signin';
+import SignUp from './component/user/signup';
 
 function App() {
   return (
-    <div> 
+    <div>
       <Preloader />
 
       <Routes>
@@ -18,6 +20,10 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/donate" element={<ArticleList />} />
           <Route path="/donate/:articleId" element={<ArticleDetails />} />
+        </Route>
+        <Route path="/signin" element={<SignIn />}>
+        </Route>
+        <Route path="/signup" element={<SignUp />}>
         </Route>
       </Routes>
 

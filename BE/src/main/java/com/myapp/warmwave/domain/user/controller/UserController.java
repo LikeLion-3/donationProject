@@ -38,12 +38,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("인증이 완료되었습니다.");
     }
 
-//    // 일반 로그인
-//    @PostMapping("/login")
-//    public ResponseEntity<ResponseUserLoginDto> login(@RequestBody RequestUserLoginDto requestDto) {
-//        ResponseUserLoginDto responseDto = userService.loginUser(requestDto);
-//        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-//    }
+    // 일반 로그인
+    @PostMapping("/login")
+    public ResponseEntity<ResponseUserLoginDto> login(@RequestBody RequestUserLoginDto requestDto) {
+        ResponseUserLoginDto responseDto = userService.loginUser(requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
     // 전체 기관 회원 조회
     @GetMapping("/institution")
