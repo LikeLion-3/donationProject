@@ -11,10 +11,16 @@ function Middle() {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get('http://localhost:8080/api/users/adjacent');
+            const response = await Axios.get('http://localhost:8080/api/users/adjacent', {
+                headers: {
+                    // 여기는 토큰 어떻게 받아와야 할지 생각하고 수정해야할듯합니다.
+                    // 'Authorization' : 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJ0ZXN0MDRAZ21haWwuY29tIn0sImV4cCI6MTcwMTcwNDI1NX0.HUoJuRZPgwA1SAYy-5kpM0_Vz_LSFEwg9lWsS6ecB13BYzcj1RrQcBkB_hDJR6I3PHusamA3LDalos_KWdjYCA'
+                }
+            });
+
             const fetchedData = response.data;
 
-            if (fetchedData) {
+            if (fetchedData.result != 'FAIL') {
                 // 데이터가 있다면 Inst 컴포넌트를 표시
                 setHasData(true);
                 setFavoriteInst(fetchedData);
