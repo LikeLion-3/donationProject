@@ -22,6 +22,9 @@ function KakaoMap({ data }) {
             // 주소-좌표 변환 객체를 생성합니다
             var geocoder = new kakao.maps.services.Geocoder();
 
+            // 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
+            var bounds = new kakao.maps.LatLngBounds();
+
             data.content.forEach((res) => {
                 // 주소로 좌표를 검색합니다
                 geocoder.addressSearch(`${res.fullAddr}`, function (result, status) {
@@ -44,10 +47,16 @@ function KakaoMap({ data }) {
                         });
 
                         infowindow.open(map, marker);
-                    }
-                    map.setCenter(coords);
 
-                    marker.setMap(map);
+                        // 마커 지정
+                        marker.setMap(map);
+
+                        // 범위 객체에 위치 입력
+                        bounds.extend(coords);
+
+                        // 지도 범위 재조정
+                        map.setBounds(bounds);
+                    }
                 })
             })
         }
