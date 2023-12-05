@@ -10,17 +10,17 @@ import lombok.*;
 public class ResponseChatMessageDto {
     private Long id;
 
-    private String nickName;
+    private String sender;
 
-    private String message;
+    private String content;
 
     private String timestamp;
 
     public static ResponseChatMessageDto fromEntity(ChatMessage chatMessage) {
         return ResponseChatMessageDto.builder()
                 .id(chatMessage.getId())
-                .nickName(chatMessage.getChatroom().getDonor().getNickname())
-                .message(chatMessage.getMessage())
+                .sender(chatMessage.getChatroom().getDonor().getNickname())
+                .content(chatMessage.getMessage())
                 .build();
     }
 }

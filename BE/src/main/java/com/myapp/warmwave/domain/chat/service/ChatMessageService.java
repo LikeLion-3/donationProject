@@ -9,6 +9,8 @@ import com.myapp.warmwave.domain.chat.repository.ChatRoomRepository;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,21 +26,23 @@ public class ChatMessageService {
     private final UserRepository<User> userRepository;
 
     @Transactional
-    public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto, Long roomId, String name) {
-        User user = userRepository.findByEmail(name)
+    public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다"));
 
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+        ChatRoom chatRoom = chatRoomRepository.findById(Long.valueOf(chatMessageDto.getRoomId()))
                 .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다"));
 
         ChatMessage chatMessage = ChatMessage.builder().chatroom(chatRoom).sender(user).message(chatMessageDto.getContent()).timestamp((new Date())).build();
         return ResponseChatMessageDto.fromEntity(chatMessageRepository.save(chatMessage));
-
     }
 
-    public List<ResponseChatMessageDto> getChatHistory(String roomId) {
-        Long longRoomId = Long.parseLong(roomId);
-        List<ChatMessage> chatHistoryList = chatMessageRepository.findAllById(longRoomId);
+    public List<ResponseChatMessageDto> getAllChatMessages(Long roomId) {
+        List<ChatMessage> chatHistoryList = chatMessageRepository.findAllByChatroomId(roomId);
         return chatHistoryList.stream().map(ResponseChatMessageDto::fromEntity).toList();
     }
 }
