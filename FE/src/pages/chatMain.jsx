@@ -148,14 +148,15 @@ function ChatMain() {
               </ConversationHeader.Actions>
             </ConversationHeader>
             <MessageList>
-              {messages.map((msg) => (
+              {messages.map((msg, index) => (
                 <Message
-                  key={msg.id} // Use the 'id' property as the key
+                  key={msg.id} // Make sure to use a unique identifier as the key
+                  order={index}
                   model={{
-                    message: msg.message,
+                    message: msg.content,
                     sentTime: msg.timestamp,
-                    sender: msg.nickName,
-                    direction: "incoming",
+                    sender: msg.sender,
+                    direction: msg.sender === "current_user" ? "outgoing" : "incoming",
                     position: "single",
                   }}
                 >
