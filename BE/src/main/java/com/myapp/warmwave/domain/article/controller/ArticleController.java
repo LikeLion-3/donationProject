@@ -29,8 +29,8 @@ public class ArticleController {
     private final ArticleMapper articleMapper;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ArticleResponseDto> postArticle(@Validated @RequestPart ArticlePostDto dto,
-                                                          @RequestPart List<MultipartFile> imageFiles) throws IOException {
+    public ResponseEntity<ArticleResponseDto> postArticle(ArticlePostDto dto,
+                                                          List<MultipartFile> imageFiles) throws IOException {
 
         Article article = articleService.createArticle(dto, imageFiles);
 
