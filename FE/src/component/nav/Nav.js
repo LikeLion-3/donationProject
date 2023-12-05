@@ -10,7 +10,7 @@ function Nav() {
                             <nav className="main-nav">
                                 {/* ***** Logo Start ***** */}
                                 <Link to="/" className="logo">
-                                    <img src="logo.png" alt="true" />
+                                    <img src="logo.png" alt="true" style={{width: "130px", height: "40px"}}/>
                                 </Link>
                                 {/* ***** Logo End ***** */}
                                 {/* ***** Menu Start ***** */}
@@ -18,6 +18,7 @@ function Nav() {
                                     <li><NavLink to="/">Home</NavLink></li>
                                     <li><NavLink to="/donate">Donate</NavLink></li>
                                     <li><NavLink to="/chat">Chat</NavLink></li>
+                                    <li><NavLink to="/community">Community</NavLink></li>
                                     {/* 로그인 여부에 따라 회원가입 / 로그인 창으로 변경하기 */}
                                     <li><NavLink to="/signin">SignIn</NavLink></li>
                                 </ul>
