@@ -7,12 +7,15 @@ import com.myapp.warmwave.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,6 +48,14 @@ public class UserController {
     public ResponseEntity<ResponseUserLoginDto> login(@RequestBody RequestUserLoginDto requestDto) {
         ResponseUserLoginDto responseDto = userService.loginUser(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<Map<String, Object>> redirectLoginPage() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("result", "FAIL");
+        map.put("msg", "로그인 페이지로 이동해주세요.");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
     // 전체 기관 회원 조회
@@ -117,8 +128,11 @@ public class UserController {
 
     // 접속한 유저의 주소 근방의 기관 조회
     @GetMapping("/adjacent")
-    public ResponseEntity<List<MainInstDto>> findAllInstByAdjLocation(Authentication authentication) {
+    public ResponseEntity<Page<MainInstDto>> findAllInstByAdjLocation(
+            Authentication authentication,
+            @RequestParam(value = "num", defaultValue = "0") int num
+    ) {
         String email = authentication.getName();
-        return ResponseEntity.ok(userService.findAllByLocation(email));
+        return ResponseEntity.ok(userService.findAllByLocation(email, num));
     }
 }

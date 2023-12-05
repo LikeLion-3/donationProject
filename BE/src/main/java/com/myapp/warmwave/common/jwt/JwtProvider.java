@@ -62,7 +62,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .subject(ACCESS_TOKEN_SUBJECT)
-                .claim("body", Utils.json.toStr(claims))
+                .claim("body", claims)
                 .expiration(new Date(now.getTime() + accessTokenExpirationPeriod))
                 .signWith(getSecretKey(), Jwts.SIG.HS512)
                 .compact();
@@ -133,9 +133,9 @@ public class JwtProvider {
     public Map<String, Object> getClaims(String accessToken) {
         try {
             return Jwts.parser()
-                    .verifyWith(cachedSecretKey)
+                    .verifyWith(getSecretKey())
                     .build()
-                    .parseUnsecuredClaims(accessToken)
+                    .parseSignedClaims(accessToken)
                     .getPayload();
         } catch (Exception e) {
             return Collections.emptyMap();

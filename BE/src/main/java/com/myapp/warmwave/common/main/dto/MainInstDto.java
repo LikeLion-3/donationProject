@@ -17,17 +17,14 @@ public class MainInstDto {
 
     private String sggName;
 
-    private int donationCount;
+    private Long donationCount;
 
-    private int favoriteCount;
-
-    public MainInstDto(Long id, String institutionName, String fullAddr, String sdName, String sggName, int donationCount, int favoriteCount) {
+    public MainInstDto(Long id, String institutionName, String fullAddr, String sdName, String sggName, Long donationCount) {
         this.id = id;
         this.institutionName = institutionName;
         this.fullAddr = fullAddr;
         this.sdName = sdName;
         this.sggName = sggName;
         this.donationCount = donationCount;
-        this.favoriteCount = favoriteCount;
     }
 }

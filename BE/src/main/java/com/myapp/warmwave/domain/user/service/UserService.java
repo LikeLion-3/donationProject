@@ -14,10 +14,11 @@ import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
-import com.myapp.warmwave.domain.user.repository.IndividualRepository;
-import com.myapp.warmwave.domain.user.repository.InstitutionRepository;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,6 @@ import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository<User> userRepository;
-    private final IndividualRepository individualRepository;
-    private final InstitutionRepository institutionRepository;
     private final EmailAuthRepository emailAuthRepository;
     private final AddressService addressService;
     private final EmailService emailService;
@@ -91,7 +90,7 @@ public class UserService {
                         .expired(false)
                         .build());
 
-        Individual individual = individualRepository.save(
+        Individual individual = userRepository.save(
                 Individual.builder()
                         .email(dto.getEmail())
                         .password(passwordEncoder.encode(dto.getPassword()))
@@ -162,8 +161,8 @@ public class UserService {
                 .map(ResponseUserDto::FromEntity)
                 .toList();
     }
-    // 기관 단일 조회 -> 승인한 기관만 조회 가능
 
+    // 기관 단일 조회 -> 승인한 기관만 조회 가능
     public ResponseUserDto findInstitution(Long userId) {
         return userRepository.findById(userId)
                 .map(Institution.class::cast)
@@ -173,12 +172,13 @@ public class UserService {
 
     // 개인 회원 단일 조회
     public ResponseUserDto findIndividual(Long userId) {
-        return individualRepository.findById(userId)
+        return userRepository.findById(userId)
+                .map(Individual.class::cast)
                 .map(ResponseUserDto::FromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
     }
-    // 전체 기관 회원 조회
 
+    // 전체 기관 회원 조회
     public List<ResponseUserDto> findAllByRoleInstitution() {
         return userRepository.findAll()
                 .stream()
@@ -190,7 +190,7 @@ public class UserService {
 
     // 전체 개인 회원 조회
     public List<ResponseUserDto> findAllByRoleIndividual() {
-        return individualRepository.findAll()
+        return userRepository.findAll()
                 .stream()
                 .map(Individual.class::cast)
                 .map(ResponseUserDto::FromEntity)
@@ -249,12 +249,14 @@ public class UserService {
         userRepository.delete(savedUser);
     }
 
-    public List<MainInstDto> findAllByLocation(String email) {
+    public Page<MainInstDto> findAllByLocation(String email, int num) {
         Individual individual = userRepository.findByEmail(email)
                 .map(Individual.class::cast)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
-        return userRepository.findAllByLocation(individual.getAddress().getSdName(), individual.getAddress().getSggName());
+        Pageable pageable = PageRequest.of(num, 5);
+
+        return userRepository.findAllByLocation(individual.getAddress().getSdName(), individual.getAddress().getSggName(), pageable);
     }
 
     public User whenSocialLogin(OAuth2User oAuth2User, String userEmail, String providerTypeCode) {

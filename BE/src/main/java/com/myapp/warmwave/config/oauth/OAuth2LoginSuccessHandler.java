@@ -34,7 +34,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 claims.put("email", oAuth2User.getEmail());
                 String accessToken = jwtProvider.createAccessToken(claims);
                 response.addHeader(jwtProvider.getAccessHeader(), "Bearer " + accessToken);
-                response.sendRedirect("oauth2/sign-up"); // 프론트의 회원가입 추가 정보 입력 폼으로 리다이렉트
+                //TODO: 컨트롤러 작성 필요
+//                response.sendRedirect("oauth2/sign-up"); // 프론트의 회원가입 추가 정보 입력 폼으로 리다이렉트
 
                 jwtProvider.sendAccessAndRefreshToken(response, accessToken, null);
             } else {
