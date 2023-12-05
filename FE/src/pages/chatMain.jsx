@@ -29,9 +29,9 @@ function ChatMain() {
 
   const stompRef = useRef(null);
 
+  // Move subscribeToTopic outside of useEffect
   const subscribeToTopic = (id) => {
     if (stompClient) {
-      stompClient.unsubscribe(`/topic/messages/${selectedConversationId}`);
       stompClient.subscribe(`/topic/messages/${id}`, (message) => {
         const receivedMessage = JSON.parse(message.body);
         setMessages((prevMessages) => [...prevMessages, receivedMessage]);
@@ -43,7 +43,12 @@ function ChatMain() {
   useEffect(() => {
     // Fetch data using Axios when the component mounts
     axios
-      .get("http://localhost:9000/api/chatRoom")
+      .get("http://localhost:9000/api/chatRoom", {
+        headers: {
+          // Authorization:
+          //   "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJhc2pzMTIzNEBuYXZlci5jb20ifSwiZXhwIjoxNzAxNzQ0MDk4fQ.cmYEt3t0dM0Dl8zOma4EtAoxtDDJdxOaohYg0LoBApWjRizxjAR5nuqYDVJHC8z0WLzR8Vs2ah3f_lLIUaxdMQ",
+        },
+      })
       .then((response) => {
         setConversations(response.data);
       })
@@ -72,11 +77,29 @@ function ChatMain() {
   }, []);
 
   const handleConversationClick = (id) => {
-    // Set the selected conversation ID, subscribe to the corresponding topic, and send a message
+    // 선택한 대화 ID를 설정하고 해당 토픽을 구독합니다.
+    // 그리고 선택한 대화에 대한 채팅 메시지를 가져옵니다.
     subscribeToTopic(id);
-    sendMessage(id);
-  };
 
+    axios
+      .get(`http://localhost:9000/api/chatMessages/${id}`, {
+        headers: {
+          // 필요한 경우 헤더를 추가합니다.
+        },
+      })
+      .then((response) => {
+        // 가져온 메시지로 messages 상태를 업데이트합니다.
+        setMessages(response.data);
+      })
+      .catch((error) => {
+        console.error("채팅 메시지를 가져오는 중 오류 발생:", error);
+      });
+
+    // 메시지 입력값이 비어있지 않은 경우에만 메시지를 보냅니다.
+    if (messageInputValue.trim() !== "") {
+      sendMessage(id);
+    }
+  };
   const sendMessage = (id) => {
     if (stompClient) {
       const messageObject = {
@@ -125,18 +148,18 @@ function ChatMain() {
               </ConversationHeader.Actions>
             </ConversationHeader>
             <MessageList>
-              {messages.map((msg, index) => (
+              {messages.map((msg) => (
                 <Message
-                  key={index}
+                  key={msg.id} // Use the 'id' property as the key
                   model={{
-                    message: msg.content,
-                    sentTime: "just now",
-                    sender: msg.sender,
-                    direction: msg.sender === "current_user" ? "outgoing" : "incoming",
+                    message: msg.message,
+                    sentTime: msg.timestamp,
+                    sender: msg.nickName,
+                    direction: "incoming",
                     position: "single",
                   }}
                 >
-                  <Avatar src={require("../assets/images/ram.png")} name={msg.sender} />
+                  <Avatar src={require("../assets/images/ram.png")} name={msg.nickName} />
                 </Message>
               ))}
             </MessageList>
