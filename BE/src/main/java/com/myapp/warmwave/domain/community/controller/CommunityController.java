@@ -8,6 +8,8 @@ import com.myapp.warmwave.domain.community.mapper.CommunityUpdateMapper;
 import com.myapp.warmwave.domain.community.service.CommunityFacadeService;
 import com.myapp.warmwave.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/community")
+@RequestMapping("/api/communities")
 public class CommunityController {
 
     private final CommunityFacadeService communityFacadeService;
@@ -45,8 +47,11 @@ public class CommunityController {
         return new ResponseEntity<>(communityMapper.communityToCommunityResponseDto(community), HttpStatus.OK);
     }
 
-//    목록 pageable 구현
-//    @GetMapping
+    // 가보자구 ~!
+    @GetMapping("/{community}")
+    public ResponseEntity<List<CommunityResponseDto>> getCommunities(@PageableDefault(size=10) Pageable pageable) {
+
+    }
 
     @PatchMapping("/{communityId}") // 수정 -> dto, 엔티티만. 이미지 X
     public ResponseEntity<CommunityResponseDto> updateCommunity(@PathVariable("communityId") Long communityId,
@@ -55,11 +60,16 @@ public class CommunityController {
         return new ResponseEntity<>(communityMapper.communityToCommunityResponseDto(community), HttpStatus.OK);
     }
 
-    @PostMapping("/images/{communityId}") // 이미지 분리
+    @DeleteMapping("/{communityId}")
+    public ResponseEntity deleteMapping(@PathVariable("communityId") Long communityId) {
+        communityService.deleteCommunity(communityId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/images/{communityId}") // 이미지 분리. 삭제는 추후
     public ResponseEntity<CommunityResponseDto> addCommunityImages(@PathVariable("communityId") Long communityId,
                                                @RequestPart List<MultipartFile> images) {
         Community community = communityFacadeService.addCommunityImages(communityId, images);
         return new ResponseEntity<>(communityMapper.communityToCommunityResponseDto(community), HttpStatus.OK);
     }
-
 }

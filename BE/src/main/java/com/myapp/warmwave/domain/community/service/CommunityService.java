@@ -28,5 +28,9 @@ public class CommunityService {
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.NOT_FOUND_ARTICLE));
     }
 
+    public void deleteCommunity(Long communityId) {
+        communityRepository.delete(getCommunity(communityId));
+    }
+
 
 }
