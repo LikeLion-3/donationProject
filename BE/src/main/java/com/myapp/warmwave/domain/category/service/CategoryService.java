@@ -26,19 +26,6 @@ import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public Category createCategory(CategoryDto dto) {
-        Category category = Category.builder()
-                .name(dto.getName())
-                .build();
-
-        Optional.ofNullable(categoryRepository.findByName(category.getName()))
-                .ifPresent(existingCategory -> {
-                    throw new CustomException(ALREADY_EXIST_CATEGORY);
-                });
-
-        return categoryRepository.save(category);
-    }
-
     public void createBasicCategories(CategoryAllPostDto categoryAllPostDto) {
         List<String> strCategories = parseCategoryStrToArray(categoryAllPostDto.getCategoryNames());
 
@@ -52,15 +39,17 @@ public class CategoryService {
         }
     }
 
+    public Category createCategory(CategoryDto dto) {
+        Category category = Category.builder()
+                .name(dto.getName())
+                .build();
 
-    public List<Category> getCategory(CategoryDto dto) {
-        List<Category> categoryList = new ArrayList<>();
+        Optional.ofNullable(categoryRepository.findByName(category.getName()))
+                .ifPresent(existingCategory -> {
+                    throw new CustomException(ALREADY_EXIST_CATEGORY);
+                });
 
-        for (String category : parseCategoryStrToArray(dto.getName())) {
-            categoryList.add(validateCategory(category));
-        }
-
-        return categoryList;
+        return categoryRepository.save(category);
     }
 
     public Page<Category> getAllCategory() {
@@ -73,6 +62,22 @@ public class CategoryService {
                 .map(String::trim)
                 .toList();
     }
+
+    public List<Category> getCategory(CategoryDto dto) {
+        List<Category> categoryList = new ArrayList<>();
+
+        for (String category : parseCategoryStrToArray(dto.getName())) {
+            categoryList.add(validateCategory(category));
+        }
+
+        return categoryList;
+    }
+
+    public void deleteCategory(CategoryDto dto) {
+        categoryRepository.deleteByName(dto.getName());
+    }
+
+
 
     private Category validateCategory(String categoryName) {
         return Optional.ofNullable(categoryRepository.findByName(categoryName))

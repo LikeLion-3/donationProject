@@ -22,6 +22,11 @@ import java.util.List;
 public class CategotyController {
     private final CategoryService categoryService;
 
+    @PostConstruct
+    private void postAllCategory() {
+        categoryService.createBasicCategories(new CategoryAllPostDto());
+    }
+
     @PostMapping
     public ResponseEntity<CategoryDto> postCategory(@RequestBody CategoryDto dto) {
         Category category = categoryService.createCategory(dto);
@@ -29,11 +34,6 @@ public class CategotyController {
         return ResponseEntity.ok(CategoryDto.builder()
                 .name(category.getName())
                 .build());
-    }
-
-    @PostConstruct
-    private void postAllCategory() {
-        categoryService.createBasicCategories(new CategoryAllPostDto());
     }
 
     @GetMapping
@@ -52,5 +52,12 @@ public class CategotyController {
                 .toList();
 
         return ResponseEntity.ok(categoryDtos);
+    }
+
+    @DeleteMapping
+    public ResponseEntity deleteCategory(@RequestBody CategoryDto dto) {
+        categoryService.deleteCategory(dto);
+
+        return ResponseEntity.noContent().build();
     }
 }
