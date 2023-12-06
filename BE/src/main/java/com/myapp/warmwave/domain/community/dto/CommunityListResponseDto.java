@@ -1,7 +1,8 @@
 package com.myapp.warmwave.domain.community.dto;
 
-import com.myapp.warmwave.domain.image.entity.Image;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,13 +10,10 @@ import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class CommunityResponseDto {
+public class CommunityListResponseDto {
     private Long id;
 
     private String title;
-
-    private String contents;
 
     private Integer hit;
 
@@ -23,7 +21,7 @@ public class CommunityResponseDto {
 
     private String category;
 
-    private List<String> images;
+    private String imgUrl;
 
     private LocalDateTime createdAt;
 }

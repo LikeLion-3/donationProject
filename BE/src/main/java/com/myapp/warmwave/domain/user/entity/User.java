@@ -61,6 +61,8 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "individualUser", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<FavoriteInst> favoriteList = new ArrayList<>();
 
+    abstract public String getName();
+
     public void updateUserInfo(String password, Address address) {
         this.password = password;
         this.address = address;

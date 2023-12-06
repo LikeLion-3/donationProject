@@ -228,3 +228,7 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,intellij+all,java,visualstudiocode,gradle
 
 **/generated
+
+src/test/resources/
+.idea/
+.idea/modules/
