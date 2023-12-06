@@ -47,16 +47,11 @@ private String imageStorePath;
             String originalFilename = imageFile.getOriginalFilename();
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
             String fileName = UUID.randomUUID() + "." + fileExtension;
-<<<<<<< HEAD
 
             // 정확한 파일 시스템 경로를 얻기 위해 ResourceUtils.getFile() 사용
             File destFile = new File(directory, fileName);
             imageFile.transferTo(destFile);
-=======
-            // 작성자 이메일, createdAt, article PK + 중복 인덱스
-            //
             imageFile.transferTo(Paths.get(imageStorePath).resolve(fileName));
->>>>>>> 8e6e373 (커뮤니티 게시글 기본 등록, 조회, 수정)
 
             String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/images/")
@@ -67,7 +62,7 @@ private String imageStorePath;
                     .imgName(fileName)
                     .imgUrl(imageUrl)
                     .article(article)
-                    .build(); // communtiy 일단 매핑 추가
+                    .build();
 
             imageRepository.save(image);
             images.add(image);
@@ -104,7 +99,7 @@ private String imageStorePath;
                         .imgName(fileName)
                         .imgUrl(imageUrl)
                         .community(community)
-                        .build(); // communtiy 일단 매핑 추가
+                        .build();
 
                 imageRepository.save(image);
                 images.add(image);

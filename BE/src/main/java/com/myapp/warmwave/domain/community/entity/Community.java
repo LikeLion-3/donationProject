@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.community.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myapp.warmwave.common.BaseEntity;
 import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.user.entity.User;
@@ -7,7 +8,6 @@ import jakarta.persistence.*;
 import com.myapp.warmwave.domain.comment.entity.Comment;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +24,7 @@ public class Community extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -39,10 +40,12 @@ public class Community extends BaseEntity {
 
     private Integer hit;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
 
+    @JsonIgnore
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
