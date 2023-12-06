@@ -70,7 +70,7 @@ function ChatMain() {
   useEffect(() => {
     // Fetch data using Axios when the component mounts
     jwtAxios
-      .get("http://localhost:8080/api/chatRoom", {})
+      .get("http://localhost:8080/api/chatRoom", {}) // 여기 나중에 localhost 지워주세용
       .then((response) => {
         setConversations(response.data);
       })
@@ -80,7 +80,7 @@ function ChatMain() {
 
     // Connect to WebSocket if not already connected
     if (!stompRef.current) {
-      const socket = new SockJS("http://localhost:8080/ws");
+      const socket = new SockJS("http://localhost:8080/ws"); // 여기 나중에 localhost 지워주세용
       const stomp = Stomp.over(socket);
 
       stomp.connect({}, () => {
@@ -102,7 +102,7 @@ function ChatMain() {
     subscribeToTopic(id);
 
     jwtAxios
-      .get(`http://localhost:8080/api/chatMessages/${id}`, {})
+      .get(`http://localhost:8080/api/chatMessages/${id}`, {}) // 여기 나중에 localhost 지워주세용
       .then((response) => {
         setMessages(response.data);
       })
