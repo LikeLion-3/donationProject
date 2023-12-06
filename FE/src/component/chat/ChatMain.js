@@ -128,8 +128,14 @@ function ChatMain() {
             <ConversationList>
               {conversations.map((conversation) => {
                 return (
-                  <Conversation key={conversation.id} name={conversation.recipientName} onClick={() => handleConversationClick(conversation.id)}>
-                    <Avatar src={require("../../assets/images/ram.png")} name="Lilly" status="available" />
+                  <Conversation
+                    key={conversation.id}
+                    name={conversation.articleTitle}
+                    lastSenderName={conversation.recipientName}
+                    info={conversation.lastMessage}
+                    onClick={() => handleConversationClick(conversation.id)}
+                  >
+                    <Avatar src={require("../../assets/images/person.png")} name="Lilly" />
                   </Conversation>
                 );
               })}
@@ -139,7 +145,7 @@ function ChatMain() {
           <ChatContainer>
             <ConversationHeader>
               <ConversationHeader.Back />
-              <Avatar src={require("../../assets/images/ram.png")} name="Zoe" />
+              <Avatar src={require("../../assets/images/person.png")} name="Zoe" />
               <ConversationHeader.Content userName="Zoe" info="Active 10 mins ago" />
               <ConversationHeader.Actions>
                 <VoiceCallButton />
@@ -148,6 +154,7 @@ function ChatMain() {
               </ConversationHeader.Actions>
             </ConversationHeader>
             <MessageList>
+              <div>채팅방을 선택해주세요</div>
               {messages.map((msg, index) => (
                 <Message
                   key={msg.id} // Make sure to use a unique identifier as the key
@@ -160,7 +167,7 @@ function ChatMain() {
                     position: "single",
                   }}
                 >
-                  <Avatar src={require("../../assets/images/ram.png")} name={msg.nickName} />
+                  <Avatar src={require("../../assets/images/person.png")} name={msg.nickName} />
                 </Message>
               ))}
             </MessageList>
