@@ -80,7 +80,11 @@ function ChatMain() {
 
     // Connect to WebSocket if not already connected
     if (!stompRef.current) {
+<<<<<<< HEAD
       const socket = new SockJS("http://localhost:8080/ws"); // 여기 나중에 localhost 지워주세용
+=======
+      const socket = new SockJS("http://localhost:9000/ws");
+>>>>>>> 62d9caa (feat : 채팅 UI 구성 및 API 연결)
       const stomp = Stomp.over(socket);
 
       stomp.connect({}, () => {
