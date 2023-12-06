@@ -1,18 +1,14 @@
 package com.myapp.warmwave.domain.chat.dto;
 
-import lombok.*;
-
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@ToString
 public class ChatMessageDto {
-    private Long userId;
-    private Long roomId;
-    private String sender;
+    private String roomId;
     private String content;
-    private Date timestamp;
+    private String sender;
 }

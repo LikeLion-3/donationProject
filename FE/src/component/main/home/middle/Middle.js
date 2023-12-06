@@ -3,7 +3,6 @@ import Inst from "../institution/Inst";
 import InstDefault from "../institution/InstDefault";
 import { useEffect, useState } from "react";
 import Axios from "axios";
-import KakaoMapDefault from "../../kakaomap/KakaoMapDefault";
 
 function Middle() {
     const [hasData, setHasData] = useState(false);
@@ -59,7 +58,7 @@ function Middle() {
                             <div className="row">
                                 <div className="col-lg-12">
                                     <div id="map">
-                                        {hasData ? <KakaoMap data={favoriteInst}/> : <KakaoMapDefault/>}
+                                        <KakaoMap data={favoriteInst}/>
                                     </div>
                                 </div>
                             </div>

@@ -11,7 +11,7 @@ function Inst({ data }) {
                     <div className="item">
                         {instList.map((i, idx) => {
                             return (
-                                <div className="row" key={idx}>
+                                <div className="row" style={{marginBottom: "30px"}} key={idx}>
                                     <div className="col-lg-8 col-sm-7">
                                         <div className="right-content">
                                             <h4>{i.institutionName}</h4>
