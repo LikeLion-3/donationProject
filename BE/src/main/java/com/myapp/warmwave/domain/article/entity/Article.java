@@ -2,6 +2,8 @@ package com.myapp.warmwave.domain.article.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myapp.warmwave.common.BaseEntity;
+import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
+import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -29,13 +31,12 @@ public class Article extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Type articleType;
 
+    @ManyToMany
+    private List<Category> categories;
+
     //게시글 상태(기본, 진행중, 완료)
     @Enumerated(EnumType.STRING)
     private Status articleStatus;
-
-    //기부물품 카테고리
-    @Enumerated(EnumType.STRING)
-    private ProductCategory prodCategory;
 
     private String userIp;
 
@@ -56,9 +57,10 @@ public class Article extends BaseEntity {
         this.articleImages = articleImages;
     }
 
-    public void applyPatch(Article article) {
-            this.title = article.getTitle();
-            this.content = article.getContent();
+    public void applyPatch(ArticlePostDto dto, List<Category> categories) {
+            this.title = dto.getTitle();
+            this.content = dto.getContent();
+            this.categories = categories;
     }
 
 }

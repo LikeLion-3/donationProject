@@ -7,6 +7,8 @@ import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
+import com.myapp.warmwave.domain.category.entity.Category;
+import com.myapp.warmwave.domain.category.service.CategoryService;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +31,12 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleMapper articleMapper;
     private final ImageService imageService;
+    private final CategoryService categoryService;
 
     public Article createArticle(ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
 
-        Article article = articleMapper.articlePostDtoToArticle(dto);
+        List<Category> categories = categoryService.getCategory(dto.getProdCategory());
+        Article article = articleMapper.articlePostDtoToArticle(dto, categories);
         //추후 세터를 삭제하는 방향을 생각해보아야함
         article.setArticleImages(imageService.uploadImages(article, imageFiles));
 
@@ -40,7 +44,8 @@ public class ArticleService {
     }
 
     public Article getArticleByArticleId(long articleId) {
-        return articleRepository.findById(articleId);
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
     }
 
     public Page<ArticleResponseDto> getAllArticles(int page, int size) {
@@ -57,10 +62,10 @@ public class ArticleService {
     }
 
     public Article updateArticle(Long articleId, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
-        Article article = articleMapper.articlePostDtoToArticle(dto);
+        List<Category> categories = categoryService.getCategory(dto.getProdCategory());
         Article findArticle = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
 
-        findArticle.applyPatch(article);
+        findArticle.applyPatch(dto, categories);
         findArticle.setArticleImages(imageService.uploadImages(findArticle, imageFiles));
 
         return articleRepository.save(findArticle);

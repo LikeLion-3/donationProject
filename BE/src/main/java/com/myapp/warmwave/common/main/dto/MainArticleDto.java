@@ -20,17 +20,17 @@ public class MainArticleDto {
 
     private Status status;
 
-    private ProductCategory category;
+//    private ProductCategory category;
 
     private LocalDateTime createdAt;
 
-    public MainArticleDto(Long articleId, String writer, String title, Type type, Status status, ProductCategory category, LocalDateTime createdAt) {
+    public MainArticleDto(Long articleId, String writer, String title, Type type, Status status, LocalDateTime createdAt) {
         this.articleId = articleId;
         this.writer = writer;
         this.title = title;
         this.type = type;
         this.status = status;
-        this.category = category;
+//        this.category = category;
         this.createdAt = createdAt;
     }
 }

@@ -63,10 +63,10 @@ public class CategoryService {
                 .toList();
     }
 
-    public List<Category> getCategory(CategoryDto dto) {
+    public List<Category> getCategory(String strCategories) {
         List<Category> categoryList = new ArrayList<>();
 
-        for (String category : parseCategoryStrToArray(dto.getName())) {
+        for (String category : parseCategoryStrToArray(strCategories)) {
             categoryList.add(validateCategory(category));
         }
 

@@ -43,7 +43,7 @@ public class CategotyController {
 
     @PostMapping("/get")
     public ResponseEntity<List<CategoryDto>> getCategory(@RequestBody CategoryDto dto) {
-        List<Category> categories = categoryService.getCategory(dto);
+        List<Category> categories = categoryService.getCategory(dto.getName());
 
         List<CategoryDto> categoryDtos = categories.stream()
                 .map(category -> CategoryDto.builder()
