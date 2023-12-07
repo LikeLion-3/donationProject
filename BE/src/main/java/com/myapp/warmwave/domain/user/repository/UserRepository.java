@@ -1,6 +1,7 @@
 package com.myapp.warmwave.domain.user.repository;
 
 import com.myapp.warmwave.common.main.dto.MainInstDto;
+import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -16,12 +17,15 @@ public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
     // 공통
     Optional<User> findByEmail(String email);
 
+    // 개인
+    List<Individual> findAllByEmailAuthTrue();
+
     // 기관
-    List<Institution> findAllByIsApproveTrue();
+    List<Institution> findAllByIsApproveTrueAndEmailAuthTrue();
 
-    List<Institution> findAllByIsApproveFalse();
+    List<Institution> findAllByIsApproveFalseAndEmailAuthTrue();
 
-    Optional<Institution> findByIdAndIsApproveTrue(Long userId);
+    List<Institution> findAllByIsApproveFalseAndEmailAuthFalse();
 
     @Query("SELECT new com.myapp.warmwave.common.main.dto.MainInstDto(ins.id, ins.institutionName, ins.address.fullAddr, ins.address.sdName, ins.address.sggName, " +
             "(SELECT COUNT(a) FROM ins.articles a WHERE a.articleType = 'DONATION')) " +

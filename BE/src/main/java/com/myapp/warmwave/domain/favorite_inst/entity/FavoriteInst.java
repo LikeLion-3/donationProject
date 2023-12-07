@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_FAVORITE_INST")
+@EqualsAndHashCode
 public class FavoriteInst {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

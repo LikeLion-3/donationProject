@@ -45,9 +45,8 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
-    public Article getArticleByArticleId(long articleId) {
-        return articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
+    public Article getArticleByArticleId(Long articleId) {
+        return articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
     }
 
     public Page<ArticleResponseDto> getAllArticles(int page, int size) {

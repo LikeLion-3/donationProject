@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_CHATROOM")
+@EqualsAndHashCode
+@ToString
 public class ChatRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

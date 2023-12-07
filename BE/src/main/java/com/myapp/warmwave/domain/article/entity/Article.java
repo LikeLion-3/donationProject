@@ -18,6 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_ARTICLE")
+@EqualsAndHashCode
+@ToString
 public class Article extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

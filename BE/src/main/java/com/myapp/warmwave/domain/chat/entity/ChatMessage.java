@@ -14,6 +14,8 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_CHAT_MESSAGE")
+@EqualsAndHashCode
+@ToString
 public class ChatMessage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
