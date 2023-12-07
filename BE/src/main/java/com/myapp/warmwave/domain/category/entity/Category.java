@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.category.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myapp.warmwave.domain.article.entity.Article;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,5 +22,6 @@ public class Category {
     private String name;
 
     @ManyToMany(mappedBy = "categories")
+    @JsonIgnore
     private Set<Article> articles = new HashSet<>();
 }

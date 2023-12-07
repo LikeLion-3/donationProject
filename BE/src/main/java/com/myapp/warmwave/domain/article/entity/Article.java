@@ -32,6 +32,7 @@ public class Article extends BaseEntity {
     private Type articleType;
 
     @ManyToMany
+    @JsonIgnore
     private List<Category> categories;
 
     //게시글 상태(기본, 진행중, 완료)
