@@ -115,7 +115,7 @@ public class UserService {
     public void confirmEmail(RequestEmailAuthDto requestDto) {
         EmailAuth emailAuth = emailAuthRepository
                 .findValidAuthByEmail(requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now())
-                .orElseThrow(() -> new CustomException(INVALID_JNT));
+                .orElseThrow(() -> new CustomException(INVALID_JWT));
 
         User user = userRepository
                 .findByEmail(requestDto.getEmail())
