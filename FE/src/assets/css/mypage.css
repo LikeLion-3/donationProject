@@ -1,0 +1,4 @@
+   .main-body {
+     min-height: calc(100vh - 120px);
+     /* 네비게이션 바와 푸터 높이만큼 제외한 나머지 높이 */
+   }
