@@ -11,15 +11,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.ALREADY_EXIST_CATEGORY;
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_CATEGORY;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -57,10 +60,15 @@ public class CategoryService {
 
         return new PageImpl<>(allCategories, PageRequest.of(1, allCategories.size()), allCategories.size());
     }
+
     private List<String> parseCategoryStrToArray(String input) {
-        return Arrays.stream(input.split(",\\s*"))
-                .map(String::trim)
-                .toList();
+        input = input.replaceAll("^\\[\"|\"\\]$", "");
+
+        List<String> result = Arrays.stream(input.split(","))
+                .map(word -> word.replaceAll("\"", "").trim())
+                .collect(Collectors.toList());
+
+        return result;
     }
 
     public List<Category> getCategory(String strCategories) {
@@ -80,6 +88,7 @@ public class CategoryService {
 
 
     private Category validateCategory(String categoryName) {
+        System.out.println("categoryName :  " + categoryName);
         return Optional.ofNullable(categoryRepository.findByName(categoryName))
                 .orElseThrow(() -> new CustomException(NOT_FOUND_CATEGORY));
     }
