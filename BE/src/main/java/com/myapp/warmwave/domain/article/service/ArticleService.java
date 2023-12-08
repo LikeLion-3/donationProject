@@ -50,7 +50,7 @@ public class ArticleService {
         Article savedArticle = articleRepository.save(article);
 
         for (Category category : categories) {
-            ArticleCategory articleCategory = ArticleCategory.buildArticleCategory(savedArticle, category);
+            ArticleCategory articleCategory = ArticleCategory.OfArticleCategory(savedArticle, category);
             articleCategoryRepository.save(articleCategory);
         }
 
@@ -84,7 +84,7 @@ public class ArticleService {
         Article findArticle = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
 
         for (Category category : categories) {
-            articleCategories.add(ArticleCategory.buildArticleCategory(findArticle, category));
+            articleCategories.add(ArticleCategory.OfArticleCategory(findArticle, category));
         }
         //추후 세터를 삭제하는 방향을 생각해보아야함
 
