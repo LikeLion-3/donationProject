@@ -1,38 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import './PostForm.css';
 
 const PostForm = () => {
+  const navigate = useNavigate();
   const [images, setImages] = useState([]);
-  const [categories, setCategories] = useState([
-    '의류',
-    '의료품',
-    '식품',
-    '잡화',
-    '기타',
-  ]);
-  const [selectedCategories, setSelectedCategories] = useState(
-    JSON.parse(localStorage.getItem('selectedCategories')) || []
-  );
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [title, setTitle] = useState(localStorage.getItem('postTitle') || '');
-  const [content, setContent] = useState(
-    localStorage.getItem('postContent') || ''
-  );
+  const [content, setContent] = useState(localStorage.getItem('postContent') || '');
 
   useEffect(() => {
-    // Navbar shrink function
-    const navbarShrink = () => {
-      const navbarCollapsible = document.body.querySelector('#mainNav');
-      if (!navbarCollapsible) {
-        return;
-      }
-      if (window.scrollY === 0) {
-        navbarCollapsible.classList.remove('navbar-shrink');
-      } else {
-        navbarCollapsible.classList.add('navbar-shrink');
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/categories');
+        const data = await response.json();
+        const categoryNames = data.content.map(category => category.name);
+        setCategories(categoryNames);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
       }
     };
+
+    fetchCategories();
   }, []);
 
   const handleImageChange = (event) => {
@@ -69,39 +61,29 @@ const PostForm = () => {
     try {
       const formData = new FormData();
 
-      // Append images to formData
       images.forEach((image, index) => {
         formData.append(`imageFiles`, image);
       });
 
-      // Append DTO data to formData
       formData.append('title', title);
       formData.append('content', content);
-      formData.append('prodCategory', JSON.stringify(selectedCategories));
+      formData.append('prodCategories', JSON.stringify(selectedCategories));
 
-      // Use fetch or axios to send formData with images and DTO to the server
       const response = await fetch('http://localhost:8080/api/articles', {
         method: 'POST',
         body: formData,
-        enctype: "multipart/form-data",
-        contentType: false
       });
 
-      // Handle the server response as needed
       const data = await response.json();
       console.log('Server response:', data);
 
-      // Clear form data if submission is successful
-      setImages([]);
-      setTitle('');
-      setContent('');
-      setSelectedCategories([]);
+      // 글 작성 후 해당 게시글 조회 페이지로 이동
+      navigate(`/donate/${data.articleId}`);
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
 
-  // Save selectedCategories to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('selectedCategories', JSON.stringify(selectedCategories));
   }, [selectedCategories]);
@@ -120,9 +102,7 @@ const PostForm = () => {
         </div>
         <div className="row gx-4 gx-lg-5 justify-content-center mb-5">
           <div className="col-lg-8 col-xl-6">
-            {/* Form and other HTML content go here */}
             <form onSubmit={handleSubmit}>
-              {/* Image input */}
               <div className="mb-3">
                 <label className="form-label" style={{ color: 'dimgray' }}>
                   이미지 추가
@@ -133,24 +113,22 @@ const PostForm = () => {
                   id="image"
                   accept="image/*"
                   onChange={handleImageChange}
-                  multiple // 여러 이미지를 선택 가능하도록 함
+                  multiple
                 />
-                {/* 이미지 미리보기 */}
                 {images.length > 0 && (
                   <div className="mt-3 d-flex flex-wrap">
-                  {images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={URL.createObjectURL(image)}
-                      alt={`Preview-${index}`}
-                      className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
-                      style={{ width: '139px', height: '150px', objectFit: 'cover' }}
-                    />
-                  ))}
-                </div>
+                    {images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={URL.createObjectURL(image)}
+                        alt={`Preview-${index}`}
+                        className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
+                        style={{ width: '139px', height: '150px', objectFit: 'cover' }}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
-              {/* Category input */}
               <div className="mb-3">
                 <label className="form-label" style={{ color: 'dimgray' }}>물품종류</label>
                 <div className="d-flex flex-wrap">
@@ -174,8 +152,6 @@ const PostForm = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Title input */}
               <div className="form-floating mb-3">
                 <input
                   type="text"
@@ -184,11 +160,9 @@ const PostForm = () => {
                   placeholder="글 제목을 입력해주세요."
                   value={title}
                   onChange={handleTitleChange}
-                  // Add any necessary validation or attributes
                 />
                 <label className="form-label" style={{ color: 'dimgray' }}>글 제목</label>
               </div>
-              {/* Content input */}
               <div className="form-floating mb-3">
                 <textarea
                   className="form-control"
@@ -197,11 +171,9 @@ const PostForm = () => {
                   value={content}
                   onChange={handleContentChange}
                   style={{ height: '10rem' }}
-                  // Add any necessary validation or attributes
                 ></textarea>
                 <label className="form-label" style={{ color: 'dimgray' }}>글 내용</label>
               </div>
-              {/* Submit Button */}
               <button
                 className="btn btn-primary btn-xl"
                 type="submit"
