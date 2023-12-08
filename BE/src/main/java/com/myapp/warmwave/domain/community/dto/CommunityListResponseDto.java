@@ -21,7 +21,5 @@ public class CommunityListResponseDto {
 
     private String category;
 
-    private String imgUrl;
-
     private LocalDateTime createdAt;
 }

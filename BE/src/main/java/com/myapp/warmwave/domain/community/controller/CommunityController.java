@@ -50,7 +50,7 @@ public class CommunityController {
         return new ResponseEntity<>(communityFacadeService.getCommunity(communityId), HttpStatus.OK);
     }
     @GetMapping("")
-    public ResponseEntity<Slice<CommunityListResponseDto>> getCommunities(@PageableDefault(size=10) Pageable pageable) {
+    public ResponseEntity<Slice<CommunityListResponseDto>> getCommunities(@PageableDefault(size=20) Pageable pageable) {
         return new ResponseEntity<>(communityService.getAllCommunities(pageable), HttpStatus.OK);
     }
 

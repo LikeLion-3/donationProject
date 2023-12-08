@@ -48,7 +48,7 @@ kakao:
       key: ${KAKAO_REST_API_KEY}
 image:
   upload:
-    path: FE/public/images
+    path: ../FE/public/images
 custom:
   jwt:
     access:

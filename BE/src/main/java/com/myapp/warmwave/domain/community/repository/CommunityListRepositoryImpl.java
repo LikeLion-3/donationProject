@@ -30,13 +30,6 @@ public class CommunityListRepositoryImpl implements CommunityListRepository{
     @Override
     public Slice<CommunityListResponseDto> findAllCommunities(Pageable pageable) {
 
-        var firstImageUrlSubQuery = JPAExpressions
-                .select(image.imgUrl)
-                .from(image)
-                .where(image.community.eq(community))
-                .orderBy(image.id.asc()) // imageId가 제일 작은 이미지를 선택
-                .limit(1);
-
         List<CommunityListResponseDto> result = jpaQueryFactory
                 .select(
                         Projections.constructor(CommunityListResponseDto.class,
@@ -50,7 +43,6 @@ public class CommunityListRepositoryImpl implements CommunityListRepository{
                                         .otherwise("Unknown").as("writer"),
 
                                 community.category,
-                                firstImageUrlSubQuery,
                                 community.createdAt)
                 )
                 .from(community)

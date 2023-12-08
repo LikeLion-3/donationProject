@@ -21,7 +21,7 @@ public class CommunityMapperImpl implements CommunityMapper{
         return Community.builder()
                 .title(dto.getTitle())
                 .contents(dto.getContents())
-                .category(dto.getContents())
+                .category(dto.getCategory())
                 .build();
     }
 
