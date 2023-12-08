@@ -37,7 +37,7 @@ public class CategoryService {
                 .map(strCategory -> Category.builder().name(strCategory).build())
                 .toList();
 
-        if(!categories.isEmpty()) {
+        if (!categories.isEmpty()) {
             categoryRepository.saveAll(categories);
         }
     }
@@ -85,10 +85,7 @@ public class CategoryService {
         categoryRepository.deleteByName(dto.getName());
     }
 
-
-
     private Category validateCategory(String categoryName) {
-        System.out.println("categoryName :  " + categoryName);
         return Optional.ofNullable(categoryRepository.findByName(categoryName))
                 .orElseThrow(() -> new CustomException(NOT_FOUND_CATEGORY));
     }

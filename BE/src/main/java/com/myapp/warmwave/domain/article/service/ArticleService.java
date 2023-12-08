@@ -5,7 +5,9 @@ import com.myapp.warmwave.common.main.dto.MainArticleDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.entity.ArticleCategory;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
+import com.myapp.warmwave.domain.article.repository.ArticleCategoryRepository;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
@@ -21,12 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_ARTICLE;
 
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
@@ -34,15 +37,26 @@ public class ArticleService {
     private final ArticleMapper articleMapper;
     private final ImageService imageService;
     private final CategoryService categoryService;
+    private final ArticleCategoryRepository articleCategoryRepository;
 
+    @Transactional
     public Article createArticle(ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
 
         List<Category> categories = categoryService.getCategory(dto.getProdCategory());
-        Article article = articleMapper.articlePostDtoToArticle(dto, categories);
+        Article article = articleMapper.articlePostDtoToArticle(dto);
+
         //추후 세터를 삭제하는 방향을 생각해보아야함
         article.setArticleImages(imageService.uploadImages(article, imageFiles));
+        Article savedArticle = articleRepository.save(article);
 
-        return articleRepository.save(article);
+        for (Category category : categories) {
+            ArticleCategory articleCategory = ArticleCategory.buildArticleCategory(savedArticle, category);
+            articleCategoryRepository.save(articleCategory);
+        }
+
+        savedArticle.setArticleCategories(articleCategoryRepository.findByArticleId(savedArticle.getId()));
+
+        return savedArticle;
     }
 
     public Article getArticleByArticleId(Long articleId) {
@@ -50,8 +64,8 @@ public class ArticleService {
     }
 
     public Page<ArticleResponseDto> getAllArticles(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page - 1, size);
 
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
         List<ArticleResponseDto> articleResponseDtoList
                 = articleRepository.findAll(pageRequest)
                 .stream()
@@ -62,11 +76,19 @@ public class ArticleService {
 
     }
 
+    @Transactional
     public Article updateArticle(Long articleId, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
+
         List<Category> categories = categoryService.getCategory(dto.getProdCategory());
+        List<ArticleCategory> articleCategories = new ArrayList<>();
         Article findArticle = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
 
-        findArticle.applyPatch(dto, categories);
+        for (Category category : categories) {
+            articleCategories.add(ArticleCategory.buildArticleCategory(findArticle, category));
+        }
+        //추후 세터를 삭제하는 방향을 생각해보아야함
+
+        findArticle.applyPatch(dto, articleCategories);
         findArticle.setArticleImages(imageService.uploadImages(findArticle, imageFiles));
 
         return articleRepository.save(findArticle);

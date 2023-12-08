@@ -1,12 +1,12 @@
 package com.myapp.warmwave.domain.category.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.entity.ArticleCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,6 +22,6 @@ public class Category {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "categories")
-    private Set<Article> articles = new HashSet<>();
+    @OneToMany(mappedBy = "category")
+    private List<ArticleCategory> articleCategories = new ArrayList<>();
 }
