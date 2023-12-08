@@ -9,9 +9,7 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,16 +25,15 @@ import static com.myapp.warmwave.domain.user.entity.QUser.user;
 public class CommunityListRepositoryImpl implements CommunityListRepository{
 
     private final JPAQueryFactory jpaQueryFactory;
+    // Refactor : 코드 중복
     @Override
-    public Slice<CommunityListResponseDto> findAllCommunities(Pageable pageable) {
-
+    public Page<CommunityListResponseDto> findAllCommunities(Pageable pageable) {
         List<CommunityListResponseDto> result = jpaQueryFactory
                 .select(
                         Projections.constructor(CommunityListResponseDto.class,
                                 community.id,
                                 community.title,
                                 community.hit,
-//                              individual.nickname -> individual 테이블이 있거나 User에 name 필드가 있어야 함
                                 new CaseBuilder()
                                         .when(user.instanceOf(Individual.class)).then("개인")
                                         .when(user.instanceOf(Institution.class)).then("기관")
@@ -47,17 +44,48 @@ public class CommunityListRepositoryImpl implements CommunityListRepository{
                 )
                 .from(community)
                 .leftJoin(community.user, user)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
+                // offset : 몇 번부터? 페이지 번호 = 1이면 .. 20부터자나!!
+                .offset((long) pageable.getPageNumber() * pageable.getPageSize())
+                .limit(pageable.getPageSize())
                 .orderBy(community.createdAt.desc())
                 .fetch();
 
-        boolean hasNext = false;
+        Long total = jpaQueryFactory
+                .select(community.count())
+                .from(community)
+                .fetchOne();
 
-        if (result.size() > pageable.getPageSize()) {
-            result.remove(result.size() - 1);
-            hasNext = true;
-        }
-        return new SliceImpl(result, pageable, hasNext);
+        return new PageImpl(result, pageable, total==null ? 0:total);
+    }
+
+    @Override
+    public Page<CommunityListResponseDto> findAllCommunitiesOrderByHit(Pageable pageable) {
+        List<CommunityListResponseDto> result = jpaQueryFactory
+                .select(
+                        Projections.constructor(CommunityListResponseDto.class,
+                                community.id,
+                                community.title,
+                                community.hit,
+                                new CaseBuilder()
+                                        .when(user.instanceOf(Individual.class)).then("개인")
+                                        .when(user.instanceOf(Institution.class)).then("기관")
+                                        .otherwise("Unknown").as("writer"),
+
+                                community.category,
+                                community.createdAt)
+                )
+                .from(community)
+                .leftJoin(community.user, user)
+                .offset((long) pageable.getPageNumber() * pageable.getPageSize())
+                .limit(pageable.getPageSize())
+                .orderBy(community.hit.desc())
+                .fetch();
+
+        Long total = jpaQueryFactory
+                .select(community.count())
+                .from(community)
+                .fetchOne();
+
+        return new PageImpl(result, pageable, total==null ? 0:total);
     }
 }

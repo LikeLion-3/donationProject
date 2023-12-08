@@ -9,6 +9,7 @@ import com.myapp.warmwave.domain.community.mapper.CommunityMapper;
 import com.myapp.warmwave.domain.community.service.CommunityFacadeService;
 import com.myapp.warmwave.domain.community.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -45,13 +46,14 @@ public class CommunityController {
         return new ResponseEntity<>(communityFacadeService.createCommunity(communityPostDto, images, userEmail), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{communityId}")
+    @GetMapping("/{communityIyd}")
     public ResponseEntity<CommunityResponseDto> getCommunity(@PathVariable("communityId") Long communityId) {
         return new ResponseEntity<>(communityFacadeService.getCommunity(communityId), HttpStatus.OK);
     }
     @GetMapping("")
-    public ResponseEntity<Slice<CommunityListResponseDto>> getCommunities(@PageableDefault(size=20) Pageable pageable) {
-        return new ResponseEntity<>(communityService.getAllCommunities(pageable), HttpStatus.OK);
+    public ResponseEntity<Page<CommunityListResponseDto>> getCommunities(@RequestParam(required = false, defaultValue = "recent") String sort,
+                                                                        @PageableDefault(size=12) Pageable pageable) {
+        return new ResponseEntity<>(communityService.getAllCommunities(pageable, sort), HttpStatus.OK);
     }
 
 //    JPA

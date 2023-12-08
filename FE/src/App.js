@@ -12,18 +12,21 @@ import PostButton from './component/article/post/PostButton';
 import PostForm from './component/article/post/PostForm'; // PostForm을 import 합니다.
 import SignIn from './component/user/signin';
 import SignUp from './component/user/signup';
+import CommunityList from './component/community/list/CommunityList';
+import CommunityDetails from './component/community/detail/CommunityDetails';
 
 function App() {
   return (
     <div>
       <Preloader />
-
       <Routes>
         <Route path="/" element={<Nav />}>
           <Route index element={<Home />} />
           <Route path="/donate" element={<ArticleList />} />
           <Route path="/donate/:articleId" element={<ArticleDetails />} />
           <Route path="/write" element={<PostForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
+          <Route path="/community" element={<CommunityList />} />
+          <Route path="/community/:communityId" element={<CommunityDetails />} />
         </Route>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />

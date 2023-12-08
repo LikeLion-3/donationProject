@@ -33,7 +33,11 @@ public class CommunityService {
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.NOT_FOUND_ARTICLE));
     }
 
-    public Slice<CommunityListResponseDto> getAllCommunities(Pageable pageable) {
+    public Page<CommunityListResponseDto> getAllCommunities(Pageable pageable, String sort) {
+        System.out.println("sort : " + sort);
+        if(sort.equals("popular")) {
+            return communityRepository.findAllCommunitiesOrderByHit(pageable);
+        }
         return communityRepository.findAllCommunities(pageable);
     }
 
