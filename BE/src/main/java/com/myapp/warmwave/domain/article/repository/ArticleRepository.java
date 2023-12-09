@@ -7,10 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface ArticleRepository extends JpaRepository<Article, Long> {
-    Article findById(long articleId);
+import java.util.Optional;
 
-    @Query("SELECT new com.myapp.warmwave.common.main.dto.MainArticleDto(a.id, a.user.email, a.title, a.articleType, a.articleStatus, a.prodCategory, a.createdAt) " +
+public interface ArticleRepository extends JpaRepository<Article, Long> {
+    Optional<Article> findByTitle(String title);
+
+    @Query("SELECT new com.myapp.warmwave.common.main.dto.MainArticleDto(a.id, a.user.email, a.title, a.articleType, a.articleStatus, a.createdAt) " +
             "FROM Article a " +
             "WHERE DATE(a.createdAt) = CURRENT_DATE " +
             "ORDER BY a.createdAt DESC")

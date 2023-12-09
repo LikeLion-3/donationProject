@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.article.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myapp.warmwave.common.BaseEntity;
+import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -16,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_ARTICLE")
+@EqualsAndHashCode
+@ToString
 public class Article extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,15 +34,15 @@ public class Article extends BaseEntity {
 
     //게시글 상태(기본, 진행중, 완료)
     @Enumerated(EnumType.STRING)
-    private Status articleStatus;
-
-    //기부물품 카테고리
-    @Enumerated(EnumType.STRING)
-    private ProductCategory prodCategory;
+    private Status articleStatus = Status.DEFAULT;
 
     private String userIp;
 
     private Long hit;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "article")
+    private List<ArticleCategory> articleCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -56,9 +59,14 @@ public class Article extends BaseEntity {
         this.articleImages = articleImages;
     }
 
-    public void applyPatch(Article article) {
-            this.title = article.getTitle();
-            this.content = article.getContent();
+    public void setArticleCategories(List<ArticleCategory> articleCategories) {
+        this.articleCategories = articleCategories;
+    }
+
+    public void applyPatch(ArticlePostDto dto, List<ArticleCategory> articleCategories) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.articleCategories = articleCategories;
     }
 
 }

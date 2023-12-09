@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_ADDRESS")
+@EqualsAndHashCode
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

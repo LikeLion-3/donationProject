@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @AllArgsConstructor
 @SuperBuilder
+@EqualsAndHashCode
+@ToString
 @DiscriminatorValue("institution")
 public class Institution extends User {
     @Column(unique = true)

@@ -20,7 +20,7 @@ public class ArticleResponseDto {
 
     private String content;
 
-    private String prodCategory;
+    private List<String> prodCategories;
 
     private String articleType;
 

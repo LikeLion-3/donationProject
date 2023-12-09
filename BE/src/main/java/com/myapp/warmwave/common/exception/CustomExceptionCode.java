@@ -42,6 +42,9 @@ public enum CustomExceptionCode {
     PASSWORD_NOT_MATCH(HttpStatus.CONFLICT, "비밀번호가 일치하지 않습니다."),
     REISSUE_FAILED(HttpStatus.CONFLICT, "다시 로그인하여 주시기 바랍니다."),
     ALREADY_DELETED_EMAIL(HttpStatus.CONFLICT, "이전에 삭제된 이메일입니다."),
+    NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+    ALREADY_EXIST_CATEGORY(HttpStatus.NOT_FOUND, "이미 존재하는 카테고리입니다."),
+
     /*
      * 415
      */

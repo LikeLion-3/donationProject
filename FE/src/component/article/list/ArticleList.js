@@ -21,9 +21,9 @@ const ArticleList = () => {
     }
   };
 
-  const ProductCard = ({ articleId, title, articleType, images, writer, category, postDate }) => {
+  const ProductCard = ({ articleId, title, articleType, images, writer, categories, postDate }) => {
     const imageUrl = images.length > 0 ? `/images/${images[0].imgName}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
-
+  
     return (
       <div className="col mb-4">
         <div className="card h-100" style={{ width: "110%" }}>
@@ -43,7 +43,10 @@ const ArticleList = () => {
               </h5>
               <hr className="my-1" />
               <p className="mb-1" style={{ color: '#212529', marginBottom: '10px' }}><strong>작성자 :</strong> {writer}</p>
-              <strong>상품카테고리 :</strong> <span className="badge bg-secondary mx-1">{category}</span>
+              <strong>물품종류 :</strong>
+              {categories.map((category, index) => (
+                <span key={index} className="badge bg-secondary mx-1" style={{ backgroundColor: '#ffa500' }}>{category}</span>
+              ))}
               <p className="mb-1" style={{ color: '#212529', marginBottom: '1px' }}><strong>게시일 :</strong> {formatDate(postDate)}</p>
               <p className="mb-1" style={{ color: '#212529', marginBottom: '10px' }}><strong>기부지역 :</strong> 서울시 송파구 백제고분로 7777-77</p>
             </div>
@@ -87,7 +90,7 @@ const ArticleList = () => {
                 articleId={product.articleId}
                 articleType={product.articleType}
                 title={product.title}
-                category={product.prodCategory}
+                categories={product.prodCategories}
                 images={product.images}
                 writer={product.writer}
                 tags={product.articleStatus}

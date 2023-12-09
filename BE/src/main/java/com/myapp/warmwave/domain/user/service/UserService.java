@@ -148,15 +148,15 @@ public class UserService {
 
     // 승인하지 않은 기관 회원 조회
     public List<ResponseUserDto> findAllByIsApproveFalse() {
-        return userRepository.findAllByIsApproveFalse()
+        return userRepository.findAllByIsApproveFalseAndEmailAuthTrue()
                 .stream()
                 .map(ResponseUserDto::FromEntity)
                 .toList();
     }
-    // 승인한 기관 회원 조회
 
+    // 승인한 기관 회원 조회
     public List<ResponseUserDto> findAllByIsApproveTrue() {
-        return userRepository.findAllByIsApproveTrue()
+        return userRepository.findAllByIsApproveTrueAndEmailAuthTrue()
                 .stream()
                 .map(ResponseUserDto::FromEntity)
                 .toList();
@@ -229,7 +229,6 @@ public class UserService {
     }
 
     // 기관 가입 승인
-
     @Transactional
     public void changeStatus(Long userId) {
         Institution savedUser = userRepository.findById(userId)
@@ -239,8 +238,8 @@ public class UserService {
         savedUser.approve();
         userRepository.save(savedUser);
     }
-    // 회원 탈퇴
 
+    // 회원 탈퇴
     @Transactional
     public void deleteUser(Long userId) {
         User savedUser = userRepository.findById(userId)
@@ -265,7 +264,6 @@ public class UserService {
         if (optUser.isPresent()) return optUser.get();
 
         // optUser가 null 이면 Individual 객체를 생성하고 반환
-
         String username = "";
         String email = "";
 

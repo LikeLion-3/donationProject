@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @ToString
+@EqualsAndHashCode
 @DiscriminatorValue("individual")
 public class Individual extends User {
     @Column(unique = true)

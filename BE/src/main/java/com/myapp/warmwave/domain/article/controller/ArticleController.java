@@ -28,9 +28,16 @@ public class ArticleController {
     private final ArticleService articleService;
     private final ArticleMapper articleMapper;
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ArticleResponseDto> postArticle(ArticlePostDto dto,
-                                                          List<MultipartFile> imageFiles) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ArticleResponseDto> postArticle(List<MultipartFile> imageFiles,
+                                                          String title,
+                                                          String content,
+                                                          String prodCategories) throws IOException {
+        ArticlePostDto dto = ArticlePostDto.builder()
+                .title(title)
+                .content(content)
+                .prodCategory(prodCategories)
+                .build();
 
         Article article = articleService.createArticle(dto, imageFiles);
 
@@ -47,15 +54,15 @@ public class ArticleController {
 
     @GetMapping
     public ResponseEntity<Page<ArticleResponseDto>> getAllArticles(@Positive @RequestParam("page") Integer page,
-                                                        @Positive @RequestParam("size") Integer size) {
+                                                                   @Positive @RequestParam("size") Integer size) {
 
         return ResponseEntity.ok(articleService.getAllArticles(page, size));
     }
 
     @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ArticleResponseDto> patchArticle(@PathVariable("articleId") Long articleId,
-                                       @RequestPart ArticlePostDto dto,
-                                       @RequestPart List<MultipartFile> imageFiles) throws IOException {
+                                                           @RequestPart ArticlePostDto dto,
+                                                           @RequestPart List<MultipartFile> imageFiles) throws IOException {
 
         Article article = articleService.updateArticle(articleId, dto, imageFiles);
 
