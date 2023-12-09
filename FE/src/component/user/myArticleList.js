@@ -11,24 +11,24 @@ function MyArticleList() {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">번호</th>
+                <th scope="col" style={{ textAlign: "center" }}>번호</th>
                 <th scope="col" style={{ textAlign: "center" }}>게시글 제목</th>
                 <td></td>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th style={{ verticalAlign: "middle" }} scope="row">1</th>
+                <th style={{ textAlign: "center", verticalAlign: "middle" }} scope="row">1</th>
                 <td style={{ verticalAlign: "middle" }}>첫번째 게시글</td>
-                <td>
-                  <button className='btn btn-danger'>나가기</button>
+                <td style={{ textAlign: "center" }}>
+                  <button className='btn btn-danger'>삭제</button>
                 </td>
               </tr>
               <tr>
-                <th style={{ verticalAlign: "middle" }} scope="row">2</th>
+                <th style={{ textAlign: "center", verticalAlign: "middle" }} scope="row">2</th>
                 <td style={{ verticalAlign: "middle" }}>두번째 게시글</td>
-                <td>
-                  <button className='btn btn-danger'>나가기</button>
+                <td style={{ textAlign: "center" }}>
+                  <button className='btn btn-danger'>삭제</button>
                 </td>
               </tr>
             </tbody>

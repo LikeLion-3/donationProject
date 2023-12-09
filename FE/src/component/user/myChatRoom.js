@@ -4,8 +4,6 @@ import axios from 'axios';
 function MyChatRoom() {
   const [chatRoomList, setChatRoomList] = useState([]);
 
-
-
   return (
     <div className="col-md-8 mt-5">
       <div className="card mb-3">
@@ -18,23 +16,23 @@ function MyChatRoom() {
             </colgroup>
             <thead>
               <tr>
-                <th scope="col">번호</th>
+                <th scope="col" style={{ textAlign: "center" }}>번호</th>
                 <th scope="col" style={{ textAlign: "center" }}>채팅방</th>
                 <td></td>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th style={{ verticalAlign: "middle" }} scope="row">1</th>
+                <th style={{ textAlign: "center", verticalAlign: "middle" }} scope="row">1</th>
                 <td style={{ verticalAlign: "middle" }}>'~~~~' 게시글의 채팅방</td>
-                <td>
+                <td style={{ textAlign: "center" }}>
                   <button className='btn btn-danger'>나가기</button>
                 </td>
               </tr>
               <tr>
-                <th style={{ verticalAlign: "middle" }} scope="row">2</th>
+                <th style={{ textAlign: "center", verticalAlign: "middle" }} scope="row">2</th>
                 <td style={{ verticalAlign: "middle" }}>'~~~~' 게시글의 채팅방</td>
-                <td>
+                <td style={{ textAlign: "center" }}>
                   <button className='btn btn-danger'>나가기</button>
                 </td>
               </tr>
