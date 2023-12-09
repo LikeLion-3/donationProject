@@ -12,6 +12,7 @@ import PostButton from './component/article/post/PostButton';
 import PostForm from './component/article/post/PostForm'; // PostForm을 import 합니다.
 import SignIn from './component/user/signin';
 import SignUp from './component/user/signup';
+import MyPage from './component/user/mypage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/donate" element={<ArticleList />} />
           <Route path="/donate/:articleId" element={<ArticleDetails />} />
           <Route path="/write" element={<PostForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
+          <Route path='/user/me' element={<MyPage />} />
         </Route>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
