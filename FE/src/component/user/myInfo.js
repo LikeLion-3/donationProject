@@ -1,67 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import EditMyInfo from './editIndivInfo';
+import ShowIndivInfo from './showIndivInfo';
+import ShowInstInfo from './showInstInfo';
+import EditInstInfo from './editInstInfo';
+import EditIndivInfo from './editIndivInfo';
 
-function MyInfo() {
+function MyInfo(props) {
+  const userType = props.userType;
   const [info, setInfo] = useState([]);
+  //status: 게시글이 정보 보여주기 상태인지 수정 가능 상태인지
+  const [status, setStatus] = useState("show");
 
-  return (
-    <div className="col-md-8 mt-5">
-      <div className="card mb-3">
-        <div className="card-body">
-          <div className="row">
-            <div className="col-sm-3">
-              <h6 className="mb-0">Full Name</h6>
-            </div>
-            <div className="col-sm-9 text-secondary">
-              Kenneth Valdez
-            </div>
-          </div>
-          <hr />
-          <div className="row">
-            <div className="col-sm-3">
-              <h6 className="mb-0">Email</h6>
-            </div>
-            <div className="col-sm-9 text-secondary">
-              fip@jukmuh.al
-            </div>
-          </div>
-          <hr />
-          <div className="row">
-            <div className="col-sm-3">
-              <h6 className="mb-0">Phone</h6>
-            </div>
-            <div className="col-sm-9 text-secondary">
-              (239) 816-9029
-            </div>
-          </div>
-          <hr />
-          <div className="row">
-            <div className="col-sm-3">
-              <h6 className="mb-0">Mobile</h6>
-            </div>
-            <div className="col-sm-9 text-secondary">
-              (320) 380-4539
-            </div>
-          </div>
-          <hr />
-          <div className="row">
-            <div className="col-sm-3">
-              <h6 className="mb-0">Address</h6>
-            </div>
-            <div className="col-sm-9 text-secondary">
-              Bay Area, San Francisco, CA
-            </div>
-          </div>
-          <hr />
-          <div className="row">
-            <div className="col-sm-12">
-              <a className="btn btn-info " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Edit</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  const switchPage = status => {
+    setStatus(status);
+  }
+
+  if (userType == 'institution' && status == 'show') {
+    return <ShowInstInfo sendDataToParent={switchPage} />
+  } else if (userType == 'individual' && status == 'show') {
+    return <ShowIndivInfo sendDataToParent={switchPage} />
+  } else if (userType == 'institution' && status == 'edit') {
+    return <EditInstInfo sendDataToParent={switchPage} />
+  } else {
+    return <EditIndivInfo sendDataToParent={switchPage} />
+  }
 }
 
 export default MyInfo;
