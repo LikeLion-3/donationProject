@@ -5,7 +5,7 @@ import axios from 'axios';
 import MyInfo from "./myInfo";
 import MyArticleList from "./myArticleList";
 import FavoriteInstList from "./favoriteInstList";
-import MyChatRoom from "./myChatRoom";
+import MyChatRoom from "../myChatRoom";
 import EditMyInfo from "./editIndivInfo";
 
 function MyPage() {
