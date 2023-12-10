@@ -46,7 +46,7 @@ public class CommunityController {
         return new ResponseEntity<>(communityFacadeService.createCommunity(communityPostDto, images, userEmail), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{communityIyd}")
+    @GetMapping("/{communityId}")
     public ResponseEntity<CommunityResponseDto> getCommunity(@PathVariable("communityId") Long communityId) {
         return new ResponseEntity<>(communityFacadeService.getCommunity(communityId), HttpStatus.OK);
     }
