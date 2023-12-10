@@ -12,7 +12,7 @@ import Login from './component/user/login';
 import PostButton from './component/article/post/PostButton';
 import PostForm from './component/article/post/PostForm'; // PostForm을 import 합니다.
 import SignUp from './component/user/signup';
-import MyPage from './component/user/mypage';
+import MyPage from './component/user/mypage/mypage';
 
 // import User from './component/user/user';
 
