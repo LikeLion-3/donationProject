@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+/* 커뮤니티 리스트 제목 열 */
+.black-link {
+  color: black !important; 
+  text-decoration: none !important;
+}

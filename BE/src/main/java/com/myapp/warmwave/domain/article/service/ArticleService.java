@@ -46,6 +46,8 @@ public class ArticleService {
         Article article = articleMapper.articlePostDtoToArticle(dto);
 
         //추후 세터를 삭제하는 방향을 생각해보아야함
+        // 로직에 fileName 필요 없음 -> fileName에 article 정보 저장하면 단방향 매핑 가능하지 않을까?
+        //  - 이러면 uploadImages 메서드의 파라미터로 article 엔티티 통째로 대신 article 정보(ex. id나 name)만 써도 됨
         article.setArticleImages(imageService.uploadImages(article, imageFiles));
         Article savedArticle = articleRepository.save(article);
 
