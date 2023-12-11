@@ -1,6 +1,7 @@
 package com.myapp.warmwave.domain.favorite_inst.service;
 
 import com.myapp.warmwave.domain.favorite_inst.dto.FavoriteInstDto;
+import com.myapp.warmwave.domain.favorite_inst.dto.ResponseFavoriteDto;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
 import com.myapp.warmwave.domain.favorite_inst.repository.FavoriteInstRepository;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -23,7 +24,7 @@ public class FavoriteInstService {
     private final UserRepository<User> userRepository;
 
     @Transactional
-    public void createFavoriteInst(Long institutionId, String indivEmail) {
+    public ResponseFavoriteDto createFavoriteInst(Long institutionId, String indivEmail) {
         Individual individual = userRepository.findByEmail(indivEmail)
                 .map(Individual.class::cast)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
@@ -44,7 +45,8 @@ public class FavoriteInstService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        favoriteInstRepository.save(favoriteInst);
+        FavoriteInst savedFavorite = favoriteInstRepository.save(favoriteInst);
+        return ResponseFavoriteDto.fromEntity(savedFavorite);
     }
 
     public List<FavoriteInstDto> findAllFavoriteInstByIndividual(Long individualId) {

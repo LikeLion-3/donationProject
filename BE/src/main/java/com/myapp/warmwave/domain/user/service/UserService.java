@@ -8,7 +8,6 @@ import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.service.AddressService;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.email.entity.EmailAuth;
-import com.myapp.warmwave.domain.email.repository.EmailAuthRepository;
 import com.myapp.warmwave.domain.email.service.EmailService;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -25,7 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 
@@ -34,7 +36,6 @@ import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository<User> userRepository;
-    private final EmailAuthRepository emailAuthRepository;
     private final AddressService addressService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
@@ -58,14 +59,9 @@ public class UserService {
         }
 
         // 이메일 인증 로직 추가
-        EmailAuth emailAuth = emailAuthRepository.save(
-                EmailAuth.builder()
-                        .email(dto.getEmail())
-                        .authToken(UUID.randomUUID().toString())
-                        .expired(false)
-                        .build());
+        EmailAuth emailAuth = emailService.createEmailAuth(dto.getEmail());
 
-        Institution institution = dto.toEntity(passwordEncoder, address.get());
+        Institution institution = dto.toEntity(passwordEncoder, address.get(), emailAuth);
         userRepository.save(institution);
 
         emailService.send(emailAuth.getEmail(), emailAuth.getAuthToken());
@@ -83,26 +79,16 @@ public class UserService {
             throw new CustomException(ALREADY_EXIST_USER);
         }
 
-        EmailAuth emailAuth = emailAuthRepository.save(
-                EmailAuth.builder()
-                        .email(dto.getEmail())
-                        .authToken(UUID.randomUUID().toString())
-                        .expired(false)
-                        .build());
+        EmailAuth emailAuth = emailService.createEmailAuth(dto.getEmail());
 
-        Individual individual = userRepository.save(
-                Individual.builder()
-                        .email(dto.getEmail())
-                        .password(passwordEncoder.encode(dto.getPassword()))
-                        .nickname(dto.getNickname())
-                        .address(addressService.createAddress(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails()))
-                        .temperature(0F)
-                        .profileImg(UserService.DEFAULT_PROFILE_IMG_INDI)
-                        .role(Role.INDIVIDUAL)
-                        .emailAuth(false)
-                        .build());
+        Address address = addressService.createAddress(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails());
+
+        Individual individual = dto.toEntity(passwordEncoder, address, emailAuth);
+
+        userRepository.save(individual);
 
         emailService.send(emailAuth.getEmail(), emailAuth.getAuthToken());
+
         return ResponseUserJoinDto.builder()
                 .id(individual.getId())
                 .email(individual.getEmail())
@@ -113,16 +99,14 @@ public class UserService {
     // 이메일 인증 성공
     @Transactional
     public void confirmEmail(RequestEmailAuthDto requestDto) {
-        EmailAuth emailAuth = emailAuthRepository
-                .findValidAuthByEmail(requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now())
-                .orElseThrow(() -> new CustomException(INVALID_JWT));
+        EmailAuth emailAuth = emailService.validEmail(requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now());
 
         User user = userRepository
                 .findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         emailAuth.usedToken();
-        user.emailVerified();
+        user.getEmailAuth().emailVerified();
     }
 
     // 로그인
@@ -134,7 +118,7 @@ public class UserService {
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword()))
             throw new CustomException(PASSWORD_NOT_MATCH);
 
-        if (!user.getEmailAuth())
+        if (Boolean.FALSE.equals(user.getEmailAuth().getIsVerified()))
             throw new CustomException(EXPIRED_JWT);
 
         Map<String, Object> claims = new HashMap<>();
@@ -148,25 +132,31 @@ public class UserService {
 
     // 승인하지 않은 기관 회원 조회
     public List<ResponseUserDto> findAllByIsApproveFalse() {
-        return userRepository.findAllByIsApproveFalseAndEmailAuthTrue()
+        return userRepository.findAllByIsApproveFalseAndEmailAuthIsVerifiedTrue()
                 .stream()
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
     }
 
     // 승인한 기관 회원 조회
     public List<ResponseUserDto> findAllByIsApproveTrue() {
-        return userRepository.findAllByIsApproveTrueAndEmailAuthTrue()
+        return userRepository.findAllByIsApproveTrueAndEmailAuthIsVerifiedTrue()
                 .stream()
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
+    }
+
+    // 회원 조회
+    public ResponseUserDto findUser(Long userId) {
+        return userRepository.findById(userId)
+                .map(ResponseUserDto::fromEntity).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     }
 
     // 기관 단일 조회 -> 승인한 기관만 조회 가능
     public ResponseUserDto findInstitution(Long userId) {
         return userRepository.findById(userId)
                 .map(Institution.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
     }
 
@@ -174,7 +164,7 @@ public class UserService {
     public ResponseUserDto findIndividual(Long userId) {
         return userRepository.findById(userId)
                 .map(Individual.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
     }
 
@@ -183,8 +173,7 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .map(Institution.class::cast)
-//                .filter(Institution::getIsApprove) -> 승인 여부에 따라 다른데 우선 전체로 기준 잡고 조회함.
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
     }
 
@@ -193,23 +182,21 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .map(Individual.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
     }
 
     // 기관 회원 정보 수정
     @Transactional
-    public Long updateInfo(RequestInstitutionUpdateDto dto, Long userId) {
+    public Long updateInstInfo(RequestInstitutionUpdateDto dto, Long userId) {
         Institution savedInstitution = userRepository.findById(userId)
                 .map(Institution.class::cast)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
 
-        Address address = addressService.findAddress(savedInstitution.getAddress().getFullAddr())
-                .orElseThrow(() -> new IllegalArgumentException("주소 검색 오류"));
-
-        addressService.updateAddress(dto, savedInstitution);
+        Address address = addressService.updateInstitutionAddress(dto, savedInstitution);
 
         savedInstitution.updateUserInfo(passwordEncoder.encode(dto.getPassword()), address);
+
         return userRepository.save(savedInstitution).getId();
     }
 

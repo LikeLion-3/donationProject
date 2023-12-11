@@ -37,11 +37,11 @@ public class AddressService {
     }
 
     @Transactional
-    public void updateAddress(RequestInstitutionUpdateDto dto, Institution institution) {
+    public Address updateInstitutionAddress(RequestInstitutionUpdateDto dto, Institution institution) {
         Address originalAddress = institution.getAddress();
 
         originalAddress.update(dto.getFullAddr(), dto.getSdName(), dto.getSggName(), dto.getDetails());
-        addressRepository.save(originalAddress);
+        return addressRepository.save(originalAddress);
     }
 
     @Transactional

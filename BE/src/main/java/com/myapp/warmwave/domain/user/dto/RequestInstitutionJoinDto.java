@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.user.dto;
 
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.domain.address.entity.Address;
+import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.service.UserService;
 import jakarta.validation.constraints.Email;
@@ -40,7 +41,7 @@ public class RequestInstitutionJoinDto {
     // 상세주소
     private String details;
 
-    public Institution toEntity(PasswordEncoder passwordEncoder, Address address) {
+    public Institution toEntity(PasswordEncoder passwordEncoder, Address address, EmailAuth emailAuth) {
         return Institution.builder()
                 .email(getEmail())
                 .password(passwordEncoder.encode(getPassword()))
@@ -50,7 +51,7 @@ public class RequestInstitutionJoinDto {
                 .temperature(0F)
                 .profileImg(UserService.DEFAULT_PROFILE_IMG_INST)
                 .role(Role.INSTITUTION)
-                .emailAuth(false)   // 이메일 인증여부 추가
+                .emailAuth(emailAuth)   // 이메일 인증여부 추가
                 .isApprove(Boolean.FALSE)
                 .build();
     }

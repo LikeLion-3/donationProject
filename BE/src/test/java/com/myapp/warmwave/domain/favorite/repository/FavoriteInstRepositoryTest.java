@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.favorite.repository;
 
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
+import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
 import com.myapp.warmwave.domain.favorite_inst.repository.FavoriteInstRepository;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -33,6 +34,8 @@ public class FavoriteInstRepositoryTest {
 
     private Individual individual;
     private Institution institution;
+    private EmailAuth emailAuth1;
+    private EmailAuth emailAuth2;
 
     private FavoriteInst favoriteInst() {
         return FavoriteInst.builder()
@@ -49,9 +52,7 @@ public class FavoriteInstRepositoryTest {
                 .email("email1")
                 .password("1234")
                 .role(Role.INDIVIDUAL)
-                .temperature(0F)
-                .profileImg("이미지1")
-                .emailAuth(false)
+                .emailAuth(emailAuth1)
                 .nickname("닉네임1")
                 .build());
 
@@ -60,13 +61,17 @@ public class FavoriteInstRepositoryTest {
                 .email("email2")
                 .password("12345")
                 .role(Role.INSTITUTION)
-                .temperature(0F)
-                .profileImg("이미지2")
-                .isApprove(false)
                 .institutionName("기관1")
-                .emailAuth(false)
-                .registerNum("123456789")
+                .emailAuth(emailAuth2)
                 .build());
+
+        emailAuth1 = EmailAuth.builder()
+                .id(1L)
+                .build();
+
+        emailAuth2 = EmailAuth.builder()
+                .id(2L)
+                .build();
     }
 
     // CREATE

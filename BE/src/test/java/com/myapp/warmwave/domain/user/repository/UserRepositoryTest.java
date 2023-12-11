@@ -4,10 +4,11 @@ import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.repository.AddressRepository;
+import com.myapp.warmwave.domain.email.entity.EmailAuth;
+import com.myapp.warmwave.domain.email.repository.EmailAuthRepository;
 import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
-import com.myapp.warmwave.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -31,8 +32,13 @@ public class UserRepositoryTest {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private EmailAuthRepository emailAuthRepository;
+
     private Address savedAddress1;
     private Address savedAddress2;
+    private EmailAuth emailAuth1;
+    private EmailAuth emailAuth2;
 
     private Individual individual() {
         return Individual.builder()
@@ -43,7 +49,7 @@ public class UserRepositoryTest {
                 .address(savedAddress1)
                 .temperature(0F)
                 .profileImg("이미지1")
-                .emailAuth(false)
+                .emailAuth(emailAuth1)
                 .nickname("닉네임1")
                 .build();
     }
@@ -59,13 +65,29 @@ public class UserRepositoryTest {
                 .profileImg("이미지2")
                 .isApprove(false)
                 .institutionName("기관1")
-                .emailAuth(false)
+                .emailAuth(emailAuth2)
                 .registerNum("123456789")
                 .build();
     }
 
     @BeforeEach
     void setup() {
+        emailAuth1 = emailAuthRepository.save(EmailAuth.builder()
+                .id(1L)
+                .email(individual().getEmail())
+                .authToken("9876")
+                .isVerified(false)
+                .expired(false)
+                .build());
+
+        emailAuth2 = emailAuthRepository.save(EmailAuth.builder()
+                .id(2L)
+                .email(institution().getEmail())
+                .authToken("5432")
+                .isVerified(false)
+                .expired(false)
+                .build());
+
         savedAddress1 = addressRepository.save(Address.builder()
                 .id(1L)
                 .userType(Role.INDIVIDUAL)
@@ -158,10 +180,10 @@ public class UserRepositoryTest {
         Individual savedUser = individual();
 
         // when
-        savedUser.emailVerified();
+        savedUser.getEmailAuth().emailVerified();
         userRepository.save(savedUser);
 
-        List<Individual> individualList = userRepository.findAllByEmailAuthTrue();
+        List<Individual> individualList = userRepository.findAllByEmailAuthIsVerifiedTrue();
 
         // then
         assertThat(individualList).hasSize(1);
@@ -174,11 +196,11 @@ public class UserRepositoryTest {
         Institution savedUser = institution();
 
         // when
-        savedUser.emailVerified();
+        savedUser.getEmailAuth().emailVerified();
         savedUser.approve();
         userRepository.save(savedUser);
 
-        List<Institution> institutionList = userRepository.findAllByIsApproveTrueAndEmailAuthTrue();
+        List<Institution> institutionList = userRepository.findAllByIsApproveTrueAndEmailAuthIsVerifiedTrue();
 
         // then
         assertThat(institutionList).hasSize(1);
@@ -191,9 +213,9 @@ public class UserRepositoryTest {
         Institution savedUser = institution();
 
         // when
-        savedUser.emailVerified();
+        savedUser.getEmailAuth().emailVerified();
         userRepository.save(savedUser);
-        List<Institution> institutionList = userRepository.findAllByIsApproveFalseAndEmailAuthTrue();
+        List<Institution> institutionList = userRepository.findAllByIsApproveFalseAndEmailAuthIsVerifiedTrue();
 
         // then
         assertThat(institutionList).hasSize(1);
@@ -206,7 +228,7 @@ public class UserRepositoryTest {
         userRepository.save(institution());
 
         // when
-        List<Institution> institutionList = userRepository.findAllByIsApproveFalseAndEmailAuthFalse();
+        List<Institution> institutionList = userRepository.findAllByIsApproveFalseAndEmailAuthIsVerifiedFalse();
 
         // then
         assertThat(institutionList).hasSize(1);
@@ -217,7 +239,7 @@ public class UserRepositoryTest {
     void findInstitutionUserApprove() {
         // given
         Institution user = institution();
-        user.emailVerified();
+        user.getEmailAuth().emailVerified();
         user.approve();
         Institution savedUser = userRepository.save(user);
 
@@ -228,7 +250,7 @@ public class UserRepositoryTest {
         // then
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get()).isEqualTo(savedUser);
-        assertThat(foundUser.get().getEmailAuth()).isTrue();
+        assertThat(foundUser.get().getEmailAuth().getIsVerified()).isTrue();
         assertThat(foundUser.get().getIsApprove()).isTrue();
     }
 
@@ -237,7 +259,7 @@ public class UserRepositoryTest {
     void findInstitutionUserApproveAndEmailAuthFalse() {
         // given
         Institution user = institution();
-        user.emailVerified();
+        user.getEmailAuth().emailVerified();
         Institution savedUser = userRepository.save(user);
 
         // when
@@ -247,7 +269,7 @@ public class UserRepositoryTest {
         // then
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get()).isEqualTo(savedUser);
-        assertThat(foundUser.get().getEmailAuth()).isTrue();
+        assertThat(foundUser.get().getEmailAuth().getIsVerified()).isTrue();
         assertThat(foundUser.get().getIsApprove()).isFalse();
     }
 
@@ -264,7 +286,7 @@ public class UserRepositoryTest {
         // then
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get()).isEqualTo(savedUser);
-        assertThat(foundUser.get().getEmailAuth()).isFalse();
+        assertThat(foundUser.get().getEmailAuth().getIsVerified()).isFalse();
         assertThat(foundUser.get().getIsApprove()).isFalse();
     }
 
@@ -277,15 +299,15 @@ public class UserRepositoryTest {
         Institution institution = institution();
 
         // when
-        individual.emailVerified();
-        institution.emailVerified();
+        individual.getEmailAuth().emailVerified();
+        institution.getEmailAuth().emailVerified();
 
         userRepository.save(individual);
         userRepository.save(institution);
 
         // then
-        assertThat(individual.getEmailAuth()).isTrue();
-        assertThat(institution.getEmailAuth()).isTrue();
+        assertThat(individual.getEmailAuth().getIsVerified()).isTrue();
+        assertThat(institution.getEmailAuth().getIsVerified()).isTrue();
     }
 
     @DisplayName("기관 사용자 가입 승인")

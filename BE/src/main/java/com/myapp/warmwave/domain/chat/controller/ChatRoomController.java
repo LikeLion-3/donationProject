@@ -28,7 +28,8 @@ public class ChatRoomController {
     }
 
     @DeleteMapping("/chatRoom/{roomId}")
-    public void deleteRoom(@PathVariable("roomId") Long roomId) {
+    public ResponseEntity<Void> deleteRoom(@PathVariable("roomId") Long roomId) {
         chatroomService.deleteChatRoom(roomId);
+        return ResponseEntity.noContent().build();
     }
 }

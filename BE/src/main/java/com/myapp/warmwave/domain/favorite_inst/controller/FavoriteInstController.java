@@ -1,10 +1,10 @@
 package com.myapp.warmwave.domain.favorite_inst.controller;
 
 import com.myapp.warmwave.domain.favorite_inst.dto.FavoriteInstDto;
+import com.myapp.warmwave.domain.favorite_inst.dto.ResponseFavoriteDto;
 import com.myapp.warmwave.domain.favorite_inst.service.FavoriteInstService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +16,11 @@ public class FavoriteInstController {
     private final FavoriteInstService favoriteInstService;
 
     @PostMapping
-    public ResponseEntity<Void> createFavorite(@PathVariable("userId") Long institutionId
+    public ResponseEntity<ResponseFavoriteDto> createFavorite(@PathVariable("userId") Long institutionId
 //                                               , Authentication authentication
     ) {
 //        String email = authentication.getName();
-        favoriteInstService.createFavoriteInst(institutionId, "test01@gmail.com");
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(favoriteInstService.createFavoriteInst(institutionId, "test01@gmail.com"));
     }
 
     @GetMapping

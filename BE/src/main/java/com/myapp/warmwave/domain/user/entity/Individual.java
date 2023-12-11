@@ -22,4 +22,9 @@ public class Individual extends User {
         this.updateUserInfo(password, address);
 //        this.profileImg = profileImg;
     }
+
+    @Override
+    public String getName() {
+        return this.nickname;
+    }
 }

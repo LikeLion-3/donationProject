@@ -18,14 +18,14 @@ public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
     Optional<User> findByEmail(String email);
 
     // 개인
-    List<Individual> findAllByEmailAuthTrue();
+    List<Individual> findAllByEmailAuthIsVerifiedTrue();
 
     // 기관
-    List<Institution> findAllByIsApproveTrueAndEmailAuthTrue();
+    List<Institution> findAllByIsApproveTrueAndEmailAuthIsVerifiedTrue();
 
-    List<Institution> findAllByIsApproveFalseAndEmailAuthTrue();
+    List<Institution> findAllByIsApproveFalseAndEmailAuthIsVerifiedTrue();
 
-    List<Institution> findAllByIsApproveFalseAndEmailAuthFalse();
+    List<Institution> findAllByIsApproveFalseAndEmailAuthIsVerifiedFalse();
 
     @Query("SELECT new com.myapp.warmwave.common.main.dto.MainInstDto(ins.id, ins.institutionName, ins.address.fullAddr, ins.address.sdName, ins.address.sggName, " +
             "(SELECT COUNT(a) FROM ins.articles a WHERE a.articleType = 'DONATION')) " +

@@ -5,6 +5,7 @@ import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.chat.entity.ChatMessage;
+import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,11 +43,9 @@ public abstract class User extends BaseEntity {
 
     private Float temperature;
 
-    private Boolean emailAuth;  // 이메일 인증 여부(회원가입 후 진행)
-
-    public void emailVerified() {
-        this.emailAuth = true;
-    }
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "EMAILAUTH_ID")
+    private EmailAuth emailAuth;  // 이메일 인증 여부(회원가입 후 진행)
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID")
@@ -60,6 +59,8 @@ public abstract class User extends BaseEntity {
 
     @OneToMany(mappedBy = "individualUser", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<FavoriteInst> favoriteList = new ArrayList<>();
+
+    abstract public String getName();
 
     public void updateUserInfo(String password, Address address) {
         this.password = password;

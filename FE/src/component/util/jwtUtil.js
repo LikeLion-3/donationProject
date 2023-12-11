@@ -71,7 +71,7 @@ const beforeRes = async (res) => {
         userCookieValue.accessToken = result.accessToken
         userCookieValue.refreshToken = result.refreshToken
 
-        setCookie("user", JSON.stringify(userCookieValue), 1)
+        setCookie("user", JSON.stringify(userCookieValue), 7)
 
         //원래의 호출
         const originalRequest = res.config

@@ -24,4 +24,9 @@ public class Institution extends User {
     public void approve() {
         this.isApprove = true;
     }
+
+    @Override
+    public String getName() {
+        return this.institutionName;
+    }
 }

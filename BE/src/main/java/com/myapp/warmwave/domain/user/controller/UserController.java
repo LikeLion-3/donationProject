@@ -82,6 +82,12 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllByIsApproveFalse());
     }
 
+    // 단일 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResponseUserDto> findUser(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(userService.findUser(userId));
+    }
+
     // 기관 단일 조회
     @GetMapping("/{userId}/institution")
     public ResponseEntity<ResponseUserDto> findInstitution(@PathVariable("userId") Long userId) {
@@ -100,7 +106,7 @@ public class UserController {
             @PathVariable("userId") Long userId,
             @RequestBody RequestInstitutionUpdateDto dto
     ) {
-        return ResponseEntity.ok(userService.updateInfo(dto, userId));
+        return ResponseEntity.ok(userService.updateInstInfo(dto, userId));
     }
 
     // 개인 회원 정보 수정
