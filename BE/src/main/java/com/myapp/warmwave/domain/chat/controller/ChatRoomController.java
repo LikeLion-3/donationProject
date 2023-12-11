@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.chat.controller;
 
 import com.myapp.warmwave.domain.chat.dto.ChatRoomDto;
 import com.myapp.warmwave.domain.chat.dto.ResponseChatRoomDto;
+import com.myapp.warmwave.domain.chat.dto.ResponseCreateChatRoomDto;
 import com.myapp.warmwave.domain.chat.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class ChatRoomController {
     private final ChatRoomService chatroomService;
 
     @PostMapping("/chatRoom")
-    public ResponseEntity<ResponseChatRoomDto> createRoom(@RequestBody ChatRoomDto requestDto) {
+    public ResponseEntity<ResponseCreateChatRoomDto> createRoom(@RequestBody ChatRoomDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(chatroomService.createChatRoom(requestDto));
     }
 

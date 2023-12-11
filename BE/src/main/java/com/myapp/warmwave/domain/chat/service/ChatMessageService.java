@@ -26,10 +26,7 @@ public class ChatMessageService {
     private final UserRepository<User> userRepository;
 
     @Transactional
-    public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+    public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto,String email) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다"));
