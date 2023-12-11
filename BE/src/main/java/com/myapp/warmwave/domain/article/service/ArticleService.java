@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.FAILED_TO_REMOVAL;
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_ARTICLE;
 
 @Slf4j
@@ -103,6 +104,10 @@ public class ArticleService {
         imageService.deleteImagesByArticleId(articleId);
         articleCategoryRepository.deleteByArticleId(articleId);
         articleRepository.deleteById(articleId);
+
+        if(articleRepository.existsById(articleId)) {
+            new CustomException(FAILED_TO_REMOVAL);
+        }
     }
 
 
