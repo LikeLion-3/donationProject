@@ -44,7 +44,7 @@ public class Article extends BaseEntity {
     @OneToMany(mappedBy = "article")
     private List<ArticleCategory> articleCategories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "article")
     @JsonIgnore
     private List<Image> articleImages = new ArrayList<>();
 
@@ -68,5 +68,4 @@ public class Article extends BaseEntity {
         this.content = dto.getContent();
         this.articleCategories = articleCategories;
     }
-
 }

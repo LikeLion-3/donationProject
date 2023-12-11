@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ArticleCategoryRepository extends JpaRepository<ArticleCategory, Long> {
     List<ArticleCategory> findByArticleId(long articleId);
+
+    void deleteByArticleId(long articleId);
 }

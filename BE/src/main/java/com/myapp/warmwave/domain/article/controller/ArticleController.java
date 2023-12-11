@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.article.controller;
 
+import com.myapp.warmwave.common.jwt.JwtProvider;
 import com.myapp.warmwave.common.main.dto.MainArticleDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ArticleController {
     private final ArticleService articleService;
     private final ArticleMapper articleMapper;
+    private final JwtProvider jwtProvider;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArticleResponseDto> postArticle(List<MultipartFile> imageFiles,
@@ -44,6 +46,22 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
+    @PatchMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ArticleResponseDto> patchArticle(@PathVariable("articleId") Long articleId,
+                                                           List<MultipartFile> imageFiles,
+                                                           String title,
+                                                           String content,
+                                                           String prodCategories) throws IOException {
+        ArticlePostDto dto = ArticlePostDto.builder()
+                .title(title)
+                .content(content)
+                .prodCategory(prodCategories)
+                .build();
+
+        Article article = articleService.updateArticle(articleId, dto, imageFiles);
+
+        return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
+    }
     @GetMapping("/{articleId}")
     public ResponseEntity<ArticleResponseDto> getArticle(@PathVariable("articleId") Long articleId) {
 
@@ -59,14 +77,10 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.getAllArticles(page, size));
     }
 
-    @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ArticleResponseDto> patchArticle(@PathVariable("articleId") Long articleId,
-                                                           @RequestPart ArticlePostDto dto,
-                                                           @RequestPart List<MultipartFile> imageFiles) throws IOException {
-
-        Article article = articleService.updateArticle(articleId, dto, imageFiles);
-
-        return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
+    @DeleteMapping("/{articleId}")
+    public ResponseEntity deleteArticle(@PathVariable("articleId") Long articleId) {
+        articleService.deleteArticle(articleId);
+        return ResponseEntity.noContent().build();
     }
 
     // 최신 게시글 5개 조회

@@ -64,4 +64,19 @@ private String imageStorePath;
         }
         return images;
     }
+
+    public void deleteImagesByArticleId(Long articleId) {
+        List<Image> imagesToDelete = imageRepository.findByArticleId(articleId);
+
+        for (Image image : imagesToDelete) {
+            String fileName = image.getImgName();
+            File fileToDelete = new File(imageStorePath, fileName);
+
+            // 파일 삭제
+            if (fileToDelete.exists()) {
+                fileToDelete.delete();
+            }
+        }
+        imageRepository.deleteAll(imagesToDelete);
+    }
 }
