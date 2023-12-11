@@ -134,7 +134,7 @@ public class UserService {
     public List<ResponseUserDto> findAllByIsApproveFalse() {
         return userRepository.findAllByIsApproveFalseAndEmailAuthIsVerifiedTrue()
                 .stream()
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
     }
 
@@ -142,15 +142,21 @@ public class UserService {
     public List<ResponseUserDto> findAllByIsApproveTrue() {
         return userRepository.findAllByIsApproveTrueAndEmailAuthIsVerifiedTrue()
                 .stream()
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
+    }
+
+    // 회원 조회
+    public ResponseUserDto findUser(Long userId) {
+        return userRepository.findById(userId)
+                .map(ResponseUserDto::fromEntity).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     }
 
     // 기관 단일 조회 -> 승인한 기관만 조회 가능
     public ResponseUserDto findInstitution(Long userId) {
         return userRepository.findById(userId)
                 .map(Institution.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
     }
 
@@ -158,7 +164,7 @@ public class UserService {
     public ResponseUserDto findIndividual(Long userId) {
         return userRepository.findById(userId)
                 .map(Individual.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("에러"));
     }
 
@@ -167,7 +173,7 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .map(Institution.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
     }
 
@@ -176,7 +182,7 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .map(Individual.class::cast)
-                .map(ResponseUserDto::FromEntity)
+                .map(ResponseUserDto::fromEntity)
                 .toList();
     }
 

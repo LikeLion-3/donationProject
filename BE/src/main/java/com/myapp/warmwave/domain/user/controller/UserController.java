@@ -82,6 +82,12 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllByIsApproveFalse());
     }
 
+    // 단일 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResponseUserDto> findUser(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(userService.findUser(userId));
+    }
+
     // 기관 단일 조회
     @GetMapping("/{userId}/institution")
     public ResponseEntity<ResponseUserDto> findInstitution(@PathVariable("userId") Long userId) {
