@@ -64,7 +64,7 @@ public class CommentService {
         commentRepository.deleteById(commentId);
 
         if(commentRepository.existsById(commentId))
-            throw new CustomException(CustomExceptionCode.FAILED_TO_REMOVE);
+            throw new CustomException(CustomExceptionCode.FAILED_TO_REMOVAL);
     }
 
     private Community validateCommunityId(Long communityId) {
