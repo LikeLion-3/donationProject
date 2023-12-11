@@ -70,4 +70,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorMap);
     }
 
+    @ExceptionHandler({CustomException.class}) //추가
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+    public ResponseEntity<Map<String, String>> handleCustomException(CustomException e) {
+        // 해당 데이터가 존재하지 않는 경우의 예외 처리
+
+        log.error(e);
+
+        Map<String, String> errorMap = new HashMap<>();
+
+        errorMap.put("time", "" + System.currentTimeMillis());
+        errorMap.put("msg", e.getExceptionCode().getMessage());
+        return ResponseEntity.badRequest().body(errorMap);
+    }
+
 }
