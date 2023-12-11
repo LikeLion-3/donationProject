@@ -1,7 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
-import { Routes, Route } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Preloader from './component/preloader/Preloader';
@@ -35,12 +34,6 @@ function App() {
                     <Route path="/donate/:articleId" element={<ArticleDetails />} />
                     <Route path="/write" element={<PostForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
                     <Route path="/user" element={<User />} />
-                <Route path="/" element={<Nav />}>
-                    <Route index element={<Home />} />
-                    <Route path="/donate" element={<ArticleList />} />
-                    <Route path="/donate/:articleId" element={<ArticleDetails />} />
-                    <Route path="/write" element={<PostForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
-                    <Route path="/user" element={<User />} />
                     <Route path='/user/me' element={<MyPage />} />
                     <Route path="/community" element={<CommunityList />} />
                     <Route path="/community/:communityId" element={<CommunityDetails />} />
@@ -48,8 +41,6 @@ function App() {
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/user/login" element={<Login />} />
             </Routes>
-            <Footer />
-            <PostButton />
             {location.pathname !== '/signup' && location.pathname !== '/user/login' && <Footer />}
             {loginState.id && <PostButton />}
         </div>
