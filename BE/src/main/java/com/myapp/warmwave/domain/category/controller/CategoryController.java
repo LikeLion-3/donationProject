@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-public class CategotyController {
+public class CategoryController {
     private final CategoryService categoryService;
 
     @PostConstruct

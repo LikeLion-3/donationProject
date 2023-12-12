@@ -44,6 +44,7 @@ public enum CustomExceptionCode {
     ALREADY_DELETED_EMAIL(HttpStatus.CONFLICT, "이전에 삭제된 이메일입니다."),
     NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
     ALREADY_EXIST_CATEGORY(HttpStatus.NOT_FOUND, "이미 존재하는 카테고리입니다."),
+    NOT_FOUND_ARTICLETYPE(HttpStatus.NOT_FOUND, "존재하지 않는 게시글종류 입니다."),
 
     /*
      * 415
@@ -53,7 +54,7 @@ public enum CustomExceptionCode {
      * 500
      */
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다."),
-    FAILED_TO_REMOVAL(HttpStatus.INTERNAL_SERVER_ERROR, "삭제에 실패했습니다.");
+    FAILED_TO_REMOVE(HttpStatus.INTERNAL_SERVER_ERROR, "삭제에 실패했습니다.");
     private final HttpStatus httpStatus;
     private final String message;
 }
