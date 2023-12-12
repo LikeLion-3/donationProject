@@ -4,9 +4,14 @@ import com.myapp.warmwave.common.BaseEntity;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 
-@Table
+@Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name="tb_comment")
 @Entity
 public class Comment extends BaseEntity {
     @Id
@@ -25,4 +30,8 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")
     private Community community;
+
+    public void updateComment(String contents) {
+        this.contents = contents;
+    }
 }

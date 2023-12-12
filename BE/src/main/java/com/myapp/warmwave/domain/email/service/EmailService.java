@@ -34,6 +34,16 @@ public class EmailService {
                 .build());
     }
 
+    @Transactional
+    public EmailAuth createEmailAuthOfSocial(String email) {
+        return emailAuthRepository.save(EmailAuth.builder()
+                .email(email)
+                .authToken(UUID.randomUUID().toString())
+                .isVerified(true)
+                .expired(true)
+                .build());
+    }
+
     public EmailAuth validEmail(String email, String authToken, LocalDateTime datetime) {
         return emailAuthRepository.findValidAuthByEmail(email, authToken, datetime)
                 .orElseThrow(() -> new CustomException(INVALID_JWT));

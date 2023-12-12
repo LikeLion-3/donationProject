@@ -43,6 +43,10 @@ public abstract class User extends BaseEntity {
 
     private Float temperature;
 
+    // OAuth2 용 컬럼 (소셜 로그인 타입, 개인 고유 등록 ID)
+    private String provider;
+    private String providerId;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EMAILAUTH_ID")
     private EmailAuth emailAuth;  // 이메일 인증 여부(회원가입 후 진행)

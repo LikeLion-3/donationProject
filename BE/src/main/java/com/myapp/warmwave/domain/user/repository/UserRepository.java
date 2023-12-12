@@ -17,6 +17,8 @@ public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
     // 공통
     Optional<User> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
     // 개인
     List<Individual> findAllByEmailAuthIsVerifiedTrue();
 

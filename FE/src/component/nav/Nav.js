@@ -22,13 +22,14 @@ function Nav() {
                             <nav className="main-nav">
                                 {/* ***** Logo Start ***** */}
                                 <Link to="/" className="logo">
-                                    <img src="logo.png" alt="true"/>
+                                    <img src="logo.png" style={{width:"110px"}} alt="true"/>
                                 </Link>
                                 {/* ***** Logo End ***** */}
                                 {/* ***** Menu Start ***** */}
                                 <ul className="nav">
                                     <li><NavLink to="/">Home</NavLink></li>
                                     <li><NavLink to="/donate">Donate</NavLink></li>
+                                    <li><NavLink to="/community">Community</NavLink></li>
                                     {!loginState.id ?
                                         <>
                                             <li><NavLink to="/signup">SigUp</NavLink></li>
