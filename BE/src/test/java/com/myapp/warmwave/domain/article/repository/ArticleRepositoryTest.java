@@ -4,8 +4,8 @@ import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
 import com.myapp.warmwave.config.QuerydslConfig;
 import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.entity.ArticleType;
 import com.myapp.warmwave.domain.article.entity.Status;
-import com.myapp.warmwave.domain.article.entity.Type;
 import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
@@ -43,7 +43,7 @@ public class ArticleRepositoryTest {
                 .title("제목1")
                 .content("내용1")
                 .articleStatus(Status.DEFAULT)
-                .articleType(Type.DONATION)
+                .articleType(ArticleType.DONATION)
                 .hit(0L)
                 .userIp("111.111.111.111")
                 .build();
@@ -56,7 +56,7 @@ public class ArticleRepositoryTest {
                 .title("제목2")
                 .content("내용2")
                 .articleStatus(Status.DEFAULT)
-                .articleType(Type.BENEFICIARY)
+                .articleType(ArticleType.BENEFICIARY)
                 .hit(0L)
                 .userIp("123.123.123.123")
                 .build();
@@ -69,7 +69,7 @@ public class ArticleRepositoryTest {
                 .title("제목3")
                 .content("내용3")
                 .articleStatus(Status.DEFAULT)
-                .articleType(Type.CERTIFICATION)
+                .articleType(ArticleType.CERTIFICATION)
                 .hit(0L)
                 .userIp("123.123.123.123")
                 .build();
@@ -109,7 +109,7 @@ public class ArticleRepositoryTest {
         // then
         assertThat(article).isEqualTo(savedArticle);
         assertThat(article.getUser().getRole()).isEqualTo(Role.INDIVIDUAL);
-        assertThat(article.getArticleType()).isEqualTo(Type.DONATION);
+        assertThat(article.getArticleType()).isEqualTo(ArticleType.DONATION);
         assertThat(savedArticle.getId()).isNotNull();
         assertThat(articleRepository.count()).isEqualTo(1);
     }
@@ -126,7 +126,7 @@ public class ArticleRepositoryTest {
         // then
         assertThat(article).isEqualTo(savedArticle);
         assertThat(article.getUser().getRole()).isEqualTo(Role.INSTITUTION);
-        assertThat(article.getArticleType()).isEqualTo(Type.BENEFICIARY);
+        assertThat(article.getArticleType()).isEqualTo(ArticleType.BENEFICIARY);
         assertThat(savedArticle.getId()).isNotNull();
         assertThat(articleRepository.count()).isEqualTo(1);
     }
@@ -159,7 +159,7 @@ public class ArticleRepositoryTest {
         // then
         assertThat(foundArticle).isPresent();
         assertThat(foundArticle.get()).isEqualTo(article);
-        assertThat(foundArticle.get().getArticleType()).isEqualTo(Type.DONATION);
+        assertThat(foundArticle.get().getArticleType()).isEqualTo(ArticleType.DONATION);
     }
 
     @DisplayName("게시글 단일 조회(기부원해요)")
@@ -174,7 +174,7 @@ public class ArticleRepositoryTest {
         // then
         assertThat(foundArticle).isPresent();
         assertThat(foundArticle.get()).isEqualTo(article);
-        assertThat(foundArticle.get().getArticleType()).isEqualTo(Type.BENEFICIARY);
+        assertThat(foundArticle.get().getArticleType()).isEqualTo(ArticleType.BENEFICIARY);
     }
 
     @DisplayName("게시글 단일 조회(인증해요)")
@@ -189,7 +189,7 @@ public class ArticleRepositoryTest {
         // then
         assertThat(foundArticle).isPresent();
         assertThat(foundArticle.get()).isEqualTo(article);
-        assertThat(foundArticle.get().getArticleType()).isEqualTo(Type.CERTIFICATION);
+        assertThat(foundArticle.get().getArticleType()).isEqualTo(ArticleType.CERTIFICATION);
     }
 
     // UPDATE

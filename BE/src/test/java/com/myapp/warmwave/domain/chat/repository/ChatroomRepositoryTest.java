@@ -4,8 +4,8 @@ import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
 import com.myapp.warmwave.config.QuerydslConfig;
 import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.entity.ArticleType;
 import com.myapp.warmwave.domain.article.entity.Status;
-import com.myapp.warmwave.domain.article.entity.Type;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.chat.entity.ChatRoom;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -78,7 +78,7 @@ public class ChatroomRepositoryTest {
                 .title("제목1")
                 .content("내용1")
                 .articleStatus(Status.DEFAULT)
-                .articleType(Type.DONATION)
+                .articleType(ArticleType.DONATION)
                 .hit(0L)
                 .build());
     }

@@ -23,7 +23,7 @@ public class ArticleCategory {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    public static ArticleCategory OfArticleCategory(Article article, Category category) {
+    public static ArticleCategory ofArticleCategory(Article article, Category category) {
         return ArticleCategory.builder()
                 .article(article)
                 .category(category)

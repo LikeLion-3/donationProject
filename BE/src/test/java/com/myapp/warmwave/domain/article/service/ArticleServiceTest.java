@@ -6,7 +6,7 @@ import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ArticleCategory;
 import com.myapp.warmwave.domain.article.entity.Status;
-import com.myapp.warmwave.domain.article.entity.Type;
+import com.myapp.warmwave.domain.article.entity.ArticleType;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.repository.ArticleCategoryRepository;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
@@ -64,7 +64,7 @@ public class ArticleServiceTest {
     @BeforeEach
     void setup() {
         articleIndiv = Article.builder()
-                .id(1L).title("제목1").content("내용1").articleType(Type.DONATION)
+                .id(1L).title("제목1").content("내용1").articleType(ArticleType.DONATION)
                 .articleStatus(Status.DEFAULT).userIp("123.123.123.123").articleCategories(new ArrayList<>())
                 .articleImages(new ArrayList<>()).user(individual).build();
 

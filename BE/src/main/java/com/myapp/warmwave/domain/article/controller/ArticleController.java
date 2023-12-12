@@ -1,10 +1,10 @@
 package com.myapp.warmwave.domain.article.controller;
 
-import com.myapp.warmwave.common.jwt.JwtProvider;
 import com.myapp.warmwave.common.main.dto.MainArticleDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.entity.ArticleType;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.service.ArticleService;
 import jakarta.validation.constraints.Positive;
@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,14 +30,17 @@ import java.util.List;
 public class ArticleController {
     private final ArticleService articleService;
     private final ArticleMapper articleMapper;
-    private final JwtProvider jwtProvider;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ArticleResponseDto> postArticle(List<MultipartFile> imageFiles,
+    public ResponseEntity<ArticleResponseDto> postArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                                          String articleType,
+                                                          List<MultipartFile> imageFiles,
                                                           String title,
                                                           String content,
                                                           String prodCategories) throws IOException {
         ArticlePostDto dto = ArticlePostDto.builder()
+                .userEmail(userDetails.getUsername())
+                .ArticleType(ArticleType.findArticleType(articleType))
                 .title(title)
                 .content(content)
                 .prodCategory(prodCategories)

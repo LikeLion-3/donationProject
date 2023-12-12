@@ -25,8 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.FAILED_TO_REMOVAL;
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_ARTICLE;
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -52,7 +51,7 @@ public class ArticleService {
         Article savedArticle = articleRepository.save(article);
 
         for (Category category : categories) {
-            ArticleCategory articleCategory = ArticleCategory.OfArticleCategory(savedArticle, category);
+            ArticleCategory articleCategory = ArticleCategory.ofArticleCategory(savedArticle, category);
             articleCategoryRepository.save(articleCategory);
         }
 
@@ -71,7 +70,7 @@ public class ArticleService {
         List<Category> categories = categoryService.getCategory(dto.getProdCategory());
 
         for (Category category : categories) {
-            ArticleCategory articleCategory = ArticleCategory.OfArticleCategory(findArticle, category);
+            ArticleCategory articleCategory = ArticleCategory.ofArticleCategory(findArticle, category);
             articleCategoryRepository.save(articleCategory);
         }
 
@@ -106,7 +105,7 @@ public class ArticleService {
         articleRepository.deleteById(articleId);
 
         if(articleRepository.existsById(articleId)) {
-            new CustomException(FAILED_TO_REMOVAL);
+            new CustomException(FAILED_TO_REMOVE);
         }
     }
 
