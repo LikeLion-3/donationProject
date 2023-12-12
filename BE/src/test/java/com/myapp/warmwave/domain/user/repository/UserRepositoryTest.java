@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.user.repository;
 
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
+import com.myapp.warmwave.config.QuerydslConfig;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.repository.AddressRepository;
 import com.myapp.warmwave.domain.email.entity.EmailAuth;
@@ -23,7 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(JpaConfig.class)
+@Import({JpaConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
     @Autowired

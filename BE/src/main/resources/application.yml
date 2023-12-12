@@ -6,11 +6,10 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ${KAKAO_REST_API_KEY}
             scope: account_email
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/api/users/{action}/oauth2/code/{registrationId}"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
             client-authentication-method: post
         provider:
           kakao:

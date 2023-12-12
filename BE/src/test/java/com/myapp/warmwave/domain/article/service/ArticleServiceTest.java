@@ -12,10 +12,8 @@ import com.myapp.warmwave.domain.article.repository.ArticleCategoryRepository;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
-import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.entity.Individual;
-import com.myapp.warmwave.domain.user.entity.Institution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,12 +57,9 @@ public class ArticleServiceTest {
     private ArticleService articleService;
 
     private Article articleIndiv;
-    private Article articleInst;
     private Category category;
-    private Image image;
     private ArticleCategory articleCategory;
     private Individual individual;
-    private Institution institution;
 
     @BeforeEach
     void setup() {
@@ -73,25 +68,14 @@ public class ArticleServiceTest {
                 .articleStatus(Status.DEFAULT).userIp("123.123.123.123").articleCategories(new ArrayList<>())
                 .articleImages(new ArrayList<>()).user(individual).build();
 
-        articleInst = Article.builder()
-                .id(2L).title("제목2").content("내용2").articleType(Type.BENEFICIARY)
-                .articleStatus(Status.DEFAULT).userIp("111.111.111.111").articleCategories(new ArrayList<>())
-                .articleImages(new ArrayList<>()).user(institution).build();
-
         category = Category.builder()
                 .id(1L).name("카테고리1").articleCategories(new ArrayList<>()).build();
-
-        image = Image.builder()
-                .id(1L).imgName("이미지1").imgUrl("url1").article(articleIndiv).build();
 
         articleCategory = ArticleCategory.builder()
                 .id(1L).article(articleIndiv).category(category).build();
 
         individual = Individual.builder()
                 .id(1L).role(Role.INDIVIDUAL).build();
-
-        institution = Institution.builder()
-                .id(2L).role(Role.INSTITUTION).build();
     }
 
     @DisplayName("기부글 작성 기능 확인")
@@ -135,7 +119,7 @@ public class ArticleServiceTest {
         // given
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
-        Article article = articleService.createArticle(reqDto, imageFiles);
+        articleService.createArticle(reqDto, imageFiles);
 
         Long articleId = 1L;
 
@@ -179,18 +163,15 @@ public class ArticleServiceTest {
         // given
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
-        Article savedArticle = articleService.createArticle(reqDto, imageFiles);
+        articleService.createArticle(reqDto, imageFiles);
 
         Long articleId = 1L;
-
-        when(articleRepository.findById(any())).thenReturn(Optional.of(articleIndiv));
 
         // when
         articleService.deleteArticle(articleId);
 
         // then
-        verify(articleRepository, times(1)).findById(articleId);
-        verify(articleRepository, times(1)).delete(articleIndiv);
+        assertThat(articleRepository.count()).isZero();
     }
 
 

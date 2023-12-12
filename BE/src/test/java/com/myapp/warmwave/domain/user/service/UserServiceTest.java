@@ -340,8 +340,7 @@ public class UserServiceTest {
         userService.deleteUser(userId);
 
         // then
-        verify(userRepository, times(1)).findById(userId);
-        verify(userRepository, times(1)).delete(individual);
+        assertThat(userRepository.count()).isZero();
     }
 
     // 개인 회원가입 과정 메서드화

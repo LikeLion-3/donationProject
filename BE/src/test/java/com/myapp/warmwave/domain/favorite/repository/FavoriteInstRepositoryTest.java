@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.favorite.repository;
 
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
+import com.myapp.warmwave.config.QuerydslConfig;
 import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
 import com.myapp.warmwave.domain.favorite_inst.repository.FavoriteInstRepository;
@@ -23,7 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Import(JpaConfig.class)
+@Import({JpaConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class FavoriteInstRepositoryTest {
     @Autowired

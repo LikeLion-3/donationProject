@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.common.jwt.JwtAuthFilter;
 import com.myapp.warmwave.common.main.dto.MainInstDto;
-import com.myapp.warmwave.config.security.SecurityConfig;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.service.UserService;
@@ -18,6 +17,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -26,16 +26,16 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {UserController.class}, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-                SecurityConfig.class, JwtAuthFilter.class
+                JwtAuthFilter.class
         })
 })
+@WithMockUser(roles = "USER")
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +43,6 @@ public class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    /*
     @DisplayName("개인 회원가입 확인")
     @Test
     void addIndiv() throws Exception {
@@ -91,7 +90,6 @@ public class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andDo(print());
     }
-    */
 
     @DisplayName("이메일 인증 확인")
     @Test
@@ -107,8 +105,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/confirm-email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
-                        .with(csrf())
-                        .with(user("test@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -132,8 +129,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
-                        .with(csrf())
-                        .with(user("test@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -155,8 +151,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/individual")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(dtoList))
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -178,8 +173,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/institution")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(dtoList))
-                        .with(csrf())
-                        .with(user("test2@gmail.com").password("1234").roles("INSTITUTION")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -200,8 +194,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(get("/api/users/" + userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -222,8 +215,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(get("/api/users/" + userId + "/individual")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -244,8 +236,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(get("/api/users/" + userId + "/institution")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(user("test2@gmail.com").password("1234").roles("INSTITUTION")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -266,8 +257,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/" + userId + "/individual")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("12345").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -288,8 +278,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/" + userId + "/institution")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
-                        .with(csrf())
-                        .with(user("test2@gmail.com").password("12345").roles("INSTITUTION")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -305,8 +294,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(put("/api/users/" + userId + "/approve")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("12345").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print());
     }
@@ -322,8 +310,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/" + userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("12345").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print());
     }
@@ -346,8 +333,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(get("/api/users/adjacent")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(user("test1@gmail.com").password("12345").roles("INDIVIDUAL")))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

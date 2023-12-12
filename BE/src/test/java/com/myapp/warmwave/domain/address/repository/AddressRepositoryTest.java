@@ -2,8 +2,8 @@ package com.myapp.warmwave.domain.address.repository;
 
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
+import com.myapp.warmwave.config.QuerydslConfig;
 import com.myapp.warmwave.domain.address.entity.Address;
-import com.myapp.warmwave.domain.address.repository.AddressRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(JpaConfig.class)
+@Import({JpaConfig.class, QuerydslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AddressRepositoryTest {
     @Autowired

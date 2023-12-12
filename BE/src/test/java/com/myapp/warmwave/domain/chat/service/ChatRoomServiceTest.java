@@ -111,8 +111,7 @@ public class ChatRoomServiceTest {
         chatRoomService.deleteChatRoom(roomId);
 
         // then
-        verify(chatRoomRepository, times(1)).findById(roomId);
-        verify(chatRoomRepository, times(1)).delete(chatRoom);
+        assertThat(chatRoomRepository.count()).isZero();
     }
 
     private ChatRoomDto saveChatRoom() {

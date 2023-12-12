@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -21,7 +22,6 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {FavoriteInstController.class}, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthFilter.class})
 })
+@WithMockUser(roles = "USER")
 public class FavoriteInstControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -50,9 +51,8 @@ public class FavoriteInstControllerTest {
 
         // then
         mockMvc.perform(post("/api/users/" + institutionId + "/favorite")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .with(user("test1@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -74,11 +74,10 @@ public class FavoriteInstControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/" + individualId + "/favorite")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .with(user("test1@gmail.com")
-                .password("1234")
-                .roles("INDIVIDUAL"))).andExpect(status().isOk()).andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @DisplayName("관심 기관 삭제 확인")
@@ -92,9 +91,8 @@ public class FavoriteInstControllerTest {
 
         // then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/" + institutionId + "/favorite")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .with(user("test1@gmail.com").password("1234").roles("INDIVIDUAL")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print());
     }

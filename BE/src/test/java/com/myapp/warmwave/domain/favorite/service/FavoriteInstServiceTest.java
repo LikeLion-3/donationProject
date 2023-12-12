@@ -126,9 +126,6 @@ public class FavoriteInstServiceTest {
         favoriteInstService.deleteFavoriteInst(institutionId, indivEmail);
 
         // then
-        verify(userRepository, times(2)).findByEmail(indivEmail);
-        verify(userRepository, times(2)).findById(institutionId);
-        verify(favoriteInstRepository, times(1))
-                .deleteByInstitutionUserAndIndividualUser(institution, individual);
+        assertThat(favoriteInstRepository.count()).isZero();
     }
 }

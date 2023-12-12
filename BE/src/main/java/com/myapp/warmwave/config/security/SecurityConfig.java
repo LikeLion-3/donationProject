@@ -40,7 +40,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(
                         oauth2 -> oauth2
-                                .loginPage("/api/users/login")
+                                .loginPage("http://localhost:3000/user/login")
                                 .successHandler(oAuth2LoginSuccessHandler)
                                 .failureHandler(oAuth2LoginFailureHandler)
                 )
