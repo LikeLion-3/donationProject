@@ -25,8 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.FAILED_TO_REMOVE;
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_ARTICLE;
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 
 @Slf4j
 @Transactional(readOnly = true)
