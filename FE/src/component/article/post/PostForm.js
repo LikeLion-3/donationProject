@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import Cookies from 'js-cookie';
 import './PostForm.css';
+import jwtAxios from '../../util/jwtUtil';
 
 const PostForm = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [donationTypeSelected, setDonationTypeSelected] = useState(false);
+  const [needTypeSelected, setNeedTypeSelected] = useState(false);
+  const [verificationTypeSelected, setVerificationTypeSelected] = useState(false);
   const [title, setTitle] = useState(localStorage.getItem('postTitle') || '');
   const [content, setContent] = useState(localStorage.getItem('postContent') || '');
 
@@ -43,6 +48,12 @@ const PostForm = () => {
     });
   };
 
+  const handleTypeChange = (type) => {
+    setDonationTypeSelected(type === '기부해요');
+    setNeedTypeSelected(type === '필요해요');
+    setVerificationTypeSelected(type === '인증해요');
+  };
+
   const handleTitleChange = (event) => {
     const newTitle = event.target.value;
     setTitle(newTitle);
@@ -68,20 +79,42 @@ const PostForm = () => {
       formData.append('title', title);
       formData.append('content', content);
       formData.append('prodCategories', JSON.stringify(selectedCategories));
+      formData.append('articleType', getSelectedType());
+
+      const userToken = Cookies.get('user');
+
+      const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
+
+      const headers = new Headers({
+        'Authorization': `Bearer ${parsedToken.accessToken}`,
+      });
 
       const response = await fetch('http://localhost:8080/api/articles', {
         method: 'POST',
         body: formData,
+        headers: headers,
       });
 
       const data = await response.json();
       console.log('Server response:', data);
 
-      // 글 작성 후 해당 게시글 조회 페이지로 이동
       navigate(`/donate/${data.articleId}`);
     } catch (error) {
       console.error('Error submitting form:', error);
     }
+  };
+
+  const getSelectedType = () => {
+    if (donationTypeSelected) {
+      return '기부해요';
+    } else if (needTypeSelected) {
+      return '필요해요';
+    } else if (verificationTypeSelected) {
+      return '인증해요';
+    }
+
+    // Default to 기부해요 if none selected
+    return '기부해요';
   };
 
   useEffect(() => {
@@ -103,6 +136,53 @@ const PostForm = () => {
         <div className="row gx-4 gx-lg-5 justify-content-center mb-5">
           <div className="col-lg-8 col-xl-6">
             <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+              <label className="form-label" style={{ color: 'dimgray' }}>게시글 유형</label>
+              <div className="d-flex flex-wrap">
+                <div className="me-2 mb-2">
+                  <button
+                    type="button"
+                    className={`btn ${donationTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                    onClick={() => handleTypeChange('기부해요')}
+                    style={{
+                      color: donationTypeSelected ? '#ffffff' : '#ffa500',
+                      backgroundColor: donationTypeSelected ? '#ffa500' : 'transparent',
+                      borderColor: '#ffa500',
+                    }}
+                  >
+                    기부해요
+                  </button>
+                </div>
+                <div className="me-2 mb-2">
+                  <button
+                    type="button"
+                    className={`btn ${needTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                    onClick={() => handleTypeChange('필요해요')}
+                    style={{
+                      color: needTypeSelected ? '#ffffff' : '#007bff',
+                      backgroundColor: needTypeSelected ? '#007bff' : 'transparent',
+                      borderColor: '#007bff',
+                    }}
+                  >
+                    필요해요
+                  </button>
+                </div>
+                <div className="me-2 mb-2">
+                  <button
+                    type="button"
+                    className={`btn ${verificationTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                    onClick={() => handleTypeChange('인증해요')}
+                    style={{
+                      color: verificationTypeSelected ? '#ffffff' : '#28a745',
+                      backgroundColor: verificationTypeSelected ? '#28a745' : 'transparent',
+                      borderColor: '#28a745',
+                    }}
+                  >
+                    인증해요
+                  </button>
+                </div>
+              </div>
+              </div>
               <div className="mb-3">
                 <label className="form-label" style={{ color: 'dimgray' }}>
                   이미지 추가
