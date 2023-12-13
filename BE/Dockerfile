@@ -1,4 +1,14 @@
-FROM openjdk:17-jre-slim-buster
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+FROM gradle:8.4-jdk17-alpine AS builder
+WORKDIR /builder
+
+COPY build.gradle settings.gradle /builder/
+RUN gradle build -x test --parallel --continue > /dev/null 2>&1 || true
+
+COPY src /builder/src
+
+RUN gradle clean bootJar
+
+FROM openjdk:17-jdk-slim
+COPY --from=builder /builder/build/libs/*.jar app/app.jar
+COPY --from=builder /builder/build/resources app/resources
+ENTRYPOINT ["java", "-jar", "app/app.jar"]
