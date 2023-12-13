@@ -3,6 +3,8 @@ import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import axios from "axios";
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
+import jwtAxios from "../util/jwtUtil";
+import Cookies from "js-cookie";
 import {
   MainContainer,
   Sidebar,
@@ -29,26 +31,46 @@ function ChatMain() {
 
   const stompRef = useRef(null);
 
-  // Move subscribeToTopic outside of useEffect
-  const subscribeToTopic = (id) => {
-    if (stompClient) {
-      stompClient.subscribe(`/topic/messages/${id}`, (message) => {
-        const receivedMessage = JSON.parse(message.body);
-        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-      });
-      setSelectedConversationId(id);
+  const parseUserCookie = () => {
+    try {
+      const cookieValue = Cookies.get("user");
+      return cookieValue ? JSON.parse(decodeURIComponent(cookieValue)) : {};
+    } catch (error) {
+      console.error("Error parsing user cookie:", error);
+      return {};
     }
   };
 
+  const subscribeToTopic = (id) => {
+    if (stompClient) {
+      const userCookie = parseUserCookie();
+      const accessToken = userCookie.accessToken;
+
+      if (accessToken) {
+        const headers = {
+          Authorization: `Bearer ${accessToken}`,
+        };
+
+        stompClient.subscribe(
+          `/topic/messages/${id}`,
+          (message) => {
+            console.log(message.body);
+            const receivedMessage = JSON.parse(message.body);
+            setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+          },
+          headers
+        );
+
+        setSelectedConversationId(id);
+      } else {
+        console.error("Access token not found or undefined in the user cookie.");
+      }
+    }
+  };
   useEffect(() => {
     // Fetch data using Axios when the component mounts
-    axios
-      .get("http://localhost:9000/api/chatRoom", {
-        headers: {
-          // Authorization:
-          //   "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJhc2pzMTIzNEBuYXZlci5jb20ifSwiZXhwIjoxNzAxNzQ0MDk4fQ.cmYEt3t0dM0Dl8zOma4EtAoxtDDJdxOaohYg0LoBApWjRizxjAR5nuqYDVJHC8z0WLzR8Vs2ah3f_lLIUaxdMQ",
-        },
-      })
+    jwtAxios
+      .get("http://localhost:8080/api/chatRoom", {})
       .then((response) => {
         setConversations(response.data);
       })
@@ -58,7 +80,7 @@ function ChatMain() {
 
     // Connect to WebSocket if not already connected
     if (!stompRef.current) {
-      const socket = new SockJS("http://localhost:9000/ws");
+      const socket = new SockJS("http://localhost:8080/ws");
       const stomp = Stomp.over(socket);
 
       stomp.connect({}, () => {
@@ -77,43 +99,46 @@ function ChatMain() {
   }, []);
 
   const handleConversationClick = (id) => {
-    // 선택한 대화 ID를 설정하고 해당 토픽을 구독합니다.
-    // 그리고 선택한 대화에 대한 채팅 메시지를 가져옵니다.
     subscribeToTopic(id);
 
-    axios
-      .get(`http://localhost:9000/api/chatMessages/${id}`, {
-        headers: {
-          // 필요한 경우 헤더를 추가합니다.
-        },
-      })
+    jwtAxios
+      .get(`http://localhost:8080/api/chatMessages/${id}`, {})
       .then((response) => {
-        // 가져온 메시지로 messages 상태를 업데이트합니다.
         setMessages(response.data);
       })
       .catch((error) => {
-        console.error("채팅 메시지를 가져오는 중 오류 발생:", error);
+        console.error("Error fetching chat messages:", error);
       });
 
-    // 메시지 입력값이 비어있지 않은 경우에만 메시지를 보냅니다.
     if (messageInputValue.trim() !== "") {
       sendMessage(id);
     }
   };
+
   const sendMessage = (id) => {
     if (stompClient) {
-      const messageObject = {
-        content: messageInputValue,
-        roomId: id, // Use the clicked conversation's id as the roomId
-      };
+      const userCookie = parseUserCookie();
+      const accessToken = userCookie.accessToken;
 
-      stompClient.send("/app/chat", {}, JSON.stringify(messageObject));
-      setMessageInputValue("");
+      if (accessToken) {
+        const headers = {
+          Authorization: `Bearer ${accessToken}`,
+        };
+
+        const messageObject = {
+          content: messageInputValue,
+          roomId: id,
+        };
+
+        stompClient.send(`/app/chat/${id}`, headers, JSON.stringify(messageObject));
+        setMessageInputValue("");
+      } else {
+        console.error("Access token not found or undefined in the user cookie.");
+      }
     } else {
       console.error("WebSocket connection not yet established.");
     }
   };
-
   return (
     <div>
       <div
@@ -126,38 +151,20 @@ function ChatMain() {
           <Sidebar position="left" scrollable={false}>
             <Search placeholder="Search..." />
             <ConversationList>
-              {conversations.map((conversation) => {
-                return (
-                  <Conversation
-                    key={conversation.id}
-                    name={conversation.articleTitle}
-                    lastSenderName={conversation.recipientName}
-                    info={conversation.lastMessage}
-                    onClick={() => handleConversationClick(conversation.id)}
-                  >
-                    <Avatar src={require("../../assets/images/person.png")} name="Lilly" />
-                  </Conversation>
-                );
-              })}
+              {conversations.map((conversation) => (
+                <Conversation key={conversation.id} name={conversation.recipientName} onClick={() => handleConversationClick(conversation.id)}>
+                  <Avatar src={require("../../assets/images/p.png")} name="Lilly" status="available" />
+                </Conversation>
+              ))}
             </ConversationList>
           </Sidebar>
 
           <ChatContainer>
-            <ConversationHeader>
-              <ConversationHeader.Back />
-              <Avatar src={require("../../assets/images/person.png")} name="Zoe" />
-              <ConversationHeader.Content userName="Zoe" info="Active 10 mins ago" />
-              <ConversationHeader.Actions>
-                <VoiceCallButton />
-                <VideoCallButton />
-                <InfoButton />
-              </ConversationHeader.Actions>
-            </ConversationHeader>
+            <ConversationHeader>{/* ... */}</ConversationHeader>
             <MessageList>
-              <div>채팅방을 선택해주세요</div>
               {messages.map((msg, index) => (
                 <Message
-                  key={msg.id} // Make sure to use a unique identifier as the key
+                  key={msg.id}
                   order={index}
                   model={{
                     message: msg.content,
@@ -167,7 +174,7 @@ function ChatMain() {
                     position: "single",
                   }}
                 >
-                  <Avatar src={require("../../assets/images/person.png")} name={msg.nickName} />
+                  <Avatar src={require("../../assets/images/p.png")} name={msg.nickName} />
                 </Message>
               ))}
             </MessageList>

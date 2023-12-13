@@ -1,29 +1,41 @@
 package com.myapp.warmwave.domain.chat.config;
 
+import com.myapp.warmwave.common.jwt.JwtProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 @Component
 public class RmeSessionChannelInterceptor implements ChannelInterceptor {
+    @Autowired
+    private JwtProvider jwtProvider;
+    @Autowired
+    private WebsocketUserContext websocketUserContext;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        System.out.println("채널 인터셉터");
-
-        MessageHeaders headers = message.getHeaders();
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        // Access headers for all frames
+        Map<String, List<String>> nativeHeaders = accessor.getMessageHeaders().get("nativeHeaders", Map.class);
 
-        if (accessor.getMessageType() == SimpMessageType.CONNECT) {
-            // 연결 설정 중에 헤더를 로깅
-            MultiValueMap<String, String> multiValueMap = headers.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
-            for (Map.Entry<String, String> header : multiValueMap.toSingleValueMap().entrySet()) {
-                System.out.println(header.getKey() + "#" + header.getValue());
+        if (nativeHeaders != null) {
+            List<String> userHeaderValue = nativeHeaders.get("Authorization");
+            if (userHeaderValue != null && !userHeaderValue.isEmpty()) {
+                String userHeader = userHeaderValue.get(0);
+                //이제 사용자 정보 처리
+                String accessToken = userHeader.replace("Bearer ", "");
+                Map<String, Object> claims = (HashMap<String, Object>) jwtProvider.getClaims(accessToken).get("body");
+                String email = claims.get("email").toString();
+                websocketUserContext.setUserEmail(email);
+            } else {
+                // 사용자 정보를 찾을 수 없는 경우 처리
             }
         }
 
