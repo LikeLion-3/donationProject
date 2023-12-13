@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/communities/{communityId}/comments")
 public class CommentController {
-
     private final CommentService commentService;
     @PostMapping()
     public ResponseEntity<CommentResponseDto> createComment(@PathVariable("communityId") Long communityId,
@@ -34,7 +33,7 @@ public class CommentController {
     @GetMapping() // 목록
     public ResponseEntity<Page<CommentResponseDto>> getComments(@PathVariable("communityId") Long communityId,
                                                                 @RequestParam(required = false, defaultValue = "recent") String sort,
-                                                                @PageableDefault(size=12) Pageable pageable) {
+                                                                @PageableDefault Pageable pageable) {
         return new ResponseEntity<>(commentService.getComments(pageable, sort, communityId), HttpStatus.OK);
     }
 
