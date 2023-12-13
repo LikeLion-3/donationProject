@@ -1,5 +1,3 @@
-import './styles.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -26,24 +24,43 @@ const ArticleDetails = () => {
       }).replace(/ /g, '')
     : '로딩 중...';
 
-  const getArticleTypeText = (type) => {
-    switch (type) {
-      case 'DONATION':
-        return '기부해요';
-      case 'BENEFICIARY':
-        return '필요해요';
-      case 'CERTIFICATION':
-        return '인증해요';
-      default:
-        return type;
-    }
-  };
+    const getArticleTypeText = (type) => {
+      return type || '기본값'; // type이 falsy한 경우 기본값을 사용하도록 설정
+    };
+    
+    const getArticleTypeStyle = (type) => {
+      switch (type) {
+        case '기부해요':
+          return { backgroundColor: '#ffc107', borderColor: '#ffc107', color: '#ffffff' };
+        case '필요해요':
+          return { backgroundColor: '#007bff', borderColor: '#007bff', color: '#ffffff' };
+        case '인증해요':
+          return { backgroundColor: '#28a745', borderColor: '#28a745', color: '#ffffff' };
+        default:
+          return { backgroundColor: '#000000', borderColor: '#000000', color: '#ffffff' };
+      }
+    };
+
+    const renderBadges = () => {
+      if (!article?.articleType) {
+        return null;
+      }
+    
+      const badgeStyle = getArticleTypeStyle(article.articleType);
+      const badgeText = getArticleTypeText(article.articleType);
+    
+      return (
+        <div className="badge" style={{ ...badgeStyle, padding: '0.5rem', fontSize: '1.5rem', marginRight: '0.5rem' }}>
+          {badgeText}
+        </div>
+      );
+    };
 
   return (
     <section className="py-5">
       <div className="container px-4 px-lg-5 my-5">
         <div className="row gx-4 gx-lg-5 align-items-start">
-          <div className="col-md-6" style={{ backgroundColor: '#f8f9fa', padding: '15px' }}>
+          <div className="col-md-6" style={{ padding: '15px' }}>
             {article?.images && article.images.length > 0 ? (
               article.images.map(image => (
                 <img
@@ -66,9 +83,7 @@ const ArticleDetails = () => {
           <div className="col-md-6">
             <div className="d-flex align-items-start mb-1" style={{ flexDirection: 'column' }}>
               <div className="d-flex align-items-center">
-                <div className="badge bg-warning text-white me-2" style={{ padding: '0.5rem', fontSize: '1.5rem' }}>
-                  {getArticleTypeText(article?.articleType)}
-                </div>
+                {renderBadges()}
                 <h1 className="fw-bolder display-5 ms-0.5 text-left" style={{ fontSize: '2rem' }}>
                   {article?.title || '로딩 중...'}
                 </h1>
