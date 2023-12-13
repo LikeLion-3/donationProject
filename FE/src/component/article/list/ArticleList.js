@@ -21,21 +21,35 @@ const ArticleList = () => {
     }
   };
 
+  const getArticleTypeBadgeStyle = (type) => {
+    switch (type) {
+      case '기부해요':
+        return { backgroundColor: '#ffc107', color: '#ffffff' }; // 기부
+      case '필요해요':
+        return { backgroundColor: '#007bff', color: '#ffffff' }; // 필요
+      case '인증해요':
+        return { backgroundColor: '#28a745', color: '#ffffff' }; // 인증
+      default:
+        return { backgroundColor: '#000000', color: '#ffffff' }; // 기본값
+    }
+  };
+
   const ProductCard = ({ articleId, title, articleType, images, writer, categories, postDate }) => {
     const imageUrl = images.length > 0 ? `/images/${images[0].imgName}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
-  
+    const badgeStyle = getArticleTypeBadgeStyle(articleType);
+
     return (
       <div className="col mb-4">
         <div className="card h-100" style={{ width: "110%" }}>
-            <img
+          <img
             className="card-img-top"
             src={imageUrl}
             alt="Product"
             style={{ maxWidth: '450px', height: '250px', objectFit: 'cover' }}
-            />    
-            <div className="card-body p-4 mb-2">
+          />
+          <div className="card-body p-4 mb-2">
             <div className="text-left">
-              <div className="badge bg-warning text-white position-absolute" style={{ top: '0.3rem', right: '0.3rem', padding: '0.5rem' }}>
+              <div className="badge position-absolute" style={{ top: '0.3rem', right: '0.3rem', padding: '0.5rem', ...badgeStyle }}>
                 {getArticleTypeText(articleType)}
               </div>
               <h5 className="fw-bolder mb-1 text-center" style={{ color: '#212529', marginBottom: '10px' }}>

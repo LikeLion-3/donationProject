@@ -50,7 +50,7 @@ const ArticleDetails = () => {
     const badgeText = getArticleTypeText(article.articleType);
 
     return (
-      <div className="badge" style={{ ...badgeStyle, padding: '0.5rem', fontSize: '1rem', marginRight: '0.5rem' }}>
+      <div className="badge" style={{ ...badgeStyle, padding: '0.5rem', fontSize: '1.2rem', marginRight: '0.5rem' }}>
         {badgeText}
       </div>
     );
@@ -115,14 +115,41 @@ const ArticleDetails = () => {
             <p style={{ fontSize: '19px', color: '#212529' }}>작성자 : {article?.writer || '로딩 중...'}</p>
 
               <div>
-                <span className="me-3" style={{ fontSize: '19px', color: '#212529' }}>조회수 :   100</span>
+                <span className="me-3" style={{ fontSize: '19px', color: '#212529' }}>조회수👀 :   100</span>
                 <span style={{ fontSize: '19px', color: '#212529' }}>게시날짜 : {formattedDate}</span>
               </div>
             </div>
             <hr style={{ borderColor: '#212529', marginTop: '1rem', marginBottom: '1rem' }} />
-            <p className="lead" style={{ color: '#212529' }}>
-              {article?.content || '로딩 중...'}
-            </p>
+            <div className="lead" style={{ color: '#666666', alignItems: 'flex-start', flexDirection: 'column', display: 'flex' }}>
+              <div style={{ color: '#666666', fontWeight: '500' }}>
+                {article?.content || '로딩 중...'}
+              </div>
+            </div>
+            <div className="mt-3 d-flex justify-content-end">
+            <button
+              className="btn btn-secondary me-2"
+              type="button"
+              style={{
+                backgroundColor: '#ffffff', // 배경색
+                borderColor: '#999999',     // 경계선 색
+                color: '#999999',           // 폰트 색
+              }}
+            >
+              수정
+            </button>
+
+            <button
+              className="btn btn-danger"
+              type="button"
+              style={{
+                backgroundColor: '#ffffff', // 배경색
+                borderColor: '#999999',     // 경계선 색
+                color: '#999999',           // 폰트 색
+              }}
+            >
+              삭제
+            </button>
+            </div>
             <hr style={{ borderColor: '#212529', marginTop: '1rem', marginBottom: '1rem' }} />
             <div className="d-flex justify-content-between align-items-center mb-3">
               <p className="mb-4" style={{ fontSize: '20px', color: '#212529' }}>
@@ -135,10 +162,11 @@ const ArticleDetails = () => {
                   backgroundColor: '#87CEEB',
                   borderColor: '#87CEEB',
                   color: '#ffffff',
+                  padding: '6px', // 버튼 내부 패딩을 조절하여 크기를 유지합니다
                 }}
               >
                 <i className="bi-cart-fill me-1"></i>
-                채팅하기
+                <span style={{ fontSize: '18px', display: 'inline-block', lineHeight: '1' }}>채팅하기</span>
               </button>
             </div>
             <hr className="my-4" />
