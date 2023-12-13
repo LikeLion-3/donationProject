@@ -24,37 +24,37 @@ const ArticleDetails = () => {
       }).replace(/ /g, '')
     : '로딩 중...';
 
-    const getArticleTypeText = (type) => {
-      return type || '기본값'; // type이 falsy한 경우 기본값을 사용하도록 설정
-    };
-    
-    const getArticleTypeStyle = (type) => {
-      switch (type) {
-        case '기부해요':
-          return { backgroundColor: '#ffc107', borderColor: '#ffc107', color: '#ffffff' };
-        case '필요해요':
-          return { backgroundColor: '#007bff', borderColor: '#007bff', color: '#ffffff' };
-        case '인증해요':
-          return { backgroundColor: '#28a745', borderColor: '#28a745', color: '#ffffff' };
-        default:
-          return { backgroundColor: '#000000', borderColor: '#000000', color: '#ffffff' };
-      }
-    };
+  const getArticleTypeText = (type) => {
+    return type || '기본값';
+  };
 
-    const renderBadges = () => {
-      if (!article?.articleType) {
-        return null;
-      }
-    
-      const badgeStyle = getArticleTypeStyle(article.articleType);
-      const badgeText = getArticleTypeText(article.articleType);
-    
-      return (
-        <div className="badge" style={{ ...badgeStyle, padding: '0.5rem', fontSize: '1.5rem', marginRight: '0.5rem' }}>
-          {badgeText}
-        </div>
-      );
-    };
+  const getArticleTypeStyle = (type) => {
+    switch (type) {
+      case '기부해요':
+        return { backgroundColor: '#ffc107', borderColor: '#ffc107', color: '#ffffff' };
+      case '필요해요':
+        return { backgroundColor: '#007bff', borderColor: '#007bff', color: '#ffffff' };
+      case '인증해요':
+        return { backgroundColor: '#28a745', borderColor: '#28a745', color: '#ffffff' };
+      default:
+        return { backgroundColor: '#000000', borderColor: '#000000', color: '#ffffff' };
+    }
+  };
+
+  const renderBadges = () => {
+    if (!article?.articleType) {
+      return null;
+    }
+
+    const badgeStyle = getArticleTypeStyle(article.articleType);
+    const badgeText = getArticleTypeText(article.articleType);
+
+    return (
+      <div className="badge" style={{ ...badgeStyle, padding: '0.5rem', fontSize: '1rem', marginRight: '0.5rem' }}>
+        {badgeText}
+      </div>
+    );
+  };
 
   return (
     <section className="py-5">
@@ -90,9 +90,8 @@ const ArticleDetails = () => {
               </div>
             </div>
             <br />
-            <div className="fs-5 mb-3 d-flex justify-content-between">
-              <div className="d-flex flex-wrap">
-                <p style={{ fontSize: '16px', marginRight: '8px', color: '#212529' }}>물품종류 :</p>
+            <div className="d-flex flex-wrap">
+                <p style={{ fontSize: '19px', marginRight: '8px', color: '#212529' }}>물품종류 :</p>
                 {article?.prodCategories && article.prodCategories.map((category, index) => (
                   <span
                     key={index}
@@ -103,18 +102,21 @@ const ArticleDetails = () => {
                       padding: '0.25rem 0.5rem',
                       paddingTop: '0.1rem',
                       paddingBottom: '0rem',
-                      color: '#212529',
-                      backgroundColor: '#D3D3D3',
-                      borderColor: '#D3D3D3',
+                      color: '#ffffff',
+                      backgroundColor: '#6c757d',
+                      borderColor: '#6c757d',
                     }}
                   >
                     {category}
                   </span>
                 ))}
               </div>
+            <div className="fs-5 mb-3 d-flex justify-content-between">
+            <p style={{ fontSize: '19px', color: '#212529' }}>작성자 : {article?.writer || '로딩 중...'}</p>
+
               <div>
-                <span className="me-3" style={{ fontSize: '18px', color: '#212529' }}>조회수: 100</span>
-                <span style={{ fontSize: '18px', color: '#212529' }}>게시날짜: {formattedDate}</span>
+                <span className="me-3" style={{ fontSize: '19px', color: '#212529' }}>조회수 :   100</span>
+                <span style={{ fontSize: '19px', color: '#212529' }}>게시날짜 : {formattedDate}</span>
               </div>
             </div>
             <hr style={{ borderColor: '#212529', marginTop: '1rem', marginBottom: '1rem' }} />
@@ -124,7 +126,7 @@ const ArticleDetails = () => {
             <hr style={{ borderColor: '#212529', marginTop: '1rem', marginBottom: '1rem' }} />
             <div className="d-flex justify-content-between align-items-center mb-3">
               <p className="mb-4" style={{ fontSize: '20px', color: '#212529' }}>
-                <span className="me-2" style={{ fontSize: '18px', color: '#212529', fontWeight: 'normal' }}>기부지역:</span> 서울시 송파구 백제고분로 777-7777
+                <span className="me-2" style={{ fontSize: '19px', color: '#212529', fontWeight: 'normal' }}>기부지역 :</span> 서울시 송파구 백제고분로 777-7777
               </p>
               <button
                 className="btn"
