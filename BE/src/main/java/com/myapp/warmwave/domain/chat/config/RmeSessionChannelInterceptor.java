@@ -1,5 +1,7 @@
 package com.myapp.warmwave.domain.chat.config;
 
+import com.myapp.warmwave.common.exception.CustomException;
+import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.common.jwt.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -29,13 +31,14 @@ public class RmeSessionChannelInterceptor implements ChannelInterceptor {
             List<String> userHeaderValue = nativeHeaders.get("Authorization");
             if (userHeaderValue != null && !userHeaderValue.isEmpty()) {
                 String userHeader = userHeaderValue.get(0);
-                //이제 사용자 정보 처리
+                //사용자 정보 처리
                 String accessToken = userHeader.replace("Bearer ", "");
                 Map<String, Object> claims = (HashMap<String, Object>) jwtProvider.getClaims(accessToken).get("body");
                 String email = claims.get("email").toString();
                 websocketUserContext.setUserEmail(email);
             } else {
                 // 사용자 정보를 찾을 수 없는 경우 처리
+                throw new CustomException(CustomExceptionCode.ILLEGAL_ARGUMENT_JWT);
             }
         }
 
