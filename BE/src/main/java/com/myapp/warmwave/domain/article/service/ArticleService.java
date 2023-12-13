@@ -2,8 +2,6 @@ package com.myapp.warmwave.domain.article.service;
 
 import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.common.main.dto.MainArticleDto;
-import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
-import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ArticleCategory;
@@ -130,8 +128,6 @@ public class ArticleService {
             throw new CustomException(FAILED_TO_REMOVE);
         }
     }
-
-
 
     public Page<MainArticleDto> findTop5OrderByCreatedAt(int num) {
         Pageable pageable = PageRequest.of(num, 5);
