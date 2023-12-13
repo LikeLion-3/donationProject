@@ -39,7 +39,7 @@ public class CommunityListRepositoryImpl implements CommunityListRepository{
                                         .when(user.instanceOf(Institution.class)).then("기관")
                                         .otherwise("Unknown").as("writer"),
 
-                                community.category,
+                                community.communityCategory,
                                 community.createdAt)
                 )
                 .from(community)
@@ -71,7 +71,7 @@ public class CommunityListRepositoryImpl implements CommunityListRepository{
                                         .when(user.instanceOf(Institution.class)).then("기관")
                                         .otherwise("Unknown").as("writer"),
 
-                                community.category,
+                                community.communityCategory,
                                 community.createdAt)
                 )
                 .from(community)

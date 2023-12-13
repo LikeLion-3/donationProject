@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.community.dto;
 
+import com.myapp.warmwave.domain.community.entity.Community;
 import lombok.Getter;
 
 @Getter
