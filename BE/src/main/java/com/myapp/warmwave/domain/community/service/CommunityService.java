@@ -34,11 +34,7 @@ public class CommunityService {
     }
 
     public Page<CommunityListResponseDto> getAllCommunities(Pageable pageable, String sort) {
-        System.out.println("sort : " + sort);
-        if(sort.equals("popular")) {
-            return communityRepository.findAllCommunitiesOrderByHit(pageable);
-        }
-        return communityRepository.findAllCommunities(pageable);
+        return communityRepository.findAllCommunities(pageable, sort);
     }
 
 //    JPA

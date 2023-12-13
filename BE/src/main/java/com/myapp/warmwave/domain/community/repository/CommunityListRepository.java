@@ -8,8 +8,5 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 
 public interface CommunityListRepository {
-    Page<CommunityListResponseDto> findAllCommunities(@PageableDefault Pageable pageable);
-
-    Page<CommunityListResponseDto> findAllCommunitiesOrderByHit(@PageableDefault Pageable pageable);
-
+    Page<CommunityListResponseDto> findAllCommunities(@PageableDefault Pageable pageable, String sort);
 }
