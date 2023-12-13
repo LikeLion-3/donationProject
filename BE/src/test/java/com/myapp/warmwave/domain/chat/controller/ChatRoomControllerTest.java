@@ -5,6 +5,7 @@ import com.myapp.warmwave.common.jwt.JwtAuthFilter;
 import com.myapp.warmwave.config.security.SecurityConfig;
 import com.myapp.warmwave.domain.chat.dto.ChatRoomDto;
 import com.myapp.warmwave.domain.chat.dto.ResponseChatRoomDto;
+import com.myapp.warmwave.domain.chat.dto.ResponseCreateChatRoomDto;
 import com.myapp.warmwave.domain.chat.service.ChatRoomService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,8 +45,8 @@ public class ChatRoomControllerTest {
     void createChatroom() throws Exception {
         // given
         ChatRoomDto reqDto = new ChatRoomDto(1L, 1L, 2L);
-        ResponseChatRoomDto resDto = new ResponseChatRoomDto(
-                1L, "기부자1", "수여자1", 1L, "상태", null
+        ResponseCreateChatRoomDto resDto = new ResponseCreateChatRoomDto(
+                1L, "기부자1", "수여자1", "제목", "상태", "메시지", null
         );
 
         // when
@@ -65,7 +66,7 @@ public class ChatRoomControllerTest {
     void readAllChatroom() throws Exception {
         // given
         ResponseChatRoomDto resDto = new ResponseChatRoomDto(
-                1L, "기부자1", "수여자1", 1L, "상태", null
+                1L, "기부자1", "수여자1", "제목", "상태", "메시지", null
         );
 
         List<ResponseChatRoomDto> chatRoomDtoList = List.of(resDto);
