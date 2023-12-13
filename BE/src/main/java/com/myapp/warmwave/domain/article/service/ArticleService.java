@@ -12,6 +12,7 @@ import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
 import com.myapp.warmwave.domain.image.service.ImageService;
+import com.myapp.warmwave.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -99,7 +100,14 @@ public class ArticleService {
     }
 
     @Transactional
-    public void deleteArticle(long articleId) {
+    public void deleteArticle(String userName, long articleId) {
+        Article article = getArticleByArticleId(articleId);
+        User user = article.getUser();
+
+        if (!user.getEmail().equals(userName)) {
+            throw new CustomException(USER_ROLE_NOT_EXIST);
+        }
+
         imageService.deleteImagesByArticleId(articleId);
         articleCategoryRepository.deleteByArticleId(articleId);
         articleRepository.deleteById(articleId);

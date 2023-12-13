@@ -5,8 +5,8 @@ import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ArticleCategory;
-import com.myapp.warmwave.domain.article.entity.Status;
 import com.myapp.warmwave.domain.article.entity.ArticleType;
+import com.myapp.warmwave.domain.article.entity.Status;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.repository.ArticleCategoryRepository;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
@@ -34,7 +34,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ArticleServiceTest {
@@ -166,9 +166,10 @@ public class ArticleServiceTest {
         articleService.createArticle(reqDto, imageFiles);
 
         Long articleId = 1L;
+        String userName = "test@gamil.com";
 
         // when
-        articleService.deleteArticle(articleId);
+        articleService.deleteArticle(userName, articleId);
 
         // then
         assertThat(articleRepository.count()).isZero();
