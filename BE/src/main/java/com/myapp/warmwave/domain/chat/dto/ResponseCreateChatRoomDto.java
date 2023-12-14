@@ -1,17 +1,14 @@
 package com.myapp.warmwave.domain.chat.dto;
 
-import com.myapp.warmwave.domain.chat.entity.ChatMessage;
 import com.myapp.warmwave.domain.chat.entity.ChatRoom;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ResponseChatRoomDto {
+public class ResponseCreateChatRoomDto {
     private Long id;
 
     private String donorName;
@@ -26,18 +23,14 @@ public class ResponseChatRoomDto {
 
     private LocalDateTime deletedAt;
 
-    public static ResponseChatRoomDto fromEntity(ChatRoom chatRoom) {
-        List<ChatMessage> chatMessages = chatRoom.getChatMessageList();
-        String lastMessageContent = chatMessages.isEmpty() ? "" : chatMessages.get(chatMessages.size() - 1).getMessage();
-        return ResponseChatRoomDto.builder()
+    public static ResponseCreateChatRoomDto fromEntity(ChatRoom chatRoom) {
+        return ResponseCreateChatRoomDto.builder()
                 .id(chatRoom.getId())
                 .donorName(chatRoom.getDonor().getNickname())
                 .recipientName(chatRoom.getRecipient().getInstitutionName())
                 .articleTitle(chatRoom.getArticle().getTitle())
                 .status(chatRoom.getStatus())
-                .lastMessage(lastMessageContent)
                 .deletedAt(chatRoom.getDeletedAt())
                 .build();
     }
-
 }

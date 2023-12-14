@@ -4,6 +4,7 @@ import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.chat.dto.ChatRoomDto;
 import com.myapp.warmwave.domain.chat.dto.ResponseChatRoomDto;
+import com.myapp.warmwave.domain.chat.dto.ResponseCreateChatRoomDto;
 import com.myapp.warmwave.domain.chat.entity.ChatRoom;
 import com.myapp.warmwave.domain.chat.repository.ChatRoomRepository;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -25,7 +26,7 @@ public class ChatRoomService {
     private final ArticleRepository articleRepository;
 
     @Transactional
-    public ResponseChatRoomDto createChatRoom(ChatRoomDto requestDto) {
+    public ResponseCreateChatRoomDto createChatRoom(ChatRoomDto requestDto) {
         Institution recipient = userRepository.findById(requestDto.getRecipientId())
                 .map(Institution.class::cast)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재 하지 않습니다"));
@@ -38,7 +39,7 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = ChatRoom.builder().donor(doner).recipient(recipient).article(article).build();
 
-        return ResponseChatRoomDto.fromEntity(chatRoomRepository.save(chatRoom));
+        return ResponseCreateChatRoomDto.fromEntity(chatRoomRepository.save(chatRoom));
     }
 
     public List<ResponseChatRoomDto> selectChatRoomList() {

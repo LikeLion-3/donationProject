@@ -5,6 +5,7 @@ import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.chat.dto.ChatRoomDto;
 import com.myapp.warmwave.domain.chat.dto.ResponseChatRoomDto;
+import com.myapp.warmwave.domain.chat.dto.ResponseCreateChatRoomDto;
 import com.myapp.warmwave.domain.chat.entity.ChatRoom;
 import com.myapp.warmwave.domain.chat.repository.ChatRoomRepository;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -74,7 +75,7 @@ public class ChatRoomServiceTest {
         ChatRoomDto reqDto = saveChatRoom();
 
         // when
-        ResponseChatRoomDto resDto = chatRoomService.createChatRoom(reqDto);
+        ResponseCreateChatRoomDto resDto = chatRoomService.createChatRoom(reqDto);
 
         // then
         assertThat(resDto).isNotNull();

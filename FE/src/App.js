@@ -18,6 +18,7 @@ import SignUp from './component/user/signup';
 import MyPage from './component/user/mypage/mypage';
 import CommunityList from './component/community/list/CommunityList';
 import CommunityDetails from './component/community/detail/CommunityDetails';
+import Comment from './component/comment/Comment';
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
                     <Route path='/user/me' element={<MyPage />} />
                     <Route path="/community" element={<CommunityList />} />
                     <Route path="/community/:communityId" element={<CommunityDetails />} />
+                    <Route path="/comment/:communityId" element={<Comment />} />
                 </Route>
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/user/login" element={<Login />} />

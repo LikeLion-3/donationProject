@@ -74,10 +74,12 @@ public class ChatMessageServiceTest {
     @Test
     void createMessage() {
         // given
+        String roomId = "1";
+        String email = "test@gmail.com";
         ChatMessageDto reqDto = saveChatMessage();
 
         // when
-        ResponseChatMessageDto resDto = chatMessageService.saveMessage(reqDto);
+        ResponseChatMessageDto resDto = chatMessageService.saveMessage(reqDto, roomId, email);
 
         // then
         assertThat(resDto).isNotNull();
@@ -87,23 +89,23 @@ public class ChatMessageServiceTest {
     @Test
     void readAllMessage() {
         // given
+        String roomId = "1";
+        String email = "test@gmail.com";
         ChatMessageDto reqDto = saveChatMessage();
-        chatMessageService.saveMessage(reqDto);
-
-        Long roomId = 1L;
+        chatMessageService.saveMessage(reqDto, roomId, email);
 
         List<ChatMessage> messageList = List.of(chatMessage);
         when(chatMessageRepository.findAllByChatroomId(any())).thenReturn(messageList);
         
         // when
-        List<ResponseChatMessageDto> resDtoList = chatMessageService.getAllChatMessages(roomId);
+        List<ResponseChatMessageDto> resDtoList = chatMessageService.getAllChatMessages(Long.valueOf(roomId));
     
         // then
         assertThat(resDtoList).hasSameSizeAs(messageList);
     }
 
     private ChatMessageDto saveChatMessage() {
-        ChatMessageDto reqDto = new ChatMessageDto("1", "내용1", "보낸 사람");
+        ChatMessageDto reqDto = new ChatMessageDto("내용1", "보낸 사람");
 
         // Authentication 은 어떻게 검증해야하지? 이렇게 하는거 맞나..?!
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(

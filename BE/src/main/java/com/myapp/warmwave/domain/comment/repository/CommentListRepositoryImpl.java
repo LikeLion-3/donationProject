@@ -49,14 +49,16 @@ public class CommentListRepositoryImpl implements CommentListRepository {
                 .from(comment)
                 .leftJoin(comment.community.user, user)
                 .where(comment.community.id.eq(communityId))
+                .offset((long) pageable.getPageNumber() * pageable.getPageSize())
+                .limit(pageable.getPageSize())
                 .orderBy(orderBy)
                 .fetch();
 
         Long total = jpaQueryFactory
-                .select(community.count())
-                .from(community)
+                .select(comment.count())
+                .from(comment)
                 .fetchOne();
-
+        System.out.println("result : " + result);
         return new PageImpl(result, pageable, total==null ? 0:total);
     }
 }

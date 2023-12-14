@@ -121,7 +121,7 @@ const CommunityList = () => {
 									<tr key={post.id}>
 										<td>{post.category}</td>
 										<td style={{ textAlign: 'center' }}>{post.writer}</td>
-										<td><Link to={`/communities/${post.id}`} className="black-link">{post.title}</Link></td>
+										<td><Link to={`/community/${post.id}`} className="black-link">{post.title}</Link></td>
 										<td style={{ textAlign: 'center' }}>{formatDate(post.createdAt)}</td>
 										<td style={{ textAlign: 'center' }}>{post.hit}</td>
 									</tr>
@@ -136,29 +136,3 @@ const CommunityList = () => {
 };
 
 export default CommunityList;
-
-// // pageable": {
-//   "pageNumber": 0,
-//   "pageSize": 20,
-//   "sort": {
-//       "empty": true,
-//       "sorted": false,
-//       "unsorted": true
-//   },
-//   "offset": 0,
-//   "paged": true,
-//   "unpaged": false
-// },
-// "totalElements": 66,
-// "totalPages": 4,
-// "last": false,
-// "size": 20,
-// "number": 0,
-// "sort": {
-//   "empty": true,
-//   "sorted": false,
-//   "unsorted": true
-// },
-// "first": true,
-// "numberOfElements": 21,
-// "empty": false
