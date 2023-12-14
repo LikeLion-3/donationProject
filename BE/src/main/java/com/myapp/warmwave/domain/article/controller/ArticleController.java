@@ -1,6 +1,7 @@
 package com.myapp.warmwave.domain.article.controller;
 
 import com.myapp.warmwave.common.main.dto.MainArticleDto;
+import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
@@ -51,22 +52,29 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
-    @PatchMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ArticleResponseDto> patchArticle(@PathVariable("articleId") Long articleId,
+    @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ArticleResponseDto> patchArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                                           @PathVariable("articleId") Long articleId,
+                                                           String articleType,
                                                            List<MultipartFile> imageFiles,
                                                            String title,
                                                            String content,
                                                            String prodCategories) throws IOException {
-        ArticlePostDto dto = ArticlePostDto.builder()
+        ArticlePatchDto dto = ArticlePatchDto.builder()
+                .articleId(articleId)
+                .userEmail(userDetails.getUsername())
+                .articleType(ArticleType.findArticleType(articleType))
+                .files(imageFiles)
                 .title(title)
                 .content(content)
                 .prodCategory(prodCategories)
                 .build();
 
-        Article article = articleService.updateArticle(articleId, dto, imageFiles);
+        Article article = articleService.updateArticle(userDetails.getUsername(), dto);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
+
     @GetMapping("/{articleId}")
     public ResponseEntity<ArticleResponseDto> getArticle(@PathVariable("articleId") Long articleId) {
 
@@ -83,8 +91,9 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{articleId}")
-    public ResponseEntity deleteArticle(@PathVariable("articleId") Long articleId) {
-        articleService.deleteArticle(articleId);
+    public ResponseEntity deleteArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                        @PathVariable("articleId") Long articleId) {
+        articleService.deleteArticle(userDetails.getUsername(), articleId);
         return ResponseEntity.noContent().build();
     }
 

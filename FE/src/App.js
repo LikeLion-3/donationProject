@@ -13,6 +13,7 @@ import User from "./component/user/user";
 import Login from './component/user/login';
 import PostButton from './component/article/post/PostButton';
 import PostForm from './component/article/post/PostForm'; // PostForm을 import 합니다.
+import PatchForm from './component/article/post/PatchForm'; // PatchForm을 import 합니다.
 import SignUp from './component/user/signup';
 import MyPage from './component/user/mypage/mypage';
 import CommunityList from './component/community/list/CommunityList';
@@ -33,7 +34,8 @@ function App() {
                     <Route index element={<Home />} />
                     <Route path="/donate" element={<ArticleList />} />
                     <Route path="/donate/:articleId" element={<ArticleDetails />} />
-                    <Route path="/write" element={<PostForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
+                    <Route path="/write" element={<PostForm />} />
+                    <Route path="/update/:articleId" element={<PatchForm />} /> 
                     <Route path="/user" element={<User />} />
                     <Route path='/user/me' element={<MyPage />} />
                     <Route path="/community" element={<CommunityList />} />

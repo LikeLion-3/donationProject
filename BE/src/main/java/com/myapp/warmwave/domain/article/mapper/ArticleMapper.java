@@ -54,6 +54,8 @@ public class ArticleMapper {
     public ArticleResponseDto articleToArticleResponseDto(Article article) {
         return ArticleResponseDto.builder()
                 .articleId(article.getId())
+                .userId(article.getUser().getId())
+                .userEmail(article.getUser().getEmail())
                 .writer(article.getUser().getName())
                 .title(article.getTitle())
                 .content(article.getContent())

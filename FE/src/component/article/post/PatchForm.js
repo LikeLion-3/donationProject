@@ -1,26 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Cookies from 'js-cookie';
 import './PostForm.css';
 import jwtAxios from '../../util/jwtUtil';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
-const PostForm = () => {
+const PatchForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [donationTypeSelected, setDonationTypeSelected] = useState(false);
   const [needTypeSelected, setNeedTypeSelected] = useState(false);
   const [verificationTypeSelected, setVerificationTypeSelected] = useState(false);
-  const [title, setTitle] = useState(localStorage.getItem('postTitle') || '');
-  const [content, setContent] = useState(localStorage.getItem('postContent') || '');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
+  useEffect(() => {
+    // location.state에서 전달된 article 정보를 가져와서 폼에 채움
+    const { article } = location.state || {};
+    if (article) {
+      setTitle(article.title || '');
+      setContent(article.content || '');
+
+      // 이미지 설정 (필요에 따라 수정)
+      // setImages(article.images || []);
+
+      // 물품종류 설정
+      setSelectedCategories(article.prodCategories || []);
+
+      // 게시글 유형 설정
+      handleTypeChange(article.articleType || '기부해요');
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
+        const response = await fetch('http://localhost:8080/api/categories');
         const data = await response.json();
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);
@@ -89,8 +109,8 @@ const PostForm = () => {
         'Authorization': `Bearer ${parsedToken.accessToken}`,
       });
 
-      const response = await fetch('/api/articles', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:8080/api/articles/${params.articleId}`, {
+        method: 'PUT',
         body: formData,
         headers: headers,
       });
@@ -126,11 +146,8 @@ const PostForm = () => {
       <div className="container px-4 px-lg-5">
         <div className="row gx-4 gx-lg-5 justify-content-center">
           <div className="col-lg-8 col-xl-6 text-center">
-            <h2 className="mt-0">게시글 작성</h2>
+            <h2 className="mt-0">게시글 수정</h2>
             <hr className="divider" />
-            <p className="text-muted mb-5">
-              "세상을 변화시키는 일은 작은 시작에서 비롯됩니다. 당신의 작은 기부가 큰 의미를 갖습니다."
-            </p>
           </div>
         </div>
         <div className="row gx-4 gx-lg-5 justify-content-center mb-5">
@@ -188,27 +205,27 @@ const PostForm = () => {
                   이미지 추가
                 </label>
                 <input
-                  type="file"
-                  className="form-control"
-                  id="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  multiple
+            type="file"
+            className="form-control"
+            id="image"
+            accept="image/*"
+            onChange={handleImageChange}
+            multiple
+          />
+          {images.length > 0 && (
+            <div className="mt-3 d-flex flex-wrap">
+              {images.map((image, index) => (
+                <img
+                  key={index}
+                  src={URL.createObjectURL(image)}
+                  alt={`Preview-${index}`}
+                  className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
+                  style={{ width: '139px', height: '150px', objectFit: 'cover' }}
                 />
-                {images.length > 0 && (
-                  <div className="mt-3 d-flex flex-wrap">
-                    {images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={URL.createObjectURL(image)}
-                        alt={`Preview-${index}`}
-                        className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
-                        style={{ width: '139px', height: '150px', objectFit: 'cover' }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+              ))}
+            </div>
+          )}
+        </div>
               <div className="mb-3">
                 <label className="form-label" style={{ color: 'dimgray' }}>물품종류</label>
                 <div className="d-flex flex-wrap">
@@ -260,7 +277,7 @@ const PostForm = () => {
                   type="submit"
                   style={{ backgroundColor: '#ffa500', borderColor: '#ffa500' }}
                 >
-                  등록
+                  수정
                 </button>
               </div>
             </form>
@@ -271,4 +288,4 @@ const PostForm = () => {
   );
 };
 
-export default PostForm;
+export default PatchForm;

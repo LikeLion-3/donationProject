@@ -2,6 +2,7 @@ package com.myapp.warmwave.domain.article.service;
 
 import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.common.main.dto.MainArticleDto;
+import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
@@ -12,6 +13,7 @@ import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
 import com.myapp.warmwave.domain.image.service.ImageService;
+import com.myapp.warmwave.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -61,9 +63,15 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article updateArticle(Long articleId, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
+    public Article updateArticle(String userEmail, ArticlePatchDto dto) throws IOException {
 
-        Article findArticle = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
+        Article findArticle = getArticleByArticleId(dto.getArticleId());
+        User user = findArticle.getUser();
+
+        if (!user.getEmail().equals(userEmail)) {
+            throw new CustomException(USER_ROLE_NOT_EXIST);
+        }
+
         imageService.deleteImagesByArticleId(findArticle.getId());
         articleCategoryRepository.deleteByArticleId(findArticle.getId());
 
@@ -76,7 +84,7 @@ public class ArticleService {
 
         //추후 세터를 삭제하는 방향을 생각해보아야함
         findArticle.applyPatch(dto, articleCategoryRepository.findByArticleId(findArticle.getId()));
-        findArticle.setArticleImages(imageService.uploadImages(findArticle, imageFiles));
+        findArticle.setArticleImages(imageService.uploadImages(findArticle, dto.getFiles()));
 
         return articleRepository.save(findArticle);
     }
@@ -99,7 +107,14 @@ public class ArticleService {
     }
 
     @Transactional
-    public void deleteArticle(long articleId) {
+    public void deleteArticle(String userName, long articleId) {
+        Article article = getArticleByArticleId(articleId);
+        User user = article.getUser();
+
+        if (!user.getEmail().equals(userName)) {
+            throw new CustomException(USER_ROLE_NOT_EXIST);
+        }
+
         imageService.deleteImagesByArticleId(articleId);
         articleCategoryRepository.deleteByArticleId(articleId);
         articleRepository.deleteById(articleId);
