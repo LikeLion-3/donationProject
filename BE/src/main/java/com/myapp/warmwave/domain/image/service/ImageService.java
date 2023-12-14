@@ -13,11 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,8 +27,13 @@ import static com.myapp.warmwave.common.exception.CustomExceptionCode.IMAGE_SIZE
 @RequiredArgsConstructor
 public class ImageService {
 
+    @Value("${image.upload.path}")
+    private String imageStorePath;
+
     private final AmazonS3 amazonS3;
+
     private final ImageRepository imageRepository;
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
     private static final long maxFileAmount = 5;
@@ -72,6 +74,7 @@ public class ImageService {
         return images;
     }
 
+    public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) throws IOException {
     private static void validateImageFiles(List<MultipartFile> imageFiles) {
         if (imageFiles.size() > maxFileAmount) {
            new CustomException(IMAGE_AMOUNT_OVER);
@@ -87,40 +90,27 @@ public class ImageService {
     public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) {
         List<Image> images = new ArrayList<>();
 
-        File directory = new File(imageStorePath);
-        if (!directory.exists()) {
-            boolean created = directory.mkdirs();
-            if (!created) {
-                log.error("Failed to create directory: {}", imageStorePath);
-            }
-        }
-
         for (MultipartFile imageFile : imageFiles) {
             String originalFilename = imageFile.getOriginalFilename();
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
             String fileName = UUID.randomUUID() + "." + fileExtension;
-            // 작성자 이메일, createdAt, article PK + 중복 인덱스
-            //
-            try {
-                imageFile.transferTo(Paths.get(imageStorePath).resolve(fileName));
 
-                String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/images/")
-                        .path(fileName)
-                        .toUriString();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(imageFile.getSize());
+            metadata.setContentType(imageFile.getContentType());
 
-                Image image = Image.builder()
-                        .imgName(fileName)
-                        .imgUrl(imageUrl)
-                        .community(community)
-                        .build();
+            String key = "community/"+fileName;
 
-                imageRepository.save(image);
-                images.add(image);
-            }
-            catch(IOException e) {
-                log.error("Failed to store images"+ String.valueOf(e));;
-            }
+            amazonS3.putObject(bucket, key, imageFile.getInputStream(), metadata);
+
+            Image image = Image.builder()
+                    .imgName(fileName)
+                    .imgUrl(amazonS3.getUrl(bucket, key).toString())
+                    .community(community)
+                    .build();
+
+            imageRepository.save(image);
+            images.add(image);
         }
         return images;
     }
