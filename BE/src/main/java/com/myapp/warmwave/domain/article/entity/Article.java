@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_ARTICLE")
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=false)
 @ToString
 public class Article extends BaseEntity {
     @Id
@@ -41,11 +41,13 @@ public class Article extends BaseEntity {
     private Long hit;
 
     @JsonIgnore
+    @Builder.Default
     @OneToMany(mappedBy = "article")
     private List<ArticleCategory> articleCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "article")
     @JsonIgnore
+    @Builder.Default
     private List<Image> articleImages = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
