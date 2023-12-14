@@ -39,10 +39,15 @@ public class CommunityController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CommunityResponseDto> createCommunity(@RequestPart List<MultipartFile> images,
-                                                                @RequestPart CommunityPostDto communityPostDto,
+    public ResponseEntity<CommunityResponseDto> createCommunity(String title,String contents,String category,
+                                                                List<MultipartFile> images,
                                                                 @AuthenticationPrincipal UserDetails userDetails) {
         // + userIp 처리
+        CommunityPostDto communityPostDto = CommunityPostDto.builder()
+                .title(title)
+                .contents(contents)
+                .category(category)
+                .build();
         String userEmail = userDetails.getUsername();
         return new ResponseEntity<>(communityFacadeService.createCommunity(communityPostDto, images, userEmail), HttpStatus.CREATED);
     }

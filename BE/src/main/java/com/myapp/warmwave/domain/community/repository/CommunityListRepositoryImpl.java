@@ -48,8 +48,14 @@ public class CommunityListRepositoryImpl implements CommunityListRepository {
                                         .when(user.instanceOf(Institution.class)).then("기관")
                                         .otherwise("Unknown").as("writer"),
                                 new CaseBuilder()
+                                        .when(community.communityCategory.eq(Community.CommunityCategory.valueOf("volunteer_recruit")))
+                                        .then("봉사모집")
                                         .when(community.communityCategory.eq(Community.CommunityCategory.valueOf("volunteer_certificate")))
                                         .then("봉사인증")
+                                        .when(community.communityCategory.eq(Community.CommunityCategory.valueOf("etc")))
+                                        .then("잡다구리")
+                                        .when(community.communityCategory.eq(Community.CommunityCategory.valueOf("notice")))
+                                        .then("공지사항")
                                         .otherwise("기타"),
                                 community.createdAt)
                 )
