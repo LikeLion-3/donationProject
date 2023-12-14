@@ -137,51 +137,51 @@ const PostForm = () => {
           <div className="col-lg-8 col-xl-6">
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-              <label className="form-label" style={{ color: 'dimgray' }}>게시글 유형</label>
-              <div className="d-flex flex-wrap">
-                <div className="me-2 mb-2">
-                  <button
-                    type="button"
-                    className={`btn ${donationTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => handleTypeChange('기부해요')}
-                    style={{
-                      color: donationTypeSelected ? '#ffffff' : '#ffa500',
-                      backgroundColor: donationTypeSelected ? '#ffa500' : 'transparent',
-                      borderColor: '#ffa500',
-                    }}
-                  >
-                    기부해요
-                  </button>
+                <label className="form-label" style={{ color: 'dimgray' }}>게시글 유형</label>
+                <div className="d-flex flex-wrap">
+                  <div className="me-2 mb-2">
+                    <button
+                      type="button"
+                      className={`btn ${donationTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => handleTypeChange('기부해요')}
+                      style={{
+                        color: donationTypeSelected ? '#ffffff' : '#ffa500',
+                        backgroundColor: donationTypeSelected ? '#ffa500' : 'transparent',
+                        borderColor: '#ffa500',
+                      }}
+                    >
+                      기부해요
+                    </button>
+                  </div>
+                  <div className="me-2 mb-2">
+                    <button
+                      type="button"
+                      className={`btn ${needTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => handleTypeChange('필요해요')}
+                      style={{
+                        color: needTypeSelected ? '#ffffff' : '#007bff',
+                        backgroundColor: needTypeSelected ? '#007bff' : 'transparent',
+                        borderColor: '#007bff',
+                      }}
+                    >
+                      필요해요
+                    </button>
+                  </div>
+                  <div className="me-2 mb-2">
+                    <button
+                      type="button"
+                      className={`btn ${verificationTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => handleTypeChange('인증해요')}
+                      style={{
+                        color: verificationTypeSelected ? '#ffffff' : '#28a745',
+                        backgroundColor: verificationTypeSelected ? '#28a745' : 'transparent',
+                        borderColor: '#28a745',
+                      }}
+                    >
+                      인증해요
+                    </button>
+                  </div>
                 </div>
-                <div className="me-2 mb-2">
-                  <button
-                    type="button"
-                    className={`btn ${needTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => handleTypeChange('필요해요')}
-                    style={{
-                      color: needTypeSelected ? '#ffffff' : '#007bff',
-                      backgroundColor: needTypeSelected ? '#007bff' : 'transparent',
-                      borderColor: '#007bff',
-                    }}
-                  >
-                    필요해요
-                  </button>
-                </div>
-                <div className="me-2 mb-2">
-                  <button
-                    type="button"
-                    className={`btn ${verificationTypeSelected ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => handleTypeChange('인증해요')}
-                    style={{
-                      color: verificationTypeSelected ? '#ffffff' : '#28a745',
-                      backgroundColor: verificationTypeSelected ? '#28a745' : 'transparent',
-                      borderColor: '#28a745',
-                    }}
-                  >
-                    인증해요
-                  </button>
-                </div>
-              </div>
               </div>
               <div className="mb-3">
                 <label className="form-label" style={{ color: 'dimgray' }}>
@@ -254,12 +254,15 @@ const PostForm = () => {
                 ></textarea>
                 <label className="form-label" style={{ color: 'dimgray' }}>글 내용</label>
               </div>
-              <button
-                className="btn btn-primary btn-xl"
-                type="submit"
-                style={{ backgroundColor: '#ffa500', borderColor: '#ffa500' }}>
-                Submit
-              </button>
+              <div className="d-flex justify-content-end">
+                <button
+                  className="btn btn-primary btn-xl"
+                  type="submit"
+                  style={{ backgroundColor: '#ffa500', borderColor: '#ffa500' }}
+                >
+                  등록
+                </button>
+              </div>
             </form>
           </div>
         </div>
