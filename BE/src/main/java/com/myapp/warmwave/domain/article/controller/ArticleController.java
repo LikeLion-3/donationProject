@@ -52,7 +52,7 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
-    @PatchMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ArticleResponseDto> patchArticle(@AuthenticationPrincipal UserDetails userDetails,
                                                            @PathVariable("articleId") Long articleId,
                                                            String articleType,

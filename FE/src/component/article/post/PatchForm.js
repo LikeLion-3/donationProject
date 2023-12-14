@@ -110,7 +110,7 @@ const PatchForm = () => {
       });
 
       const response = await fetch(`http://localhost:8080/api/articles/${params.articleId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         body: formData,
         headers: headers,
       });

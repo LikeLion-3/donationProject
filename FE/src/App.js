@@ -34,8 +34,8 @@ function App() {
                     <Route index element={<Home />} />
                     <Route path="/donate" element={<ArticleList />} />
                     <Route path="/donate/:articleId" element={<ArticleDetails />} />
-                    <Route path="/write" element={<PostForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
-                    <Route path="/update/:articleId" element={<PatchForm />} /> {/* PostForm을 /write 경로에 연결합니다. */}
+                    <Route path="/write" element={<PostForm />} />
+                    <Route path="/update/:articleId" element={<PatchForm />} /> 
                     <Route path="/user" element={<User />} />
                     <Route path='/user/me' element={<MyPage />} />
                     <Route path="/community" element={<CommunityList />} />
