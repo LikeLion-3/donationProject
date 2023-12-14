@@ -41,6 +41,10 @@ private String imageStorePath;
             }
         }
 
+        if (imageFiles == null) {
+            return images;
+        }
+
         for (MultipartFile imageFile : imageFiles) {
             String originalFilename = imageFile.getOriginalFilename();
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -49,7 +53,6 @@ private String imageStorePath;
             // 정확한 파일 시스템 경로를 얻기 위해 ResourceUtils.getFile() 사용
             File destFile = new File(directory, fileName);
             imageFile.transferTo(destFile);
-            imageFile.transferTo(Paths.get(imageStorePath).resolve(fileName));
 
             String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/images/")

@@ -1,6 +1,7 @@
 package com.myapp.warmwave.domain.article.service;
 
 import com.myapp.warmwave.common.Role;
+import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
 import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
@@ -145,13 +146,14 @@ public class ArticleServiceTest {
 
         when(articleRepository.findById(any())).thenReturn(Optional.of(articleIndiv));
 
-        ArticlePostDto updateDto = ArticlePostDto.builder()
+        ArticlePatchDto updateDto = ArticlePatchDto.builder()
                 .title("제목1 변경").content("내용2").prodCategory("카테고리2").build();
 
         savedArticle.applyPatch(updateDto, List.of(articleCategory));
+        String userEmail = "test@gmail.com";
 
         // when
-        Article foundArticle = articleService.updateArticle(articleId, updateDto, imageFiles);
+        Article foundArticle = articleService.updateArticle(userEmail, updateDto);
 
         // then
         assertThat(foundArticle.getTitle()).isNotEqualTo(title);

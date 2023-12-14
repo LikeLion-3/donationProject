@@ -2,7 +2,7 @@ package com.myapp.warmwave.domain.article.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.myapp.warmwave.common.BaseEntity;
-import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
+import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
 import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -63,7 +63,7 @@ public class Article extends BaseEntity {
         this.articleCategories = articleCategories;
     }
 
-    public void applyPatch(ArticlePostDto dto, List<ArticleCategory> articleCategories) {
+    public void applyPatch(ArticlePatchDto dto, List<ArticleCategory> articleCategories) {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.articleCategories = articleCategories;

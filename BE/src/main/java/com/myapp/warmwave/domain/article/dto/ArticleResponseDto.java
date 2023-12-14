@@ -13,7 +13,10 @@ import java.util.List;
 public class ArticleResponseDto {
     private Long articleId;
 
-    //추후 멤버객체로 매핑예정
+    private Long userId;
+
+    private String userEmail;
+
     private String writer;
 
     private String title;
