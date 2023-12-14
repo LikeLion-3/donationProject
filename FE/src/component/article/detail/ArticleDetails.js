@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import jwtAxios from '../../util/jwtUtil';
+import { getCookie } from '../../util/cookieUtil';
+
 
 const ArticleDetails = () => {
   const [article, setArticle] = useState(null);
   const params = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get(`http://localhost:8080/api/articles/${params.articleId}`)
@@ -18,10 +23,10 @@ const ArticleDetails = () => {
 
   const formattedDate = article?.createdAt
     ? new Date(article.createdAt).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }).replace(/ /g, '')
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).replace(/ /g, '')
     : '로딩 중...';
 
   const getArticleTypeText = (type) => {
@@ -55,6 +60,34 @@ const ArticleDetails = () => {
       </div>
     );
   };
+
+  const handleDelete = async () => {
+    const userToken = Cookies.get('user');
+    const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
+
+    try {
+      await axios.delete(`http://localhost:8080/api/articles/${params.articleId}`, {
+        headers: {
+          'Authorization': `Bearer ${parsedToken.accessToken}`,
+        },
+      });
+
+      // 삭제 후 목록 페이지로 이동
+      navigate('/donate');
+    } catch (error) {
+      console.error('Error deleting article:', error);
+    }
+  };
+
+  const handleUpdate = () => {
+    // '수정' 버튼 클릭 시, PatchForm 페이지로 이동하고 현재 글의 정보를 전달
+    navigate(`/update/${params.articleId}`, { state: { article } });
+  };
+
+  const loggedInUserId = getCookie('user')?.id; // 토큰이 없을 때를 대비해 ?. 연산자 추가
+  const articleWriterId = article?.userId;
+
+  const showEditButtons = loggedInUserId && loggedInUserId === articleWriterId;
 
   return (
     <section className="py-5">
@@ -91,28 +124,28 @@ const ArticleDetails = () => {
             </div>
             <br />
             <div className="d-flex flex-wrap">
-                <p style={{ fontSize: '19px', marginRight: '8px', color: '#212529' }}>물품종류 :</p>
-                {article?.prodCategories && article.prodCategories.map((category, index) => (
-                  <span
-                    key={index}
-                    className="btn btn-outline-dark me-2 mb-2"
-                    disabled
-                    style={{
-                      fontSize: '16px',
-                      padding: '0.25rem 0.5rem',
-                      paddingTop: '0.1rem',
-                      paddingBottom: '0rem',
-                      color: '#ffffff',
-                      backgroundColor: '#6c757d',
-                      borderColor: '#6c757d',
-                    }}
-                  >
-                    {category}
-                  </span>
-                ))}
-              </div>
+              <p style={{ fontSize: '19px', marginRight: '8px', color: '#212529' }}>물품종류 :</p>
+              {article?.prodCategories && article.prodCategories.map((category, index) => (
+                <span
+                  key={index}
+                  className="btn btn-outline-dark me-2 mb-2"
+                  disabled
+                  style={{
+                    fontSize: '16px',
+                    padding: '0.25rem 0.5rem',
+                    paddingTop: '0.1rem',
+                    paddingBottom: '0rem',
+                    color: '#ffffff',
+                    backgroundColor: '#6c757d',
+                    borderColor: '#6c757d',
+                  }}
+                >
+                  {category}
+                </span>
+              ))}
+            </div>
             <div className="fs-5 mb-3 d-flex justify-content-between">
-            <p style={{ fontSize: '19px', color: '#212529' }}>작성자 : {article?.writer || '로딩 중...'}</p>
+              <p style={{ fontSize: '19px', color: '#212529' }}>작성자 : {article?.writer || '로딩 중...'}</p>
 
               <div>
                 <span className="me-3" style={{ fontSize: '19px', color: '#212529' }}>조회수👀 :   100</span>
@@ -126,29 +159,35 @@ const ArticleDetails = () => {
               </div>
             </div>
             <div className="mt-3 d-flex justify-content-end">
-            <button
-              className="btn btn-secondary me-2"
-              type="button"
-              style={{
-                backgroundColor: '#ffffff', // 배경색
-                borderColor: '#999999',     // 경계선 색
-                color: '#999999',           // 폰트 색
-              }}
-            >
-              수정
-            </button>
+              {showEditButtons && (
+                <>
+                  <button
+                    className="btn btn-secondary me-2"
+                    type="button"
+                    onClick={handleUpdate}
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderColor: '#999999',
+                      color: '#999999',
+                    }}
+                  >
+                    수정
+                  </button>
 
-            <button
-              className="btn btn-danger"
-              type="button"
-              style={{
-                backgroundColor: '#ffffff', // 배경색
-                borderColor: '#999999',     // 경계선 색
-                color: '#999999',           // 폰트 색
-              }}
-            >
-              삭제
-            </button>
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={handleDelete}
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderColor: '#999999',
+                      color: '#999999',
+                    }}
+                  >
+                    삭제
+                  </button>
+                </>
+              )}
             </div>
             <hr style={{ borderColor: '#212529', marginTop: '1rem', marginBottom: '1rem' }} />
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -162,7 +201,7 @@ const ArticleDetails = () => {
                   backgroundColor: '#87CEEB',
                   borderColor: '#87CEEB',
                   color: '#ffffff',
-                  padding: '6px', // 버튼 내부 패딩을 조절하여 크기를 유지합니다
+                  padding: '6px',
                 }}
               >
                 <i className="bi-cart-fill me-1"></i>
