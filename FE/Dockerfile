@@ -1,7 +1,9 @@
 FROM node:20.9.0-alpine AS builder
 
-COPY package.json package-lock.json ./
-COPY ./* /home/app
+WORKDIR /home/app
+
+COPY package.json package-lock.json /
+COPY ./* /
 
 RUN npm install
 RUN npm run build
