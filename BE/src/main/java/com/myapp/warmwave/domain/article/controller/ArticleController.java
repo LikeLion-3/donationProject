@@ -34,8 +34,8 @@ public class ArticleController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArticleResponseDto> postArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                                          @RequestParam(required = false) List<MultipartFile> imageFiles,
                                                           String articleType,
-                                                          List<MultipartFile> imageFiles,
                                                           String title,
                                                           String content,
                                                           String prodCategories) throws IOException {
@@ -55,8 +55,9 @@ public class ArticleController {
     @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ArticleResponseDto> patchArticle(@AuthenticationPrincipal UserDetails userDetails,
                                                            @PathVariable("articleId") Long articleId,
+                                                           @RequestParam(required = false) List<MultipartFile> imageFiles,
+                                                           @RequestParam(required = false) List<String> originalImageUrls,
                                                            String articleType,
-                                                           List<MultipartFile> imageFiles,
                                                            String title,
                                                            String content,
                                                            String prodCategories) throws IOException {
@@ -64,6 +65,7 @@ public class ArticleController {
                 .articleId(articleId)
                 .userEmail(userDetails.getUsername())
                 .articleType(ArticleType.findArticleType(articleType))
+                .originalImageUrls(originalImageUrls)
                 .files(imageFiles)
                 .title(title)
                 .content(content)

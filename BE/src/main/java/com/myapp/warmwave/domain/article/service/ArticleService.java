@@ -12,6 +12,7 @@ import com.myapp.warmwave.domain.article.repository.ArticleCategoryRepository;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
+import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 
@@ -72,7 +74,6 @@ public class ArticleService {
             throw new CustomException(USER_ROLE_NOT_EXIST);
         }
 
-        imageService.deleteImagesByArticleId(findArticle.getId());
         articleCategoryRepository.deleteByArticleId(findArticle.getId());
 
         List<Category> categories = categoryService.getCategory(dto.getProdCategory());
@@ -83,6 +84,12 @@ public class ArticleService {
         }
 
         //추후 세터를 삭제하는 방향을 생각해보아야함
+        List<String> deleteImageUrls = findArticle.getArticleImages().stream()
+                .map(Image::getImgUrl)
+                .filter(url -> !dto.getOriginalImageUrls().contains(url))
+                .collect(Collectors.toList());
+
+        imageService.deleteImagesByUrls(deleteImageUrls);
         findArticle.applyPatch(dto, articleCategoryRepository.findByArticleId(findArticle.getId()));
         findArticle.setArticleImages(imageService.uploadImages(findArticle, dto.getFiles()));
 
