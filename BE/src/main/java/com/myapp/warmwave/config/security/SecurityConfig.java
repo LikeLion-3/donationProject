@@ -39,17 +39,18 @@ public class SecurityConfig {
                                 .logoutUrl("/api/users/logout")
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers(
                                         "/", "/api/users/login", "/api/users/register/**",
                                         "/api/articles/today", "/api/main/count", "/api/users/adjacent", "/api/users/confirm-email",
                                         "/api/users/**", // 테스트용
-                                        "/ws/**"
+                                        "/ws/**",
+                                        "/api/user/refresh"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(
                         oauth2 -> oauth2
                                 .loginPage("http://localhost:3000/user/login")
