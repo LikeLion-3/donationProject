@@ -77,6 +77,16 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
+    @PatchMapping("/status/{articleId}")
+    public ResponseEntity<ArticleResponseDto> patchArticleStatus(@PathVariable("articleId") Long articleId,
+                                                                 @AuthenticationPrincipal UserDetails userDetails,
+                                                                 @RequestParam(required = true) String articleStatus) {
+
+        Article article = articleService.updateArticleStatus(articleId, userDetails.getUsername(), articleStatus);
+
+        return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
+    }
+
     @GetMapping("/{articleId}")
     public ResponseEntity<ArticleResponseDto> getArticle(@PathVariable("articleId") Long articleId) {
 

@@ -96,6 +96,18 @@ public class ArticleService {
         return articleRepository.save(findArticle);
     }
 
+    public Article updateArticleStatus(Long articleId, String userEmail, String articleStatus) {
+        Article findArticle = getArticleByArticleId(articleId);
+        User user = findArticle.getUser();
+
+        if (!user.getEmail().equals(userEmail))
+            throw new CustomException(USER_ROLE_NOT_EXIST);
+
+        findArticle.setArticleStatusByString(articleStatus);
+
+        return articleRepository.save(findArticle);
+    }
+
     public Article getArticleByArticleId(Long articleId) {
         return articleRepository.findById(articleId).orElseThrow(() -> new CustomException(NOT_FOUND_ARTICLE));
     }
