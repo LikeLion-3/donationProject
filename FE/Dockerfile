@@ -1,9 +1,10 @@
-FROM node:20.9.0-alpine AS builder
+#FROM node:20.9.0-alpine AS builder
+FROM nginx
 
 WORKDIR /home/app
 
-COPY package.json package-lock.json /home/app/
-COPY ./* /home/app/
+COPY package.json package-lock.json /
+COPY ./* /
 
 RUN npm install
 RUN npm run build
