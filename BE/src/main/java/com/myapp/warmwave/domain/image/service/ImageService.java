@@ -3,6 +3,7 @@ package com.myapp.warmwave.domain.image.service;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.image.entity.Image;
@@ -21,27 +22,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.IMAGE_AMOUNT_OVER;
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.IMAGE_SIZE_OVER;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ImageService {
 
+    private final AmazonS3 amazonS3;
+    private final ImageRepository imageRepository;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+    private static final long maxFileAmount = 5;
+    private static final long maxFileSizePerFile = 5 * 1024 * 1024;
+    //추후 삭제
     @Value("${image.upload.path}")
     private String imageStorePath;
 
-    private final AmazonS3 amazonS3;
-
-    private final ImageRepository imageRepository;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-
     public List<Image> uploadImages(Article article, List<MultipartFile> imageFiles) throws IOException {
-        List<Image> images = new ArrayList<>();
+        validateImageFiles(imageFiles); // 예외처리 메서드
 
-        if (imageFiles == null) {
+        List<Image> images = new ArrayList<>();
+        if (imageFiles == null)
             return images;
-        }
 
         for (MultipartFile imageFile : imageFiles) {
             String originalFilename = imageFile.getOriginalFilename();
@@ -66,6 +70,18 @@ public class ImageService {
             images.add(image);
         }
         return images;
+    }
+
+    private static void validateImageFiles(List<MultipartFile> imageFiles) {
+        if (imageFiles.size() > maxFileAmount) {
+           new CustomException(IMAGE_AMOUNT_OVER);
+        }
+
+        for (MultipartFile imageFile : imageFiles) {
+            if (imageFile.getSize() > maxFileSizePerFile) {
+                new CustomException(IMAGE_SIZE_OVER);
+            }
+        }
     }
 
     public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) {
