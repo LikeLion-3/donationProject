@@ -1,5 +1,8 @@
 package com.myapp.warmwave.domain.image.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.image.entity.Image;
@@ -8,38 +11,33 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import java.io.File;
-import java.io.IOException;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ImageService {
 
-@Value("${image.upload.path}")
-private String imageStorePath;
+    @Value("${image.upload.path}")
+    private String imageStorePath;
+
+    private final AmazonS3 amazonS3;
 
     private final ImageRepository imageRepository;
 
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
     public List<Image> uploadImages(Article article, List<MultipartFile> imageFiles) throws IOException {
         List<Image> images = new ArrayList<>();
-
-        File directory = ResourceUtils.getFile(imageStorePath);
-        if (!directory.exists()) {
-            boolean created = directory.mkdirs();
-            if (!created) {
-                log.error("Failed to create directory: {}", imageStorePath);
-            }
-        }
 
         if (imageFiles == null) {
             return images;
@@ -50,18 +48,17 @@ private String imageStorePath;
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
             String fileName = UUID.randomUUID() + "." + fileExtension;
 
-            // 정확한 파일 시스템 경로를 얻기 위해 ResourceUtils.getFile() 사용
-            File destFile = new File(directory, fileName);
-            imageFile.transferTo(destFile);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(imageFile.getSize());
+            metadata.setContentType(imageFile.getContentType());
 
-            String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/images/")
-                    .path(fileName)
-                    .toUriString();
+            String key = "article/" + fileName;
+
+            amazonS3.putObject(bucket, key, imageFile.getInputStream(), metadata);
 
             Image image = Image.builder()
                     .imgName(fileName)
-                    .imgUrl(imageUrl)
+                    .imgUrl(amazonS3.getUrl(bucket, key).toString())
                     .article(article)
                     .build();
 
@@ -117,13 +114,33 @@ private String imageStorePath;
 
         for (Image image : imagesToDelete) {
             String fileName = image.getImgName();
-            File fileToDelete = new File(imageStorePath, fileName);
-
-            // 파일 삭제
-            if (fileToDelete.exists()) {
-                fileToDelete.delete();
+            String key = "article/" + fileName;
+            try {
+                amazonS3.deleteObject(bucket, key);
+            } catch (AmazonServiceException e) {
+                System.err.println(e.getErrorMessage());
+                System.exit(1);
             }
         }
         imageRepository.deleteAll(imagesToDelete);
+    }
+
+    public  void deleteImagesByUrls(List<String> urls) {
+        String key = "";
+        for(String url : urls) {
+            if (url != null) {
+                int lastSlashIndex = url.lastIndexOf('/');
+                if (lastSlashIndex != -1 && lastSlashIndex < url.length() - 1) {
+                    key = url.substring(lastSlashIndex + 1);
+                }
+            }
+
+            try {
+                amazonS3.deleteObject(bucket, key);
+            }  catch (AmazonServiceException e) {
+                System.err.println(e.getErrorMessage());
+                System.exit(1);
+            }
+        }
     }
 }

@@ -20,6 +20,8 @@ public class ArticlePatchDto {
     @NotNull
     private ArticleType articleType;
 
+    private List<String> originalImageUrls;
+
     private List<MultipartFile> files;
 
     @NotNull

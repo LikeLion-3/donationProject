@@ -20,19 +20,12 @@ const PatchForm = () => {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    // location.state에서 전달된 article 정보를 가져와서 폼에 채움
     const { article } = location.state || {};
     if (article) {
       setTitle(article.title || '');
       setContent(article.content || '');
-
-      // 이미지 설정 (필요에 따라 수정)
-      // setImages(article.images || []);
-
-      // 물품종류 설정
+      setImages(article.images || []);
       setSelectedCategories(article.prodCategories || []);
-
-      // 게시글 유형 설정
       handleTypeChange(article.articleType || '기부해요');
     }
   }, [location.state]);
@@ -77,13 +70,11 @@ const PatchForm = () => {
   const handleTitleChange = (event) => {
     const newTitle = event.target.value;
     setTitle(newTitle);
-    localStorage.setItem('postTitle', newTitle);
   };
 
   const handleContentChange = (event) => {
     const newContent = event.target.value;
     setContent(newContent);
-    localStorage.setItem('postContent', newContent);
   };
 
   const handleSubmit = async (event) => {
@@ -92,10 +83,18 @@ const PatchForm = () => {
     try {
       const formData = new FormData();
 
-      images.forEach((image, index) => {
-        formData.append(`imageFiles`, image);
-      });
 
+      // 이미지가 존재하는 경우에만 FormData에 추가
+      if (images.length > 0) {
+        images.forEach((image, index) => {
+          formData.append(`imageFiles`, image);
+        });
+      }
+
+      const originalImageUrls = (location.state && location.state.article && location.state.article.images)
+        ? location.state.article.images.map((image) => image.imgUrl)
+        : [];
+      formData.append('originalImageUrls', JSON.stringify(originalImageUrls));
       formData.append('title', title);
       formData.append('content', content);
       formData.append('prodCategories', JSON.stringify(selectedCategories));
@@ -133,13 +132,8 @@ const PatchForm = () => {
       return '인증해요';
     }
 
-    // Default to 기부해요 if none selected
     return '기부해요';
   };
-
-  useEffect(() => {
-    localStorage.setItem('selectedCategories', JSON.stringify(selectedCategories));
-  }, [selectedCategories]);
 
   return (
     <section className="page-section" id="contact">
@@ -205,27 +199,27 @@ const PatchForm = () => {
                   이미지 추가
                 </label>
                 <input
-            type="file"
-            className="form-control"
-            id="image"
-            accept="image/*"
-            onChange={handleImageChange}
-            multiple
-          />
-          {images.length > 0 && (
-            <div className="mt-3 d-flex flex-wrap">
-              {images.map((image, index) => (
-                <img
-                  key={index}
-                  src={URL.createObjectURL(image)}
-                  alt={`Preview-${index}`}
-                  className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
-                  style={{ width: '139px', height: '150px', objectFit: 'cover' }}
+                  type="file"
+                  className="form-control"
+                  id="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  multiple
                 />
-              ))}
-            </div>
-          )}
-        </div>
+                {images.length > 0 && (
+                  <div className="mt-3 d-flex flex-wrap">
+                    {images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={image.imgUrl ? image.imgUrl : URL.createObjectURL(image)}
+                        alt={`Preview-${index}`}
+                        className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
+                        style={{ width: '139px', height: '150px', objectFit: 'cover' }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
               <div className="mb-3">
                 <label className="form-label" style={{ color: 'dimgray' }}>물품종류</label>
                 <div className="d-flex flex-wrap">
@@ -233,9 +227,8 @@ const PatchForm = () => {
                     <div key={category} className="me-2 mb-2">
                       <button
                         type="button"
-                        className={`btn ${
-                          selectedCategories.includes(category) ? 'btn-primary' : 'btn-outline-primary'
-                        }`}
+                        className={`btn ${selectedCategories.includes(category) ? 'btn-primary' : 'btn-outline-primary'
+                          }`}
                         onClick={() => handleCategoryChange(category)}
                         style={{
                           color: selectedCategories.includes(category) ? '#ffffff' : '#ffa500',
