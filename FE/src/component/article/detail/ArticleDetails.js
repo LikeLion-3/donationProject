@@ -99,7 +99,7 @@ const ArticleDetails = () => {
                 <img
                   key={image.id}
                   className="card-img-top mb-5 mb-md-0"
-                  src={`/images/${image.imgName}`}
+                  src={image.imgUrl}  // 이미지의 URL을 사용
                   alt={image.imgName}
                   style={{ maxHeight: '400px', width: '100%', objectFit: 'contain' }}
                 />

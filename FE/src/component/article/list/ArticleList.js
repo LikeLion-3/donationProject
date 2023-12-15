@@ -24,23 +24,23 @@ const ArticleList = () => {
   const getArticleTypeBadgeStyle = (type) => {
     switch (type) {
       case '기부해요':
-        return { backgroundColor: '#ffc107', color: '#ffffff' }; // 기부
+        return { backgroundColor: '#ffc107', color: '#ffffff' };
       case '필요해요':
-        return { backgroundColor: '#007bff', color: '#ffffff' }; // 필요
+        return { backgroundColor: '#007bff', color: '#ffffff' };
       case '인증해요':
-        return { backgroundColor: '#28a745', color: '#ffffff' }; // 인증
+        return { backgroundColor: '#28a745', color: '#ffffff' };
       default:
-        return { backgroundColor: '#000000', color: '#ffffff' }; // 기본값
+        return { backgroundColor: '#000000', color: '#ffffff' };
     }
   };
 
   const ProductCard = ({ articleId, title, articleType, images, writer, categories, postDate }) => {
-    const imageUrl = images.length > 0 ? `/images/${images[0].imgName}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
+    const imageUrl = images.length > 0 ? images[0].imgUrl : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
     const badgeStyle = getArticleTypeBadgeStyle(articleType);
 
     return (
       <div className="col mb-4">
-        <div className="card h-100" style={{ width: "110%" }}>
+        <div className="card h-100" style={{ width: '110%' }}>
           <img
             className="card-img-top"
             src={imageUrl}
