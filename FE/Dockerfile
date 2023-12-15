@@ -3,12 +3,10 @@ FROM node:20.9.0-alpine AS builder
 WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./
-
-RUN npm install
-
 COPY ./* ./
 
-RUN sudo npm run build
+RUN npm install
+RUN npm run build
 
 FROM nginx:latest
 RUN rm /etc/nginx/conf.d/default.conf
