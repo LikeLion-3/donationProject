@@ -1,12 +1,12 @@
 FROM node:20.9.0-alpine AS builder
 
-WORKDIR /FE
+WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./
 
 RUN npm install
 
-COPY . ./
+COPY ./ ./
 
 RUN npm run build
 
@@ -15,6 +15,5 @@ RUN rm /etc/nginx/conf.d/default.conf
 RUN rm -rf /etc/nginx/conf.d/*
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=builder FE/build /usr/share/nginx/html
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
 EXPOSE 80
-CMD [ "nginx", "-g", "daemon off;"]
