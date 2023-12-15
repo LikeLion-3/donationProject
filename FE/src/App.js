@@ -20,6 +20,7 @@ import CommunityList from './component/community/list/CommunityList';
 import CommunityDetails from './component/community/detail/CommunityDetails';
 import Comment from './component/comment/Comment';
 import CommunityWrite from './component/community/write/CommunityWrite';
+import CommunityUpdate from './component/community/write/CommunityUpdate';
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/community/:communityId" element={<CommunityDetails />} />
                     <Route path="/comment/:communityId" element={<Comment />} />
                     <Route path="/community/write" element={<CommunityWrite />} />
+                    <Route path="/community/update/:communityId" element={<CommunityUpdate />} />
 
                 </Route>
                 <Route path="/signup" element={<SignUp />} />

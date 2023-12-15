@@ -3,7 +3,6 @@ package com.myapp.warmwave.domain.image.service;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.image.entity.Image;
@@ -19,9 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.IMAGE_AMOUNT_OVER;
-import static com.myapp.warmwave.common.exception.CustomExceptionCode.IMAGE_SIZE_OVER;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,9 +25,8 @@ public class ImageService {
 
     @Value("${image.upload.path}")
     private String imageStorePath;
-
+    
     private final AmazonS3 amazonS3;
-
     private final ImageRepository imageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -89,6 +84,10 @@ public class ImageService {
 
     public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) {
         List<Image> images = new ArrayList<>();
+        System.out.println("imageService's images : " + images);
+        if(imageFiles==null) {
+            return images;
+        }
 
         for (MultipartFile imageFile : imageFiles) {
             String originalFilename = imageFile.getOriginalFilename();
@@ -128,6 +127,28 @@ public class ImageService {
                 System.exit(1);
             }
         }
+
+        imageRepository.deleteAll(imagesToDelete);
+    }
+
+    public void deleteImagesByCommunityId(Long communityId) {
+        List<Image> imagesToDelete = imageRepository.findByCommunityId(communityId);
+        if(imagesToDelete.isEmpty()){
+            System.out.println("이미지 없음");
+            throw new CustomException(CustomExceptionCode.NOT_FOUND_IMAGE);
+        }
+
+        for (Image image : imagesToDelete) {
+            String fileName = image.getImgName();
+            String key = "community/" + fileName;
+            try {
+                System.out.println("key : " + key);
+                amazonS3.deleteObject(bucket, key);
+            } catch (AmazonServiceException e) {
+                System.err.println(e.getErrorMessage());
+                System.exit(1);
+            }
+        }
         imageRepository.deleteAll(imagesToDelete);
     }
 
@@ -148,5 +169,6 @@ public class ImageService {
                 System.exit(1);
             }
         }
+        imageRepository.deleteAllByImgUrl(urls);
     }
 }

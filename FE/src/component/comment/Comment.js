@@ -23,7 +23,7 @@ function Comment({ communityId }) {
     setLoading(true);
 
     try {
-      const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIn0sImV4cCI6MTcwMjk3NDY4Nn0.2TYa8k_2S8pzsokXZEglIyv69tYJfrGnKMhmfyDP-jEQwsSUCHKNQ9xBKmEEpFovxAukfjrF_Txgzsr5jznNOg'; // 토큰은 여기에
+      const token = process.env.REACT_APP_TOKEN;
       const response = await axios.get(`http://localhost:8080/api/communities/${communityId}/comments?page=${page}&size=${limit}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -52,10 +52,10 @@ function Comment({ communityId }) {
         dataLength={comments.length}
         next={fetchComments}
         hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
+        loader={comments.length === 0 ? <p>댓글 없음</p> : <h4>Loading...</h4>} // 댓글이 없으면 로더를 표시하지 않음
         endMessage={
           <p style={{ textAlign: 'center' }}>
-            <b>You have seen it all</b>
+            <p>마지막 댓글</p>
           </p>
         }
       >

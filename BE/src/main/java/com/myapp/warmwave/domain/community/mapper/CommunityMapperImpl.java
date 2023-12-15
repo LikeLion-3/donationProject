@@ -32,6 +32,7 @@ public class CommunityMapperImpl implements CommunityMapper{
                         .map(Image::getImgUrl)
                         .collect(Collectors.toList()))
                 .createdAt(community.getCreatedAt())
+                .userId(community.getUser().getId())
                 .build();
     }
     public Community updateCommunity(Community community, CommunityPatchDto dto) {

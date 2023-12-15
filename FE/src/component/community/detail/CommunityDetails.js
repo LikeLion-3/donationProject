@@ -1,19 +1,25 @@
-// CommunityDetails.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { getCookie } from '../../util/cookieUtil';
 import Comment from './../../comment/Comment';
+import jwtAxios from "../../util/jwtUtil"
+
+
 function CommunityDetails() {
   const [community, setCommunity] = useState(null);
   const params = useParams();
+  const navigate = useNavigate();
+
+  const userToken = Cookies.get('user');
+  const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
 
   useEffect(() => {
-    const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIn0sImV4cCI6MTcwMjk2Mzc3MH0.y93O_SP_YMaJhx7h0obQotaLIK0qSD-k0_bm1iagSeTT88tn1y89QQXiHUx_uOdSnWAp0klMxgHpMbLCAgA9kw';
-    axios.get(`/api/communities/${params.communityId}`, {
+    axios.get(`http://localhost:8080/api/communities/${params.communityId}`, {
       headers: {
-        Authorization: `Bearer ${token}` // 토큰을 Authorization 헤더에 추가
+        Authorization: `Bearer ${parsedToken.accessToken}`
       }
-
     })
       .then(response => {
         setCommunity(response.data);
@@ -22,6 +28,28 @@ function CommunityDetails() {
         console.error('Error fetching community:', error);
       });
   }, [params.communityId]);
+
+  const handleUpdate = () => {
+    navigate(`/community/update/${params.communityId}`, { state: { community } });
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('정말로 삭제하시겠습니까?')) {
+      try {
+        await axios.delete(`http://localhost:8080/api/communities/${params.communityId}`, {
+          headers: { Authorization: `Bearer ${parsedToken.accessToken}` }
+        });
+        navigate('/community');
+      } catch (error) {
+        console.error('Error deleting community:', error);
+      }
+    }
+  };
+
+  const loggedInUserId = getCookie('user')?.id;
+  const communityWriterId = community?.userId;
+
+  const isWriter = loggedInUserId && loggedInUserId === communityWriterId;
 
   const formattedDate = community?.createdAt
     ? new Date(community.createdAt).toLocaleDateString('ko-KR', {
@@ -45,20 +73,17 @@ function CommunityDetails() {
                 <p className="lead mb-0" style={{ color: 'black' }}>
                   {community?.writer || '로딩 중...'}
                 </p>
-                <p className="lead mb-0">
-                  조회수 {community?.hit || 0} |
-                  {community?.category || '로딩 중...'} |
-                  {formattedDate}
+                <p className="lead">
+                  조회수 {community?.hit || 0} | {community?.category || '로딩 중...'} | {formattedDate}
                 </p>
               </div>
             </div>
           </div>
           {community?.images && community.images.map((image, index) => {
-            const imgName = image.split('/').pop();
             return (
-              <div className="col-md-12" key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '402px', marginTop: '30px', marginBottom: '30px' }}>
+              <div className="col-md-12" key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '402px', marginTop: '30px' }}>
                 <img
-                  src={`/images/${imgName}`} // 이미지 경로
+                  src={image}
                   alt={`${index}`}
                   style={{
                     maxWidth: '600px',
@@ -72,14 +97,23 @@ function CommunityDetails() {
             );
           })}
           <div className="col-md-12">
-            <p className="lead" style={{ color: 'black', marginBottom:'20px' }}>{community?.contents || '로딩 중...'}</p>
+            <p className="lead" style={{ color: 'black', marginBottom: '20px', marginTop: '30px'  }}>{community?.contents || '로딩 중...'}</p>
           </div>
+          {/* 수정, 삭제 버튼 */}
+          {isWriter && (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                <button className="btn " onClick={handleUpdate} style={{ backgroundColor: '#FFFFFF', borderColor: '#999999', color: "#999999", marginRight: '10px' }}>수정</button>
+                <button className="btn " onClick={handleDelete} style={{ backgroundColor: '#FFFFFF', borderColor: '#999999', color: "#999999" }}>삭제</button>
+              </div>
+            </>
+          )}
         </div>
         <div style={{ marginTop: '20px' }}>
           <Comment communityId={params.communityId} />
         </div>
       </div>
-    </section>
+    </section >
   );
 }
 

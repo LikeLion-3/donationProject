@@ -62,7 +62,7 @@ const CommunityWrite = () => {
       formData.append('contents', content);
       formData.append('category', category);
 
-      const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIn0sImV4cCI6MTcwMzEyMTc4OH0.sbWtUkjwih1ZEjWweMb2gUaYChajk1CRvIEPyOPG5x91ZGqgoE4WXEGBlLE51c9wWgZtOf96n4HQ85XB35Vgsw';
+      const token = process.env.REACT_APP_TOKEN;
       const headers = new Headers({
         'Authorization': `Bearer ${token}`,
       });
