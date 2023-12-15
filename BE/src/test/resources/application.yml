@@ -21,7 +21,7 @@ spring:
     include: secret
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
@@ -33,18 +33,12 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_ADDRESS}
-    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
           starttls:
             enable: true
           auth: true
-kakao:
-  rest:
-    api:
-      key: ${KAKAO_REST_API_KEY}
 
 image:
   upload:

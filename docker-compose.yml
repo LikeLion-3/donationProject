@@ -3,8 +3,6 @@ services:
   back:
     container_name: backend
     image: zerobird/warmwave
-    env_file:
-      - ./my-env-file.env
     restart: always
     ports:
       - 8080:8080

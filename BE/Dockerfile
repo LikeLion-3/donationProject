@@ -5,8 +5,6 @@
 
 FROM openjdk:17-jdk-slim AS builder
 WORKDIR /BE
-COPY env-back.env .
-RUN export $(cat env-back.env | xargs)
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
