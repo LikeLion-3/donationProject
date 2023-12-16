@@ -12,7 +12,7 @@ function CommunityDetails() {
   useEffect(() => {
     // 백엔드 API 엔드포인트로부터 데이터를 가져옵니다.
     // axios.get(`http://localhost:8080/api/articles/${params.articleId}`)
-    axios.get(`http://localhost:8080/api/articles/1`)
+    axios.get(`/api/articles/1`)
       .then(response => {
         // 가져온 데이터를 상태에 설정합니다.
         setArticle(response.data);
