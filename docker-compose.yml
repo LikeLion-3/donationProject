@@ -1,14 +1,14 @@
 version: "3.2"
 services:
   back:
-    container_name: backend
+    container_name: back
     image: zerobird/warmwave:latest
     restart: always
     ports:
       - 8080:8080
 
   front:
-    container_name: frontend
+    container_name: front
     image: zerobird/warmwave_react:latest
     restart: always
     ports:
