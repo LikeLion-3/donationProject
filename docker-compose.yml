@@ -13,3 +13,5 @@ services:
     restart: always
     ports:
       - 80:80
+    depends_on:
+      - back
