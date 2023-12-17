@@ -1,6 +1,7 @@
 package com.myapp.warmwave.config.security;
 
 import com.myapp.warmwave.common.jwt.JwtAuthFilter;
+import com.myapp.warmwave.config.CorsConfig;
 import com.myapp.warmwave.config.oauth.OAuth2LoginFailureHandler;
 import com.myapp.warmwave.config.oauth.OAuth2LoginSuccessHandler;
 import com.myapp.warmwave.config.oauth.service.CustomOAuth2UserService;
