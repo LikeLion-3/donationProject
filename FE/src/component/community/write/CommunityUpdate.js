@@ -1,29 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import jwtAxios from "../../util/jwtUtil";
-import { API_SERVER_HOST } from "../../util/jwtUtil";
 import Cookies from 'js-cookie';
+import { getCookie } from '../../util/cookieUtil';
+import jwtAxios from '../../util/jwtUtil';
 
-const CommunityWrite = () => {
+const CommunityUpdate = () => {
   const navigate = useNavigate();
-  const [images, setImages] = useState([]);
-  const [title, setTitle] = useState(localStorage.getItem('postTitle') || '');
-  const [content, setContent] = useState(localStorage.getItem('postContent') || '');
-  const [category, setCategory] = useState(localStorage.getItem('postCategory') || '');
-  const [previewImage, setPreviewImage] = useState(null);
+  const params = useParams();
+  const location = useLocation();
+  const { communityId } = useParams();
+
+  const [title, setTitle] = useState('');
+  const [contents, setContents] = useState('');
+  const [category, setCategory] = useState('');
+  const [image, setImage] = useState([]);
+  const [previewImage, setPreviewImage] = useState(''); // 미리보기
+
+  const community = location.state ? location.state.community : null;
+
+  useEffect(() => {
+    const { community } = location.state || {};
+    if (community) {
+      setTitle(community.title || '');
+      setContents(community.contents || '');
+      setCategory(community.category || '');
+      setImage(community.images || '');
+    }
+  }, [location.state]);
+
+  const [changedFields, setChangedFields] = useState({
+    title: false,
+    contents: false,
+    category: false,
+    images: false,
+  });
 
   const handleTitleChange = (event) => {
     const newTitle = event.target.value;
     setTitle(newTitle);
+    setChangedFields({ ...changedFields, title: true });
     localStorage.setItem('postTitle', newTitle);
   };
 
-  const handleContentChange = (event) => {
-    const newContent = event.target.value;
-    setContent(newContent);
-    localStorage.setItem('postContent', newContent);
+  const handleContentsChange = (event) => {
+    const newContents = event.target.value;
+    setContents(newContents);
+    setChangedFields({ ...changedFields, contents: true });
+    localStorage.setItem('postContent', newContents);
+  };
+
+  const handleCategoryChange = (event) => {
+    const newCategory = event.target.innerText;
+    setCategory(newCategory);
+    setChangedFields({ ...changedFields, category: true });
+    localStorage.setItem('postCategory', newCategory);
   };
 
   const handleImageClick = () => {
@@ -31,16 +63,18 @@ const CommunityWrite = () => {
   };
 
   const handleImageChange = (event) => {
-    const selectedImages = Array.from(event.target.files);
-    setImages((prevImages) => [...prevImages, ...selectedImages]);
-
-    // 이미지 미리보기 생성
-    if (selectedImages[0]) {
+          // 깃허브Url 등록 -> 이미지 바꿨지만 url 삭제 안 되는 중
+    const newImage = event.target.files[0];
+    if (newImage) {
+      setImage(newImage);
+      setChangedFields({ ...changedFields, images: true });
+  
+          // 이미지 미리보기 생성
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
       };
-      reader.readAsDataURL(selectedImages[0]);
+      reader.readAsDataURL(newImage);
     }
   };
 
@@ -50,28 +84,28 @@ const CommunityWrite = () => {
     try {
       const formData = new FormData();
 
-      formData.append('title', title);
-      formData.append('contents', content);
-      formData.append('category', category);
+      if (changedFields.title) formData.append('title', title);
+      if (changedFields.contents) formData.append('contents', contents);
+      if (changedFields.category) formData.append('category', category);
 
-      images.forEach((image, index) => {
-        formData.append(`images`, image);
-      });
+      if (changedFields.images && image) {
+        formData.append('images', image);
+      }
 
-      const response = await jwtAxios.post(`${API_SERVER_HOST}/api/communities`, formData);
-  
-      console.log('Server response:', response);
-      const data = response.data;
+      const response = await jwtAxios.put(`http://localhost:8080/api/communities/${params.communityId}`, formData);
+
+      const data = await response.data; // response.data는 java 객체
+      console.log('Server response:', data);
       navigate(`/community/${data.id}`);
-      
     } catch (error) {
       console.error('Error submitting form:', error);
     }
-  }
+  };
 
   return (
     <section className="community-list-page-section" id="contact">
       <div className="container" style={{ maxWidth: '900px' }}>
+        <h1>수정</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="row gx-4 gx-lg-5 align-items-center" style={{ border: '2px solid #E2E2E2' }}>
@@ -86,7 +120,6 @@ const CommunityWrite = () => {
                       placeholder="글 제목을 입력해주세요."
                       value={title}
                       onChange={handleTitleChange}
-                    // style={{border: 'none'}}
                     />
                     <label className="form-label" style={{ color: 'dimgray' }}>제목</label>
                   </div>
@@ -95,7 +128,8 @@ const CommunityWrite = () => {
               <div classnames="community-body">
                 <div className="col-md-12" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '402px', marginTop: '30px', marginBottom: '30px' }}>
                   <img
-                    src={previewImage || '/images/community_default.PNG'} // 미리보기 이미지 또는 기본 이미지
+                    src={previewImage || (community?.images && community.images.length > 0 ? community.images[0] : '/images/community_default.PNG')}
+                    // previewImage
                     alt='사진 등록하기'
                     style={{
                       maxWidth: '400px',
@@ -118,15 +152,15 @@ const CommunityWrite = () => {
                     <span
                       key={cat}
                       className={`badge m-1 ${cat === category ? 'selected-badge' : 'unselected-badge'}`}
-                      onClick={() => setCategory(cat)}
+                      onClick={handleCategoryChange}
                       style={{
                         cursor: 'pointer',
                         border: `1px solid #FABA96`,
                         color: cat === category ? 'white' : '#FABA96',
                         backgroundColor: cat === category ? '#FABA96' : 'white',
-                        padding: '0.5em 0.8em', // 세로 및 가로 패딩 조정
-                        fontSize: '1rem', // 글씨 크기 조정
-                        borderRadius: '0.25rem' // 둥근 모서리 조정
+                        padding: '0.5em 0.8em',
+                        fontSize: '1rem',
+                        borderRadius: '0.25rem'
                       }}
                     >
                       {cat}
@@ -138,8 +172,8 @@ const CommunityWrite = () => {
                     className="form-control"
                     id="content"
                     placeholder="글 내용을 입력해주세요"
-                    value={content}
-                    onChange={handleContentChange}
+                    value={contents}
+                    onChange={handleContentsChange}
                     style={{ height: '10rem' }}
                   ></textarea>
                   <label className="form-label" style={{ color: 'dimgray' }}>내용</label>
@@ -148,11 +182,18 @@ const CommunityWrite = () => {
             </div>
           </div>
           <div className="d-flex justify-content-end" style={{ marginTop: '20px', marginBottom: '10px' }}>
+            <Link to={`/community/${params.communityId}`}>
+              <button
+                className="btn btn-primary btn-xl"
+                style={{ backgroundColor: '#FABA96', borderColor: '#FABA96', marginRight: '10px' }}>
+                취소하기
+              </button>
+            </Link>
             <button
               className="btn btn-primary btn-xl"
-              type="submit"
+              onClick={handleSubmit}
               style={{ backgroundColor: '#FABA96', borderColor: '#FABA96' }}>
-              Submit
+              저장하기
             </button>
           </div>
         </form>
@@ -162,4 +203,4 @@ const CommunityWrite = () => {
   );
 };
 
-export default CommunityWrite;
+export default CommunityUpdate;

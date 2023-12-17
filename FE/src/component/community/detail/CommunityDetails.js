@@ -12,9 +12,6 @@ function CommunityDetails() {
   const params = useParams();
   const navigate = useNavigate();
 
-  const userToken = Cookies.get('user');
-  const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
-
   useEffect(() => {
     jwtAxios.get(`${API_SERVER_HOST}/api/communities/${params.communityId}`)
     .then(response => {
