@@ -3,6 +3,7 @@ package com.myapp.warmwave.common.jwt;
 import com.myapp.warmwave.common.util.Utils;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -137,6 +138,8 @@ public class JwtProvider {
                     .build()
                     .parseSignedClaims(accessToken)
                     .getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
         } catch (Exception e) {
             return Collections.emptyMap();
         }
