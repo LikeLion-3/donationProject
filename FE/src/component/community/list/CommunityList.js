@@ -35,7 +35,7 @@ const CommunityList = () => {
 		const fetchData = async () => {
 			try {
 				console.log(currentPage);
-				const response = await fetch(`http://localhost:8080/api/communities?page=${currentPage - 1}&size=12&sort=${sortOrder}`);
+				const response = await fetch(`/api/communities?page=${currentPage - 1}&size=12&sort=${sortOrder}`);
 				const data = await response.json();
 				console.log(data);
 				setPosts(data.content);

@@ -9,7 +9,7 @@ function CommunityDetails() {
 
   useEffect(() => {
     const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImJvZHkiOnsiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIn0sImV4cCI6MTcwMjk2Mzc3MH0.y93O_SP_YMaJhx7h0obQotaLIK0qSD-k0_bm1iagSeTT88tn1y89QQXiHUx_uOdSnWAp0klMxgHpMbLCAgA9kw';
-    axios.get(`http://localhost:8080/api/communities/${params.communityId}`, {
+    axios.get(`/api/communities/${params.communityId}`, {
       headers: {
         Authorization: `Bearer ${token}` // 토큰을 Authorization 헤더에 추가
       }

@@ -9,7 +9,7 @@ function MiddleBar() {
 
     useEffect(() => {
         // 서버에서 데이터를 받아오는 API 엔드포인트에 대한 URL을 적절히 변경
-        Axios.get('http://localhost:8080/api/main/count')
+        Axios.get('/api/main/count')
             .then(response => {
                 const data = response.data;
                 setIndivCount(data.indivCount);

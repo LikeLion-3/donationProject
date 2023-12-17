@@ -127,11 +127,9 @@ public class ArticleService {
         articleRepository.deleteById(articleId);
 
         if(articleRepository.existsById(articleId)) {
-            new CustomException(FAILED_TO_REMOVE);
+            throw new CustomException(FAILED_TO_REMOVE);
         }
     }
-
-
 
     public Page<MainArticleDto> findTop5OrderByCreatedAt(int num) {
         Pageable pageable = PageRequest.of(num, 5);
