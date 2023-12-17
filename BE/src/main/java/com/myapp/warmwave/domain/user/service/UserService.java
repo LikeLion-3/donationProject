@@ -132,7 +132,6 @@ public class UserService {
         String accessToken = jwtProvider.createAccessToken(claims);
         String refreshToken = jwtProvider.createRefreshToken();
 
-        return new ResponseUserLoginDto(user.getId(), accessToken, refreshToken);
         //pk, email, 사용자 이름(기관, 개인)
         Map<String, Object> cookieMap = new HashMap<>();
         cookieMap.put(ACCESS_TOKEN, accessToken);
@@ -142,6 +141,7 @@ public class UserService {
         cookieManager.setCookie(response, cookieMap.get(ACCESS_TOKEN).toString(), ACCESS_TOKEN, expiration);
         cookieManager.setCookie(response, cookieMap.get(REFRESH_TOKEN).toString(), REFRESH_TOKEN, expiration);
 
+        return new ResponseUserLoginDto(user.getId(), user.getEmail(), user.getName());
     }
 
     // 승인하지 않은 기관 회원 조회
