@@ -26,8 +26,8 @@ public class JwtProvider {
      * JWT의 Subject와 Claim으로 email 사용 -> 클레임의 name을 "email"으로 설정
      * JWT의 헤더에 들어오는 값 : 'Authorization(Key) = Bearer {토큰} (Value)' 형식
      */
-    private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
-    private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
+    public static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
+    public static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     public static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
     private final UserRepository<User> userRepository;
