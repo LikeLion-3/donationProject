@@ -1,4 +1,4 @@
-package com.myapp.warmwave.config.security;
+package com.myapp.warmwave.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
