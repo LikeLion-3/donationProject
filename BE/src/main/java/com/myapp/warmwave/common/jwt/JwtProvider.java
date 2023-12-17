@@ -1,6 +1,6 @@
 package com.myapp.warmwave.common.jwt;
 
-import com.myapp.warmwave.common.util.Utils;
+import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.*;
+
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.EXPIRED_JWT;
 
 @Slf4j
 @Getter
@@ -170,5 +172,16 @@ public class JwtProvider {
             return false;
         }
         return true;
+    }
+
+    public void isTokenExpired(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSecretKey())
+                    .build()
+                    .parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(EXPIRED_JWT);
+        }
     }
 }
