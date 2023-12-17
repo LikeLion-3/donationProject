@@ -164,11 +164,10 @@ public class JwtProvider {
     public boolean isTokenValid(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(cachedSecretKey)
+                    .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token);
         } catch (Exception e) {
-            log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
             return false;
         }
         return true;
