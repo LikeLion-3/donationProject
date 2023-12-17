@@ -4,23 +4,19 @@ import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.common.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class ApiRefreshController {
-
     private final JwtProvider jwtProvider;
 
     @GetMapping("/refresh")
-    public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
+    public Map<String, Object> refresh(String refreshToken) {
+
         if (refreshToken == null) {
             throw new CustomException(CustomExceptionCode.NULL_REFRESH);
         }
@@ -41,9 +37,7 @@ public class ApiRefreshController {
             return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
         }
 
-        Map<String, Object> claims = new HashMap<>();
-
-        claims = jwtProvider.getClaims(refreshToken);
+        Map<String, Object> claims = jwtProvider.getClaims(refreshToken);
 
         String newAccessToken = jwtProvider.createAccessToken(claims);
 
