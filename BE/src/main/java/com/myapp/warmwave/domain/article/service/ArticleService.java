@@ -2,6 +2,8 @@ package com.myapp.warmwave.domain.article.service;
 
 import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.common.main.dto.MainArticleDto;
+import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
+import com.myapp.warmwave.domain.article.dto.ArticlePostDto;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ArticleCategory;
@@ -53,7 +55,7 @@ public class ArticleService {
         Article savedArticle = articleRepository.save(article);
 
         for (Category category : categories) {
-            ArticleCategory articleCategory = ArticleCategory.OfArticleCategory(savedArticle, category);
+            ArticleCategory articleCategory = ArticleCategory.ofArticleCategory(savedArticle, category);
             articleCategoryRepository.save(articleCategory);
         }
 
@@ -77,7 +79,7 @@ public class ArticleService {
         List<Category> categories = categoryService.getCategory(dto.getProdCategory());
 
         for (Category category : categories) {
-            ArticleCategory articleCategory = ArticleCategory.OfArticleCategory(findArticle, category);
+            ArticleCategory articleCategory = ArticleCategory.ofArticleCategory(findArticle, category);
             articleCategoryRepository.save(articleCategory);
         }
 
