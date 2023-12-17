@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { classnames } from 'classnames';
+import jwtAxios from "../../util/jwtUtil";
+import { API_SERVER_HOST } from "../../util/jwtUtil";
+import Cookies from 'js-cookie';
 
 const CommunityWrite = () => {
   const navigate = useNavigate();
@@ -11,12 +13,6 @@ const CommunityWrite = () => {
   const [content, setContent] = useState(localStorage.getItem('postContent') || '');
   const [category, setCategory] = useState(localStorage.getItem('postCategory') || '');
   const [previewImage, setPreviewImage] = useState(null);
-
-  const handleCategoryChange = (selectedCategory) => {
-    setCategory((prevCategory) => {
-      return [...prevCategory, selectedCategory];
-    });
-  };
 
   const handleTitleChange = (event) => {
     const newTitle = event.target.value;
@@ -54,32 +50,32 @@ const CommunityWrite = () => {
     try {
       const formData = new FormData();
 
-      images.forEach((image, index) => {
-        formData.append(`images`, image);
-      });
-
       formData.append('title', title);
       formData.append('contents', content);
       formData.append('category', category);
 
-      const token = process.env.REACT_APP_TOKEN;
-      const headers = new Headers({
-        'Authorization': `Bearer ${token}`,
-      });
-      const response = await fetch('http://localhost:8080/api/communities', {
-        method: 'POST',
-        headers: headers,
-        body: formData,
+      images.forEach((image, index) => {
+        formData.append(`images`, image);
       });
 
-      const data = await response.json();
-      console.log('Server response:', data);
+      const userToken = Cookies.get('user');
+      const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
+      const token = parsedToken.accessToken;
 
+      const response = await jwtAxios.post(`${API_SERVER_HOST}/api/communities`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      console.log('Server response:', response);
+      const data = response.data;
       navigate(`/community/${data.id}`);
+      
     } catch (error) {
       console.error('Error submitting form:', error);
     }
-  };
+  }
 
   return (
     <section className="community-list-page-section" id="contact">

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -58,11 +59,13 @@ public class CommunityService {
     public CommunityResponseDto updateCommunity(Long communityId, CommunityPatchDto dto, List<MultipartFile> images) throws IOException {
         System.out.println("images(service) : " + images); // null
 
+        Community originCommunity = getCommunity(communityId);
 
         // 사진 지우고, 새로 등록하고, dto 데이터들로 업데이트 하고 세이브
-        imageService.deleteImagesByCommunityId(communityId); // s3에서만 삭제
-        Community originCommunity = getCommunity(communityId);
-        originCommunity.getImages().clear(); // 이미지(DB) 삭제
+        if(!CollectionUtils.isEmpty(images)) {
+            imageService.deleteImagesByCommunityId(communityId); // s3에서만 삭제
+            originCommunity.getImages().clear(); // 이미지(DB) 삭제
+        }
         communityMapper.updateCommunity(originCommunity, dto);
         originCommunity.getImages().addAll(imageService.uploadImagesForCommunity(originCommunity, images));
 

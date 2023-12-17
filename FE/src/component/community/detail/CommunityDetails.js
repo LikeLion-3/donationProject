@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getCookie } from '../../util/cookieUtil';
 import Comment from './../../comment/Comment';
 import jwtAxios from "../../util/jwtUtil"
+import { API_SERVER_HOST } from "../../util/jwtUtil"
 
 
 function CommunityDetails() {
@@ -16,17 +16,13 @@ function CommunityDetails() {
   const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/communities/${params.communityId}`, {
-      headers: {
-        Authorization: `Bearer ${parsedToken.accessToken}`
-      }
+    jwtAxios.get(`${API_SERVER_HOST}/api/communities/${params.communityId}`)
+    .then(response => {
+      setCommunity(response.data);
     })
-      .then(response => {
-        setCommunity(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching community:', error);
-      });
+    .catch(error => {
+      console.error('Error fetching community:', error);
+    });
   }, [params.communityId]);
 
   const handleUpdate = () => {
@@ -36,9 +32,7 @@ function CommunityDetails() {
   const handleDelete = async () => {
     if (window.confirm('정말로 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://localhost:8080/api/communities/${params.communityId}`, {
-          headers: { Authorization: `Bearer ${parsedToken.accessToken}` }
-        });
+        await jwtAxios.delete(`${API_SERVER_HOST}/api/communities/${params.communityId}`);
         navigate('/community');
       } catch (error) {
         console.error('Error deleting community:', error);

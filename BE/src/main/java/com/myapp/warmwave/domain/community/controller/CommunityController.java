@@ -30,15 +30,11 @@ public class CommunityController {
 
     private final CommunityFacadeService communityFacadeService;
     private final CommunityService communityService;
-    private final CommunityMapper communityMapper;
-
-    public CommunityController(CommunityFacadeService communityFacadeService, CommunityService communityService, CommunityMapper communityMapper) {
+    public CommunityController(CommunityFacadeService communityFacadeService, CommunityService communityService) {
         this.communityFacadeService = communityFacadeService;
         this.communityService = communityService;
-        this.communityMapper = communityMapper;
     }
-
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("")
     public ResponseEntity<CommunityResponseDto> createCommunity(@ModelAttribute CommunityPostDto dto,
                                                                 List<MultipartFile> images,
                                                                 @AuthenticationPrincipal UserDetails userDetails) throws IOException {
@@ -52,7 +48,6 @@ public class CommunityController {
                                                                 @ModelAttribute CommunityPatchDto dto,
                                                                 List<MultipartFile> images,
                                                                 @AuthenticationPrincipal UserDetails userDetails) throws IOException {
-        System.out.println("image(controller) " + images); // null
         return new ResponseEntity<>(communityService.updateCommunity(communityId, dto, images), HttpStatus.OK);
     }
 
