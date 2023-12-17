@@ -20,7 +20,7 @@ const PostForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/categories');
+        const response = await fetch('/api/categories');
         const data = await response.json();
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);

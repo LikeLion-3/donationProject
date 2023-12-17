@@ -83,7 +83,7 @@ const ArticleList = () => {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await fetch('http://localhost:8080/api/articles?page=1&size=10');
+          const response = await fetch('/api/articles?page=1&size=10');
           const data = await response.json();
           setProducts(data.content);
         } catch (error) {

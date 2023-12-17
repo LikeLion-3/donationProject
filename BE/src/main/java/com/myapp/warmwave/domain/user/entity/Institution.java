@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=false)
 @ToString
 @DiscriminatorValue("institution")
 public class Institution extends User {

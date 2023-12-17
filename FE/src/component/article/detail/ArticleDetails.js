@@ -12,7 +12,7 @@ const ArticleDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/articles/${params.articleId}`)
+    axios.get(`/api/articles/${params.articleId}`)
       .then(response => {
         setArticle(response.data);
       })
