@@ -33,8 +33,8 @@ const PatchForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/categories');
-        const data = await response.json();
+        const response = await jwtAxios.get('http://localhost:8080/api/categories');
+        const data = await response.data;
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);
       } catch (error) {
@@ -108,13 +108,9 @@ const PatchForm = () => {
         'Authorization': `Bearer ${parsedToken.accessToken}`,
       });
 
-      const response = await fetch(`http://localhost:8080/api/articles/${params.articleId}`, {
-        method: 'PUT',
-        body: formData,
-        headers: headers,
-      });
+      const response = await jwtAxios.put(`http://localhost:8080/api/articles/${params.articleId}`, formData);
 
-      const data = await response.json();
+      const data = await response.data;
       console.log('Server response:', data);
 
       navigate(`/donate/${data.articleId}`);

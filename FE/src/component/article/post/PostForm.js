@@ -20,8 +20,8 @@ const PostForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
-        const data = await response.json();
+        const response = await jwtAxios.get('http://localhost:8080/api/categories');
+        const data = response.data;
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);
       } catch (error) {
@@ -81,21 +81,9 @@ const PostForm = () => {
       formData.append('prodCategories', JSON.stringify(selectedCategories));
       formData.append('articleType', getSelectedType());
 
-      const userToken = Cookies.get('user');
+      const response = await jwtAxios.post('http://localhost:8080/api/articles', formData);
 
-      const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
-
-      const headers = new Headers({
-        'Authorization': `Bearer ${parsedToken.accessToken}`,
-      });
-
-      const response = await fetch('http://localhost:8080/api/articles', {
-        method: 'POST',
-        body: formData,
-        headers: headers,
-      });
-
-      const data = await response.json();
+      const data = await response.data;
       console.log('Server response:', data);
 
       navigate(`/donate/${data.articleId}`);
