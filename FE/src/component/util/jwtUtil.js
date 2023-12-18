@@ -1,5 +1,7 @@
 import axios from "axios";
 import { getCookie } from "./cookieUtil";
+// 로컬 테스트에 필요합니다 ! 아래 코드를 주석 해제하여 테스트 진행하신 후 커밋하실 때는 주석처리 혹은 삭제 하시어 커밋해주셔야 합니다.
+// export const API_SERVER_HOST = "localhost:8080"
 
 const jwtAxios = axios.create() // axios 인스턴스를 생성
 
