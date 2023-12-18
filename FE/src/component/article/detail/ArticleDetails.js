@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtAxios from '../../util/jwtUtil';
@@ -12,14 +11,15 @@ const ArticleDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`/api/articles/${params.articleId}`)
+    jwtAxios.get(`http://localhost:8080/api/articles/${params.articleId}`)
       .then(response => {
+        console.log(response.data);
         setArticle(response.data);
       })
       .catch(error => {
         console.error('Error fetching article:', error);
       });
-  }, [params]);
+  }, [params.articleId]);
 
   const formattedDate = article?.createdAt
     ? new Date(article.createdAt).toLocaleDateString('ko-KR', {
@@ -66,7 +66,7 @@ const ArticleDetails = () => {
     const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
 
     try {
-      await axios.delete(`http://localhost:8080/api/articles/${params.articleId}`, {
+      await jwtAxios.delete(`http://localhost:8080/api/articles/${params.articleId}`, {
         headers: {
           'Authorization': `Bearer ${parsedToken.accessToken}`,
         },
