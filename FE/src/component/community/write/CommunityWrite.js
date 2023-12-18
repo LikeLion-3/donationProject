@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import jwtAxios from "../../util/jwtUtil";
 import { API_SERVER_HOST } from "../../util/jwtUtil";
-import Cookies from 'js-cookie';
 
 const CommunityWrite = () => {
   const navigate = useNavigate();

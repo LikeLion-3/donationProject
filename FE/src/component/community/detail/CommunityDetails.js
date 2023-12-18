@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import { getCookie } from '../../util/cookieUtil';
 import Comment from './../../comment/Comment';
 import jwtAxios from "../../util/jwtUtil"

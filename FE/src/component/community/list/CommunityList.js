@@ -5,6 +5,7 @@ import './CommunityList.css';
 import Pagination from "react-js-pagination";
 import { useSelector } from 'react-redux';
 import jwtAxios from '../../util/jwtUtil';
+import { API_SERVER_HOST } from "../../util/jwtUtil"
 
 
 const CommunityList = () => {
@@ -38,7 +39,7 @@ const CommunityList = () => {
 
 		const fetchData = async () => {
 			try {
-				const response = await jwtAxios.get(`http://localhost:8080/api/communities?page=${currentPage - 1}&size=12&sort=${sortOrder}`);
+				const response = await jwtAxios.get(`${API_SERVER_HOST}/api/communities?page=${currentPage - 1}&size=12&sort=${sortOrder}`);
 				const data = await response.data;
 				console.log(data);
 				setPosts(data.content);
