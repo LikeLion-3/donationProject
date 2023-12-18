@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import jwtAxios from '../util/jwtUtil';
 import InfiniteScroll from "react-infinite-scroll-component";
 
 function Comment({ communityId }) {
@@ -23,12 +23,9 @@ function Comment({ communityId }) {
     setLoading(true);
 
     try {
-      const token = process.env.REACT_APP_TOKEN;
-      const response = await axios.get(`http://localhost:8080/api/communities/${communityId}/comments?page=${page}&size=${limit}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      console.log()
+      const response = await jwtAxios.get(`http://localhost:8080/api/communities/${communityId}/comments?page=${page}&size=${limit}`);
+      console.log('Server response:', response);
 
       setComments(prev => [...prev, ...response.data.content]);
       setHasMore(!response.data.last);
