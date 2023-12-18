@@ -28,11 +28,12 @@ public class JwtRefreshService {
         }
 
         //리프레시 토큰이 만료되었어도 클레임을 가져옴
-        Map<String, Object> claims = jwtProvider.getClaims(refreshToken);
+        Map<String, Object> refreshTokenClaims = jwtProvider.getClaims(refreshToken);
+        Map<String, Object> accessTokenClaims = (Map<String, Object>) jwtProvider.getClaims(accessToken).get("body");
 
-        String newAccessToken = jwtProvider.createAccessToken(claims);
+        String newAccessToken = jwtProvider.createAccessToken(accessTokenClaims);
 
-        String newRefreshToken = checkTime((Long) claims.get("exp")) ? jwtProvider.createRefreshToken() : refreshToken;
+        String newRefreshToken = checkTime((Long) refreshTokenClaims.get("exp")) ? jwtProvider.createRefreshToken() : refreshToken;
 
         return Map.of(ACCESS_TOKEN, newAccessToken, REFRESH_TOKEN, newRefreshToken);
     }
