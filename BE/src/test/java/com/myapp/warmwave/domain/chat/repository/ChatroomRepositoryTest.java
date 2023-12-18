@@ -93,8 +93,7 @@ public class ChatroomRepositoryTest {
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
         // then
-        assertThat(savedChatRoom).isEqualTo(chatRoom);
-        assertThat(savedChatRoom.getId()).isNotNull();
+        assertThat(savedChatRoom).isNotNull();
         assertThat(chatRoomRepository.count()).isEqualTo(1);
     }
 

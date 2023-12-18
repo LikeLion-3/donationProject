@@ -1,17 +1,14 @@
 import axios from "axios";
 import { getCookie, setCookie } from "./cookieUtil";
-export const API_SERVER_HOST = 'http://localhost:8080'
 
 const jwtAxios = axios.create() // axios 인스턴스를 생성
 
 // accessToken과 refreshToken을 이용하여 새로운 JWT를 받아오는 함수, JWT가 만료되었을 때 새로운 토큰을 받아옵니다.
 const refreshJWT =  async (accessToken, refreshToken) => {
 
-    const host = API_SERVER_HOST
-
     const header = {headers: {"Authorization":`Bearer ${accessToken}`}}
 
-    const res = await axios.get(`${host}/api/users/refresh?refreshToken=${refreshToken}`, header)
+    const res = await axios.get(`/api/users/refresh?refreshToken=${refreshToken}`, header)
 
     console.log("----------------------")
     console.log(res.data)

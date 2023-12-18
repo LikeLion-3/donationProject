@@ -20,13 +20,13 @@ import static com.myapp.warmwave.common.exception.CustomExceptionCode.USER_ROLE_
 @Component
 @RequiredArgsConstructor
 public class ArticleMapper {
-    private final UserRepository userRepository;
+    private final UserRepository<User> userRepository;
 
     public Article articlePostDtoToArticle(ArticlePostDto dto) {
 
         Optional<User> user = userRepository.findByEmail(dto.getUserEmail());
         if(user.isEmpty()) {
-            new CustomException(NOT_FOUND_USER);
+            throw new CustomException(NOT_FOUND_USER);
         }
 
         switch (user.get().getRole()) {

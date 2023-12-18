@@ -41,11 +41,13 @@ public class Community extends BaseEntity {
     private Integer hit;
 
     @JsonIgnore
+    @Builder.Default
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
 
     @JsonIgnore
+    @Builder.Default
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 

@@ -1,9 +1,7 @@
 import axios from "axios"
 import jwtAxios from "../util/jwtUtil"
 
-export const API_SERVER_HOST = 'http://localhost:8080'  // 로컬 서버의 주소 정의
-
-const host = `${API_SERVER_HOST}/api/users` // API 요청의 기본 URL설정
+const host = `/api/users` // API 요청의 기본 URL설정
 
 export const loginPost = async (loginParam) => {   // 사용자가 로그인을 시도할 때 호출
     // loginParam은 로그인 정보를 담고 있는 객체로, 'email'과 'password'를 포함
