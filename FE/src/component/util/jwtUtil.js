@@ -1,5 +1,6 @@
 import axios from "axios";
-import { getCookie, setCookie } from "./cookieUtil";
+import { getCookie } from "./cookieUtil";
+export const API_SERVER_HOST = process.env.REACT_APP_HOST
 
 const jwtAxios = axios.create() // axios 인스턴스를 생성
 
@@ -54,15 +55,11 @@ const beforeRes = async (res) => {
 //fail response 응답이 실패했을 때 실행되는 인터셉터
 const responseFail = async (err) => {
     console.log("response fail error.............")
-    if (err.response.status === 401) {
+    const res = err.response
+    if (res !== null && res.status === 401) {
         const userCookieValue = getCookie("user")
         const result = await refreshJWT(userCookieValue.accessToken, userCookieValue.refreshToken)
         console.log("refreshJWT RESULT", result)
-
-        userCookieValue.accessToken = result.accessToken
-        userCookieValue.refreshToken = result.refreshToken
-
-        setCookie("user", JSON.stringify(userCookieValue), 7)
 
         //원래의 호출
         const originalRequest = err.config
