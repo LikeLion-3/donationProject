@@ -44,10 +44,8 @@ public class SecurityConfig {
                         authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers(
                                         "/", "/api/users/login", "/api/users/register/**",
-                                        "/api/articles/today", "/api/main/count", "/api/users/adjacent", "/api/users/confirm-email",
-                                        "/api/users/**", // 테스트용
-                                        "/ws/**",
-                                        "/api/user/refresh"
+                                        "/api/articles/today", "/api/main/count", "/api/users/confirm-email",
+                                        "/ws/**", "/api/user/refresh"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
