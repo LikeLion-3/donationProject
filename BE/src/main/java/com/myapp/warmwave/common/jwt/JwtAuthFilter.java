@@ -18,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.EXPIRED_JWT;
@@ -55,8 +54,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 "/api/users/register/individual",
                 // 이메일 링크 인증 경로의 호출은 체크하지 않음
                 "/api/users/confirm-email",
-                // 토큰 재발급 경로의 호출은 체크하지 않음
-                "/api/users/refresh"
         };
 
         String path = request.getRequestURI();
@@ -76,14 +73,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 //토큰이 파기되었을 때 리프레시 토큰을 통해 액세스 토큰을 재발급
                 if (e.getExceptionCode().equals(EXPIRED_JWT)) {
                     Map<String, String> tokens = jwtRefreshService.refreshToken(request);
-                    cookieManager.setCookie(response, ACCESS_TOKEN, tokens.get(ACCESS_TOKEN), jwtProvider.getAccessTokenExpirationPeriod());
-                    cookieManager.setCookie(response, REFRESH_TOKEN, tokens.get(REFRESH_TOKEN), jwtProvider.getRefreshTokenExpirationPeriod());
+                    cookieManager.deleteCookie(response, ACCESS_TOKEN);
+                    cookieManager.deleteCookie(response, REFRESH_TOKEN);
+                    cookieManager.setCookie(response, tokens.get(ACCESS_TOKEN), ACCESS_TOKEN, jwtProvider.getAccessTokenExpirationPeriod());
+                    cookieManager.setCookie(response, tokens.get(REFRESH_TOKEN), REFRESH_TOKEN, jwtProvider.getRefreshTokenExpirationPeriod());
 
-                    token = cookieManager.getCookie(request, ACCESS_TOKEN);
+                    token = tokens.get(ACCESS_TOKEN);
                 }
             }
 
-            Map<String, Object> claims = (HashMap<String, Object>) jwtProvider.getClaims(token).get("body");
+            Map<String, Object> claims = (Map<String, Object>) jwtProvider.getClaims(token).get("body");
             email = claims.get("email").toString();
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
