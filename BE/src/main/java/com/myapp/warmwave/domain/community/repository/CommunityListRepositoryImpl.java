@@ -1,26 +1,22 @@
 package com.myapp.warmwave.domain.community.repository;
 
+import com.myapp.warmwave.domain.community.dto.CommunityListProjectionDto;
 import com.myapp.warmwave.domain.community.dto.CommunityListResponseDto;
-import com.myapp.warmwave.domain.community.dto.CommunityResponseDto;
 import com.myapp.warmwave.domain.community.entity.Community;
-import com.myapp.warmwave.domain.user.entity.Individual;
-import com.myapp.warmwave.domain.user.entity.Institution;
+import com.myapp.warmwave.domain.user.dto.CacheUserDto;
+import com.myapp.warmwave.domain.user.service.UserService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.myapp.warmwave.domain.comment.entity.QComment.comment;
 import static com.myapp.warmwave.domain.community.entity.QCommunity.community;
-import static com.myapp.warmwave.domain.image.entity.QImage.image;
-import static com.myapp.warmwave.domain.user.entity.QIndividual.individual;
-import static com.myapp.warmwave.domain.user.entity.QInstitution.institution;
 import static com.myapp.warmwave.domain.user.entity.QUser.user;
 
 @Repository
@@ -28,8 +24,8 @@ import static com.myapp.warmwave.domain.user.entity.QUser.user;
 public class CommunityListRepositoryImpl implements CommunityListRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final UserService userService;
 
-    // Refactor : 코드 중복
     @Override
     public Page<CommunityListResponseDto> findAllCommunities(Pageable pageable, String sort) {
         OrderSpecifier<?> orderBy = community.createdAt.desc();
@@ -37,16 +33,13 @@ public class CommunityListRepositoryImpl implements CommunityListRepository {
             orderBy = community.hit.desc();
         }
 
-        List<CommunityListResponseDto> result = jpaQueryFactory
+        List<CommunityListProjectionDto> projections = jpaQueryFactory
                 .select(
-                        Projections.constructor(CommunityListResponseDto.class,
+                        Projections.constructor(CommunityListProjectionDto.class,
                                 community.id,
                                 community.title,
                                 community.hit,
-                                new CaseBuilder()
-                                        .when(user.instanceOf(Individual.class)).then("개인")
-                                        .when(user.instanceOf(Institution.class)).then("기관")
-                                        .otherwise("Unknown").as("writer"),
+                                community.user.id,
                                 new CaseBuilder()
                                         .when(community.communityCategory.eq(Community.CommunityCategory.valueOf("volunteer_recruit")))
                                         .then("봉사모집")
@@ -65,6 +58,20 @@ public class CommunityListRepositoryImpl implements CommunityListRepository {
                 .limit(pageable.getPageSize())
                 .orderBy(orderBy)
                 .fetch();
+
+        List<CommunityListResponseDto> result = new ArrayList<>();
+        for (CommunityListProjectionDto projection : projections) {
+            CacheUserDto userCacheDTO = userService.findUserCacheDtoById(projection.getUserId());
+            String writer = userCacheDTO.getName();
+            result.add(new CommunityListResponseDto(
+                    projection.getId(),
+                    projection.getTitle(),
+                    projection.getHit(),
+                    writer,
+                    projection.getCategory(),
+                    projection.getCreatedAt()
+            ));
+        }
 
         Long total = jpaQueryFactory
                 .select(community.count())

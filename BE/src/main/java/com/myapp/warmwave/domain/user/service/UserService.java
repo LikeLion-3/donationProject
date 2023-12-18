@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -287,5 +288,12 @@ public class UserService {
                 .nickname(username)
                 .email(email)
                 .build();
+    }
+
+    @Cacheable(value = "users", key = "#id", cacheManager = "userCacheManager")
+    public CacheUserDto findUserCacheDtoById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> new CacheUserDto(user.getId(), user.getName()))
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     }
 }

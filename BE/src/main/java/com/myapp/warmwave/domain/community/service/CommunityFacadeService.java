@@ -38,17 +38,6 @@ public class CommunityFacadeService {
         return communityMapper.communityToCommunityResponseDto(createdCommunity);
     }
 
-//    @Transactional
-//    public CommunityResponseDto updateCommunityImages(Long communityId, List<MultipartFile> images) throws IOException {
-//        System.out.println("images : " + images); // null
-//        Community community = communityService.getCommunity(communityId);
-//        imageService.deleteImagesByCommunityId(communityId);
-//        community.getImages().addAll(imageService.uploadImagesForCommunity(community, images));
-//
-//        Community updatedCommunity = communityService.saveCommunity(community);
-//        return communityMapper.communityToCommunityResponseDto(communityService.saveCommunity(updatedCommunity));
-//    }
-
     public CommunityResponseDto getCommunity(Long communityId) {
         return communityMapper.communityToCommunityResponseDto(communityService.getCommunity(communityId));
     }
