@@ -3,6 +3,8 @@ package com.myapp.warmwave.domain.image.service;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.myapp.warmwave.common.exception.CustomException;
+import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.image.entity.Image;
@@ -12,22 +14,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ImageService {
-
-    @Value("${image.upload.path}")
-    private String imageStorePath;
 
     private final AmazonS3 amazonS3;
 
@@ -74,12 +72,12 @@ public class ImageService {
 
     private static void validateImageFiles(List<MultipartFile> imageFiles) {
         if (imageFiles.size() > maxFileAmount) {
-           new CustomException(IMAGE_AMOUNT_OVER);
+          throw  new CustomException(IMAGE_AMOUNT_OVER);
         }
 
         for (MultipartFile imageFile : imageFiles) {
             if (imageFile.getSize() > maxFileSizePerFile) {
-                new CustomException(IMAGE_SIZE_OVER);
+               throw  new CustomException(IMAGE_SIZE_OVER);
             }
         }
     }
