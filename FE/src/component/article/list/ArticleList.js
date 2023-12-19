@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import jwtAxios from '../../util/jwtUtil';
-import Cookies from 'js-cookie';
+import axios from 'axios'; // jwtAxios 대신에 axios를 사용
 
 
 
