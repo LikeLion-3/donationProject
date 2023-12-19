@@ -9,7 +9,7 @@ function MiddleArticle() {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get('http://localhost:8080/api/articles/today');
+            const response = await Axios.get('/api/articles/today');
             const fetchedData = response.data;
 
             if (fetchedData.content.length > 0) {

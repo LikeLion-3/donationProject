@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_CHAT_MESSAGE")
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=false)
 @ToString
 public class ChatMessage extends BaseEntity {
     @Id

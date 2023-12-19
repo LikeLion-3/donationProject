@@ -4,6 +4,7 @@ import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.common.jwt.JwtProvider;
 import com.myapp.warmwave.common.main.dto.MainInstDto;
+import com.myapp.warmwave.config.security.CookieManager;
 import com.myapp.warmwave.domain.address.entity.Address;
 import com.myapp.warmwave.domain.address.service.AddressService;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
@@ -14,6 +15,7 @@ import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,6 +33,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
+import static com.myapp.warmwave.config.security.CookieManager.ACCESS_TOKEN;
+import static com.myapp.warmwave.config.security.CookieManager.REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +45,7 @@ public class UserService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final CookieManager cookieManager;
 
     public static final String DEFAULT_PROFILE_IMG_INST = "/static/profile/default_inst.jpg";
     public static final String DEFAULT_PROFILE_IMG_INDI = "/static/profile/default_indi.jpg";
@@ -111,7 +117,7 @@ public class UserService {
 
     // 로그인
     @Transactional
-    public ResponseUserLoginDto loginUser(RequestUserLoginDto requestDto) {
+    public ResponseUserLoginDto loginUser(HttpServletResponse response, RequestUserLoginDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new CustomException(USER_NOT_MATCH));
 
@@ -127,7 +133,16 @@ public class UserService {
         String accessToken = jwtProvider.createAccessToken(claims);
         String refreshToken = jwtProvider.createRefreshToken();
 
-        return new ResponseUserLoginDto(user.getId(), accessToken, refreshToken);
+        //pk, email, 사용자 이름(기관, 개인)
+        Map<String, Object> cookieMap = new HashMap<>();
+        cookieMap.put(ACCESS_TOKEN, accessToken);
+        cookieMap.put(REFRESH_TOKEN, refreshToken);
+        long expiration = (60 * 60 * 24 * 7);
+
+        cookieManager.setCookie(response, cookieMap.get(ACCESS_TOKEN).toString(), ACCESS_TOKEN, expiration);
+        cookieManager.setCookie(response, cookieMap.get(REFRESH_TOKEN).toString(), REFRESH_TOKEN, expiration);
+
+        return new ResponseUserLoginDto(user.getId(), user.getEmail(), user.getName());
     }
 
     // 승인하지 않은 기관 회원 조회
@@ -273,5 +288,12 @@ public class UserService {
                 .nickname(username)
                 .email(email)
                 .build();
+    }
+
+    @Cacheable(value = "users", key = "#id", cacheManager = "userCacheManager")
+    public CacheUserDto findUserCacheDtoById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> new CacheUserDto(user.getId(), user.getName()))
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     }
 }

@@ -8,6 +8,7 @@ import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ArticleType;
 import com.myapp.warmwave.domain.article.mapper.ArticleMapper;
 import com.myapp.warmwave.domain.article.service.ArticleService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,8 @@ public class ArticleController {
     private final ArticleMapper articleMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ArticleResponseDto> postArticle(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ArticleResponseDto> postArticle(HttpServletRequest httpServletRequest,
+                                                          @AuthenticationPrincipal UserDetails userDetails,
                                                           @RequestParam(required = false) List<MultipartFile> imageFiles,
                                                           String articleType,
                                                           String title,
@@ -47,13 +49,14 @@ public class ArticleController {
                 .prodCategory(prodCategories)
                 .build();
 
-        Article article = articleService.createArticle(dto, imageFiles);
+        Article article = articleService.createArticle(httpServletRequest, dto, imageFiles);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
     @PutMapping(value = "/{articleId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ArticleResponseDto> patchArticle(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ArticleResponseDto> patchArticle(HttpServletRequest httpServletRequest,
+                                                           @AuthenticationPrincipal UserDetails userDetails,
                                                            @PathVariable("articleId") Long articleId,
                                                            @RequestParam(required = false) List<MultipartFile> imageFiles,
                                                            @RequestParam(required = false) List<String> originalImageUrls,
@@ -72,7 +75,7 @@ public class ArticleController {
                 .prodCategory(prodCategories)
                 .build();
 
-        Article article = articleService.updateArticle(userDetails.getUsername(), dto);
+        Article article = articleService.updateArticle(httpServletRequest, userDetails.getUsername(), dto);
 
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }

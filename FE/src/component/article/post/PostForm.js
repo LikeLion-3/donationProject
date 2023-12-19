@@ -20,8 +20,8 @@ const PostForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/categories');
-        const data = await response.json();
+        const response = await jwtAxios.get('http://localhost:8080/api/categories');
+        const data = response.data;
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);
       } catch (error) {
@@ -35,6 +35,14 @@ const PostForm = () => {
   const handleImageChange = (event) => {
     const selectedImages = Array.from(event.target.files);
     setImages((prevImages) => [...prevImages, ...selectedImages]);
+  };
+
+  const handleRemoveImage = (index) => {
+    setImages((prevImages) => {
+      const newImages = [...prevImages];
+      newImages.splice(index, 1); // 선택한 인덱스의 이미지를 제거
+      return newImages;
+    });
   };
 
   const handleCategoryChange = (selectedCategory) => {
@@ -81,21 +89,9 @@ const PostForm = () => {
       formData.append('prodCategories', JSON.stringify(selectedCategories));
       formData.append('articleType', getSelectedType());
 
-      const userToken = Cookies.get('user');
+      const response = await jwtAxios.post('http://localhost:8080/api/articles', formData);
 
-      const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
-
-      const headers = new Headers({
-        'Authorization': `Bearer ${parsedToken.accessToken}`,
-      });
-
-      const response = await fetch('http://localhost:8080/api/articles', {
-        method: 'POST',
-        body: formData,
-        headers: headers,
-      });
-
-      const data = await response.json();
+      const data = await response.data;
       console.log('Server response:', data);
 
       navigate(`/donate/${data.articleId}`);
@@ -198,13 +194,28 @@ const PostForm = () => {
                 {images.length > 0 && (
                   <div className="mt-3 d-flex flex-wrap">
                     {images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={URL.createObjectURL(image)}
-                        alt={`Preview-${index}`}
-                        className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
-                        style={{ width: '139px', height: '150px', objectFit: 'cover' }}
-                      />
+                      <div key={index} className="position-relative me-2 mb-2">
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-remove-image position-absolute top-0 end-0"
+                          onClick={() => handleRemoveImage(index)}
+                          style={{
+                            padding: '0.2rem 0.4rem', // 크기 조정
+                            backgroundColor: '#a9a9a9', // 연한 회색 배경색
+                            borderColor: '#a9a9a9', // 연한 회색 테두리 색
+                            color: '#fff', // 흰색 글자색
+                            fontSize: '0.8rem', // 폰트 크기 조정
+                          }}
+                        >
+                          X
+                        </button>
+                        <img
+                          src={image.imgUrl ? image.imgUrl : URL.createObjectURL(image)}
+                          alt={`Preview-${index}`}
+                          className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
+                          style={{ width: '139px', height: '150px', objectFit: 'cover' }}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}

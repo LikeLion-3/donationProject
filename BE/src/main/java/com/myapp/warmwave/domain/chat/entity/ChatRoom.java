@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_CHATROOM")
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=false)
 @ToString
 public class ChatRoom extends BaseEntity {
     @Id
@@ -36,6 +36,7 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "ARTICLE_ID")
     private Article article;
 
+    @Builder.Default
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.PERSIST)
     private List<ChatMessage> chatMessageList = new ArrayList<>();
 

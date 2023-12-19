@@ -26,4 +26,6 @@ public class CommunityResponseDto {
     private List<String> images;
 
     private LocalDateTime createdAt;
+
+    private Long userId;
 }

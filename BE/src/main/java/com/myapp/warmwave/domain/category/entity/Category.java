@@ -22,6 +22,7 @@ public class Category {
     private String name;
 
     @JsonIgnore
+    @Builder.Default
     @OneToMany(mappedBy = "category")
     private List<ArticleCategory> articleCategories = new ArrayList<>();
 }

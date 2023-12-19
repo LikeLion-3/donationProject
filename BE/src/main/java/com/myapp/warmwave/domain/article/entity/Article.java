@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "TB_ARTICLE")
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
 public class Article extends BaseEntity {
     @Id
@@ -34,6 +34,7 @@ public class Article extends BaseEntity {
 
     //게시글 상태(기본, 진행중, 완료)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Status articleStatus = Status.DEFAULT;
 
     private String userIp;
@@ -42,10 +43,12 @@ public class Article extends BaseEntity {
 
     @JsonIgnore
     @OneToMany(mappedBy = "article")
+    @Builder.Default
     private List<ArticleCategory> articleCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "article")
     @JsonIgnore
+    @Builder.Default
     private List<Image> articleImages = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,7 +70,8 @@ public class Article extends BaseEntity {
         this.articleStatus = Status.getStatusByString(articleStatus);
     }
 
-    public void applyPatch(ArticlePatchDto dto, List<ArticleCategory> articleCategories) {
+    public void applyPatch(String userIp, ArticlePatchDto dto, List<ArticleCategory> articleCategories) {
+        this.userIp = userIp;
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.articleCategories = articleCategories;

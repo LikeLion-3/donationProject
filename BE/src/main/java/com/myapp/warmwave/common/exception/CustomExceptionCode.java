@@ -12,6 +12,8 @@ public enum CustomExceptionCode {
      */
     NOT_MATCH_WRITER(HttpStatus.BAD_REQUEST, "작성자가 아닙니다."),
     ALREADY_LOGOUT_USER(HttpStatus.BAD_REQUEST, "다시 로그인해 주시기 바랍니다."),
+    IMAGE_AMOUNT_OVER(HttpStatus.BAD_REQUEST, "이미지 개수가가 허용된 크기를 초과했습니다.(최대 5개)"),
+    IMAGE_SIZE_OVER(HttpStatus.BAD_REQUEST, "이미지 크기가 허용된 크기를 초과했습니다.(개당 5mb 이하)"),
     /*
      * 401
      */
@@ -46,6 +48,7 @@ public enum CustomExceptionCode {
     NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
     ALREADY_EXIST_CATEGORY(HttpStatus.NOT_FOUND, "이미 존재하는 카테고리입니다."),
     NOT_FOUND_ARTICLETYPE(HttpStatus.NOT_FOUND, "존재하지 않는 게시글종류 입니다."),
+    NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "해당 이미지를 찾을 수 없습니다."),
 
     /*
      * 415

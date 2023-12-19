@@ -1,12 +1,14 @@
 package com.myapp.warmwave.config.security;
 
 import com.myapp.warmwave.common.jwt.JwtAuthFilter;
+import com.myapp.warmwave.config.CorsConfig;
 import com.myapp.warmwave.config.oauth.OAuth2LoginFailureHandler;
 import com.myapp.warmwave.config.oauth.OAuth2LoginSuccessHandler;
 import com.myapp.warmwave.config.oauth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -43,11 +45,10 @@ public class SecurityConfig {
                         authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers(
                                         "/", "/api/users/login", "/api/users/register/**",
-                                        "/api/articles/today", "/api/main/count", "/api/users/adjacent", "/api/users/confirm-email",
-                                        "/api/users/**", // 테스트용
-                                        "/ws/**",
-                                        "/api/user/refresh"
+                                        "/api/articles/today", "/api/main/count", "/api/users/confirm-email",
+                                        "/ws/**", "/api/user/refresh"
                                 ).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/articles/**", "/api/communities/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

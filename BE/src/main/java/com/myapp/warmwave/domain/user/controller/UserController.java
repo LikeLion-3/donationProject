@@ -4,6 +4,7 @@ import com.myapp.warmwave.common.main.dto.MainInstDto;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,17 +44,9 @@ public class UserController {
 
     // 일반 로그인
     @PostMapping("/login")
-    public ResponseEntity<ResponseUserLoginDto> login(@RequestBody RequestUserLoginDto requestDto) {
-        ResponseUserLoginDto responseDto = userService.loginUser(requestDto);
+    public ResponseEntity<ResponseUserLoginDto> login(HttpServletResponse response, @RequestBody RequestUserLoginDto requestDto) {
+        ResponseUserLoginDto responseDto = userService.loginUser(response, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    @GetMapping("/login")
-    public ResponseEntity<Map<String, Object>> redirectLoginPage() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("result", "FAIL");
-        map.put("msg", "로그인 페이지로 이동해주세요.");
-        return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
     // 전체 기관 회원 조회
