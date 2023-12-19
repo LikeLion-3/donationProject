@@ -47,10 +47,8 @@ public class SecurityConfig {
                                         "/", "/api/users/login", "/api/users/register/**",
                                         "/api/articles/today", "/api/main/count", "/api/users/confirm-email",
                                         "/ws/**", "/api/user/refresh"
-                                )
-                                .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/articles/**")
-                                .permitAll()
+                                ).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/articles/**", "/api/communities/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
