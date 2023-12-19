@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import jwtAxios from '../../util/jwtUtil';
-import axios from 'axios'; // jwtAxios 대신에 axios를 사용
+import axios from 'axios';
 
 
 
@@ -87,7 +87,7 @@ const ArticleList = () => {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await jwtAxios('http://localhost:8080/api/articles?page=1&size=10');
+          const response = await axios('http://localhost:8080/api/articles?page=1&size=10');
           const data = await response.data;
           setProducts(data.content);
         } catch (error) {

@@ -90,8 +90,6 @@ const PatchForm = () => {
 
     try {
       const formData = new FormData();
-
-
       // 이미지가 존재하는 경우에만 FormData에 추가
       if (images.length > 0) {
         images.forEach((image, index) => {
@@ -107,14 +105,6 @@ const PatchForm = () => {
       formData.append('content', content);
       formData.append('prodCategories', JSON.stringify(selectedCategories));
       formData.append('articleType', getSelectedType());
-
-      const userToken = Cookies.get('user');
-
-      const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
-
-      const headers = new Headers({
-        'Authorization': `Bearer ${parsedToken.accessToken}`,
-      });
 
       const response = await jwtAxios.put(`http://localhost:8080/api/articles/${params.articleId}`, formData);
 
