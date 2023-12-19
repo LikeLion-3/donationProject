@@ -80,7 +80,7 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.articleToArticleResponseDto(article));
     }
 
-    @PatchMapping("/status/{articleId}")
+    @PutMapping("/status/{articleId}")
     public ResponseEntity<ArticleResponseDto> patchArticleStatus(@PathVariable("articleId") Long articleId,
                                                                  @AuthenticationPrincipal UserDetails userDetails,
                                                                  @RequestParam(required = true) String articleStatus) {
