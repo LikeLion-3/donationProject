@@ -63,7 +63,7 @@ public class ArticleController {
                                                            String articleType,
                                                            String title,
                                                            String content,
-                                                           String prodCategories) throws IOException {
+                                                           String prodCategories) throws Exception {
         ArticlePatchDto dto = ArticlePatchDto.builder()
                 .articleId(articleId)
                 .userEmail(userDetails.getUsername())
