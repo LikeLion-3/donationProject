@@ -20,21 +20,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.*;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ImageService {
 
-    @Value("${image.upload.path}")
-    private String imageStorePath;
-
     private final AmazonS3 amazonS3;
+
     private final ImageRepository imageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+    private static final long maxFileAmount = 5;
+    private static final long maxFileSizePerFile = 5 * 1024 * 1024;
 
     public List<Image> uploadImages(Article article, List<MultipartFile> imageFiles) throws IOException {
+        validateImageFiles(imageFiles); // 예외처리 메서드
+
         List<Image> images = new ArrayList<>();
 
         if (imageFiles == null) {
@@ -64,6 +68,18 @@ public class ImageService {
             images.add(image);
         }
         return images;
+    }
+
+    private static void validateImageFiles(List<MultipartFile> imageFiles) {
+        if (imageFiles.size() > maxFileAmount) {
+          throw  new CustomException(IMAGE_AMOUNT_OVER);
+        }
+
+        for (MultipartFile imageFile : imageFiles) {
+            if (imageFile.getSize() > maxFileSizePerFile) {
+               throw  new CustomException(IMAGE_SIZE_OVER);
+            }
+        }
     }
 
     public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) throws IOException {
