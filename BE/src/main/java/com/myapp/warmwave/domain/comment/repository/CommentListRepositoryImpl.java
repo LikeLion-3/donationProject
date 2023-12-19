@@ -62,7 +62,8 @@ public class CommentListRepositoryImpl implements CommentListRepository {
                     projection.getCreatedAt(),
                     projection.getModifiedAt(),
                     writer,
-                    projection.getCommunityId()
+                    projection.getCommunityId(),
+                    projection.getUserId()
             ));
         }
         Long total = jpaQueryFactory
