@@ -3,6 +3,8 @@ package com.myapp.warmwave.domain.image.service;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.myapp.warmwave.common.exception.CustomException;
+import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.image.entity.Image;
@@ -12,11 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +29,6 @@ public class ImageService {
     private String imageStorePath;
 
     private final AmazonS3 amazonS3;
-
     private final ImageRepository imageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -68,43 +66,34 @@ public class ImageService {
         return images;
     }
 
-    public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) {
+    public List<Image> uploadImagesForCommunity(Community community, List<MultipartFile> imageFiles) throws IOException {
         List<Image> images = new ArrayList<>();
-
-        File directory = new File(imageStorePath);
-        if (!directory.exists()) {
-            boolean created = directory.mkdirs();
-            if (!created) {
-                log.error("Failed to create directory: {}", imageStorePath);
-            }
+        System.out.println("imageService's images : " + images);
+        if(imageFiles==null) {
+            return images;
         }
 
         for (MultipartFile imageFile : imageFiles) {
             String originalFilename = imageFile.getOriginalFilename();
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
             String fileName = UUID.randomUUID() + "." + fileExtension;
-            // 작성자 이메일, createdAt, article PK + 중복 인덱스
-            //
-            try {
-                imageFile.transferTo(Paths.get(imageStorePath).resolve(fileName));
 
-                String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/images/")
-                        .path(fileName)
-                        .toUriString();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(imageFile.getSize());
+            metadata.setContentType(imageFile.getContentType());
 
-                Image image = Image.builder()
-                        .imgName(fileName)
-                        .imgUrl(imageUrl)
-                        .community(community)
-                        .build();
+            String key = "community/"+fileName;
 
-                imageRepository.save(image);
-                images.add(image);
-            }
-            catch(IOException e) {
-                log.error("Failed to store images"+ String.valueOf(e));;
-            }
+            amazonS3.putObject(bucket, key, imageFile.getInputStream(), metadata);
+
+            Image image = Image.builder()
+                    .imgName(fileName)
+                    .imgUrl(amazonS3.getUrl(bucket, key).toString())
+                    .community(community)
+                    .build();
+
+            imageRepository.save(image);
+            images.add(image);
         }
         return images;
     }
@@ -116,6 +105,28 @@ public class ImageService {
             String fileName = image.getImgName();
             String key = "article/" + fileName;
             try {
+                amazonS3.deleteObject(bucket, key);
+            } catch (AmazonServiceException e) {
+                System.err.println(e.getErrorMessage());
+                System.exit(1);
+            }
+        }
+
+        imageRepository.deleteAll(imagesToDelete);
+    }
+
+    public void deleteImagesByCommunityId(Long communityId) {
+        List<Image> imagesToDelete = imageRepository.findByCommunityId(communityId);
+        if(imagesToDelete.isEmpty()){
+            System.out.println("이미지 없음");
+            throw new CustomException(CustomExceptionCode.NOT_FOUND_IMAGE);
+        }
+
+        for (Image image : imagesToDelete) {
+            String fileName = image.getImgName();
+            String key = "community/" + fileName;
+            try {
+                System.out.println("key : " + key);
                 amazonS3.deleteObject(bucket, key);
             } catch (AmazonServiceException e) {
                 System.err.println(e.getErrorMessage());
@@ -142,5 +153,6 @@ public class ImageService {
                 System.exit(1);
             }
         }
+        imageRepository.deleteAllByImgUrl(urls);
     }
 }

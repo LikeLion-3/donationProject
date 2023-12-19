@@ -3,6 +3,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import './CommunityList.css';
 import Pagination from "react-js-pagination";
+import { useSelector } from 'react-redux';
+import jwtAxios from '../../util/jwtUtil';
+import { API_SERVER_HOST } from "../../util/jwtUtil"
 
 
 const CommunityList = () => {
@@ -13,6 +16,8 @@ const CommunityList = () => {
 	const [page, setPage] = useState(0);
 	const [totalCnt, setTotalCnt] = useState(0);
 	const [pageRange, setPageRange] = useState(0);
+	const loginState = useSelector(state => state.loginSlice);
+
 
 	useEffect(() => {
 		const calculatePageRange = () => {
@@ -34,9 +39,8 @@ const CommunityList = () => {
 
 		const fetchData = async () => {
 			try {
-				console.log(currentPage);
-				const response = await fetch(`/api/communities?page=${currentPage - 1}&size=12&sort=${sortOrder}`);
-				const data = await response.json();
+				const response = await jwtAxios.get(`${API_SERVER_HOST}/api/communities?page=${currentPage - 1}&size=12&sort=${sortOrder}`);
+				const data = await response.data;
 				console.log(data);
 				setPosts(data.content);
 				setTotalPages(data.totalPages);
@@ -84,18 +88,29 @@ const CommunityList = () => {
 						<div className="mb-3">
 							<div className="d-flex justify-content-between align-items-center mb-3">
 								<div>
-									<button className="btn " onClick={() => handleSort('recent')} style={{ backgroundColor: '#FABA96', borderColor: '#fff', color: "#FFFFFF" }}>최신순</button>
+									<button className="btn " onClick={() => handleSort('recent')} style={{ backgroundColor: '#FABA96', borderColor: '#fff', color: "#FFFFFF", marginRight: '8px'}}>최신순</button>
 									<button className="btn btn-primary" onClick={() => handleSort('popular')} style={{ backgroundColor: '#FABA96', borderColor: '#fff', color: "#FFFFFF" }}>조회순</button>
+									<Pagination
+										activePage={page}
+										itemsCountPerPage={12} // 한 페이지에 표시되는 아이템 수
+										totalItemsCount={totalCnt}
+										pageRangeDisplayed={5} // 한 번에 보여지는 페이지 범위
+										prevPageText={"‹"}
+										nextPageText={"›"}
+										onChange={handlePageChange}
+									/>
 								</div>
-								<Pagination
-									activePage={page}
-									itemsCountPerPage={12} // 한 페이지에 표시되는 아이템 수
-									totalItemsCount={totalCnt}
-									pageRangeDisplayed={5} // 한 번에 보여지는 페이지 범위
-									prevPageText={"‹"}
-									nextPageText={"›"}
-									onChange={handlePageChange}
-								/>
+								{loginState.id &&
+
+									<Link to="/community/write">
+										<button
+											className="btn btn-primary btn-xl"
+											type="submit"
+											style={{ backgroundColor: '#FABA96', borderColor: '#FABA96' }}>
+											글 작성
+										</button>
+									</Link>
+								}
 							</div>
 						</div>
 						<table className="table table-hover">
