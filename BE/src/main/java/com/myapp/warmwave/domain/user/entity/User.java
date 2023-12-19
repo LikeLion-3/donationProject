@@ -8,10 +8,7 @@ import com.myapp.warmwave.domain.chat.entity.ChatMessage;
 import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.favorite_inst.entity.FavoriteInst;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -55,12 +52,15 @@ public abstract class User extends BaseEntity {
     @JoinColumn(name = "ADDRESS_ID")
     private Address address;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Article> articles = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "sender", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<ChatMessage> messageList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "individualUser", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<FavoriteInst> favoriteList = new ArrayList<>();
 

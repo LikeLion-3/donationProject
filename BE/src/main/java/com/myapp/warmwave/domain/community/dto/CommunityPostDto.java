@@ -1,8 +1,9 @@
 package com.myapp.warmwave.domain.community.dto;
 
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Builder
 public class CommunityPostDto {
     private String title;
 

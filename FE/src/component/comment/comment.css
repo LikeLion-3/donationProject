@@ -1,0 +1,21 @@
+.comment-container {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.comment-content {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.comment-buttons {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.comment-container:hover .comment-buttons {
+  display: block;
+}

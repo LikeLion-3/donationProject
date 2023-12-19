@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import jwtAxios from '../../util/jwtUtil';
 import { getCookie } from '../../util/cookieUtil';
 
-
 const ArticleDetails = () => {
   const [article, setArticle] = useState(null);
+  const [showImages, setShowImages] = useState(true);
   const params = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/articles/${params.articleId}`)
+    jwtAxios.get(`http://localhost:8080/api/articles/${params.articleId}`)
       .then(response => {
         setArticle(response.data);
       })
       .catch(error => {
         console.error('Error fetching article:', error);
       });
-  }, [params]);
+  }, [params.articleId]);
+
+  const handleToggleImages = () => {
+    setShowImages(!showImages);
+  };
 
   const formattedDate = article?.createdAt
     ? new Date(article.createdAt).toLocaleDateString('ko-KR', {
@@ -66,7 +69,7 @@ const ArticleDetails = () => {
     const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
 
     try {
-      await axios.delete(`http://localhost:8080/api/articles/${params.articleId}`, {
+      await jwtAxios.delete(`http://localhost:8080/api/articles/${params.articleId}`, {
         headers: {
           'Authorization': `Bearer ${parsedToken.accessToken}`,
         },
@@ -94,12 +97,12 @@ const ArticleDetails = () => {
       <div className="container px-4 px-lg-5 my-5">
         <div className="row gx-4 gx-lg-5 align-items-start">
           <div className="col-md-6" style={{ padding: '15px' }}>
-            {article?.images && article.images.length > 0 ? (
+            {showImages && article?.images && article.images.length > 0 ? (
               article.images.map(image => (
                 <img
                   key={image.id}
                   className="card-img-top mb-5 mb-md-0"
-                  src={image.imgUrl}  // 이미지의 URL을 사용
+                  src={image.imgUrl}
                   alt={image.imgName}
                   style={{ maxHeight: '400px', width: '100%', objectFit: 'contain' }}
                 />

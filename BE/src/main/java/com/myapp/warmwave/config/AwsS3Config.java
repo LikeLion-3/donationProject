@@ -1,4 +1,4 @@
-package com.myapp.warmwave.config.security;
+package com.myapp.warmwave.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

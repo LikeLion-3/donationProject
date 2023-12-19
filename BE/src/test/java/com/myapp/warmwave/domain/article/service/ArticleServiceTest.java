@@ -64,6 +64,9 @@ public class ArticleServiceTest {
 
     @BeforeEach
     void setup() {
+        individual = Individual.builder()
+                .id(1L).email("test@gmail.com").role(Role.INDIVIDUAL).build();
+
         articleIndiv = Article.builder()
                 .id(1L).title("제목1").content("내용1").articleType(ArticleType.DONATION)
                 .articleStatus(Status.DEFAULT).userIp("123.123.123.123").articleCategories(new ArrayList<>())
@@ -74,9 +77,6 @@ public class ArticleServiceTest {
 
         articleCategory = ArticleCategory.builder()
                 .id(1L).article(articleIndiv).category(category).build();
-
-        individual = Individual.builder()
-                .id(1L).role(Role.INDIVIDUAL).build();
     }
 
     @DisplayName("기부글 작성 기능 확인")
@@ -142,8 +142,6 @@ public class ArticleServiceTest {
         Article savedArticle = articleService.createArticle(reqDto, imageFiles);
         String title = savedArticle.getTitle();
 
-        Long articleId = 1L;
-
         when(articleRepository.findById(any())).thenReturn(Optional.of(articleIndiv));
 
         ArticlePatchDto updateDto = ArticlePatchDto.builder()
@@ -168,7 +166,10 @@ public class ArticleServiceTest {
         articleService.createArticle(reqDto, imageFiles);
 
         Long articleId = 1L;
-        String userName = "test@gamil.com";
+        String userName = "test@gmail.com";
+
+        when(articleRepository.findById(any())).thenReturn(Optional.of(articleIndiv));
+        when(articleRepository.existsById(any())).thenReturn(false);
 
         // when
         articleService.deleteArticle(userName, articleId);

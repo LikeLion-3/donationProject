@@ -1,5 +1,7 @@
 package com.myapp.warmwave.domain.community.dto;
 
+import com.myapp.warmwave.domain.category.entity.Category;
+import com.myapp.warmwave.domain.community.entity.Community;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

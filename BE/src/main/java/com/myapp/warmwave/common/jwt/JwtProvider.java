@@ -1,8 +1,9 @@
 package com.myapp.warmwave.common.jwt;
 
-import com.myapp.warmwave.common.util.Utils;
+import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.*;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.EXPIRED_JWT;
+
 @Slf4j
 @Getter
 @Component
@@ -26,8 +29,8 @@ public class JwtProvider {
      * JWT의 Subject와 Claim으로 email 사용 -> 클레임의 name을 "email"으로 설정
      * JWT의 헤더에 들어오는 값 : 'Authorization(Key) = Bearer {토큰} (Value)' 형식
      */
-    private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
-    private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
+    public static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
+    public static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     public static final String EMAIL_CLAIM = "email";
     private static final String BEARER = "Bearer ";
     private final UserRepository<User> userRepository;
@@ -137,6 +140,8 @@ public class JwtProvider {
                     .build()
                     .parseSignedClaims(accessToken)
                     .getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
         } catch (Exception e) {
             return Collections.emptyMap();
         }
@@ -159,13 +164,23 @@ public class JwtProvider {
     public boolean isTokenValid(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(cachedSecretKey)
+                    .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token);
         } catch (Exception e) {
-            log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
             return false;
         }
         return true;
+    }
+
+    public void isTokenExpired(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSecretKey())
+                    .build()
+                    .parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(EXPIRED_JWT);
+        }
     }
 }
