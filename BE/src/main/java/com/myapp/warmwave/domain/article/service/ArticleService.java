@@ -15,6 +15,7 @@ import com.myapp.warmwave.domain.category.service.CategoryService;
 import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,10 +44,11 @@ public class ArticleService {
     private final ArticleCategoryRepository articleCategoryRepository;
 
     @Transactional
-    public Article createArticle(ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
+    public Article createArticle(HttpServletRequest httpServletRequest, ArticlePostDto dto, List<MultipartFile> imageFiles) throws IOException {
 
+        String userIp = getUserIP(httpServletRequest);
         List<Category> categories = categoryService.getCategory(dto.getProdCategory());
-        Article article = articleMapper.articlePostDtoToArticle(dto);
+        Article article = articleMapper.articlePostDtoToArticle(userIp, dto);
 
         //추후 세터를 삭제하는 방향을 생각해보아야함
         // 로직에 fileName 필요 없음 -> fileName에 article 정보 저장하면 단방향 매핑 가능하지 않을까?
@@ -65,8 +67,9 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article updateArticle(String userEmail, ArticlePatchDto dto) throws IOException {
+    public Article updateArticle(HttpServletRequest httpServletRequest, String userEmail, ArticlePatchDto dto) throws IOException {
 
+        String userIp = getUserIP(httpServletRequest);
         Article findArticle = getArticleByArticleId(dto.getArticleId());
         User user = findArticle.getUser();
 
@@ -90,7 +93,7 @@ public class ArticleService {
                 .collect(Collectors.toList());
 
         imageService.deleteImagesByUrls(deleteImageUrls);
-        findArticle.applyPatch(dto, articleCategoryRepository.findByArticleId(findArticle.getId()));
+        findArticle.applyPatch(userIp, dto, articleCategoryRepository.findByArticleId(findArticle.getId()));
         findArticle.setArticleImages(imageService.uploadImages(findArticle, dto.getFiles()));
 
         return articleRepository.save(findArticle);
@@ -134,5 +137,13 @@ public class ArticleService {
     public Page<MainArticleDto> findTop5OrderByCreatedAt(int num) {
         Pageable pageable = PageRequest.of(num, 5);
         return articleRepository.findTop5OrderByCreatedAtDesc(pageable);
+    }
+
+    private String getUserIP(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
     }
 }

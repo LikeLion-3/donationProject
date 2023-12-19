@@ -66,7 +66,8 @@ public class Article extends BaseEntity {
         this.articleCategories = articleCategories;
     }
 
-    public void applyPatch(ArticlePatchDto dto, List<ArticleCategory> articleCategories) {
+    public void applyPatch(String userIp, ArticlePatchDto dto, List<ArticleCategory> articleCategories) {
+        this.userIp = userIp;
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.articleCategories = articleCategories;

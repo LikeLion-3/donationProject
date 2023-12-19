@@ -15,6 +15,7 @@ import com.myapp.warmwave.domain.category.entity.Category;
 import com.myapp.warmwave.domain.category.service.CategoryService;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.entity.Individual;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,11 +84,12 @@ public class ArticleServiceTest {
     @Test
     void createArticle() throws IOException {
         // given
+        HttpServletRequest httpServletRequest = null;
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
 
         // when
-        Article savedArticle = articleService.createArticle(reqDto, imageFiles);
+        Article savedArticle = articleService.createArticle(httpServletRequest, reqDto, imageFiles);
 
         // then
         assertThat(savedArticle).isNotNull();
@@ -97,9 +99,10 @@ public class ArticleServiceTest {
     @Test
     void readAllArticle() throws IOException {
         // given
+        HttpServletRequest httpServletRequest = null;
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
-        articleService.createArticle(reqDto, imageFiles);
+        articleService.createArticle(httpServletRequest, reqDto, imageFiles);
 
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Article> articleList = List.of(articleIndiv);
@@ -118,9 +121,10 @@ public class ArticleServiceTest {
     @Test
     void readArticle() throws IOException {
         // given
+        HttpServletRequest httpServletRequest = null;
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
-        articleService.createArticle(reqDto, imageFiles);
+        articleService.createArticle(httpServletRequest, reqDto, imageFiles);
 
         Long articleId = 1L;
 
@@ -137,9 +141,10 @@ public class ArticleServiceTest {
     @Test
     void updateArticle() throws IOException {
         // given
+        HttpServletRequest httpServletRequest = null;
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
-        Article savedArticle = articleService.createArticle(reqDto, imageFiles);
+        Article savedArticle = articleService.createArticle(httpServletRequest, reqDto, imageFiles);
         String title = savedArticle.getTitle();
 
         when(articleRepository.findById(any())).thenReturn(Optional.of(articleIndiv));
@@ -147,11 +152,11 @@ public class ArticleServiceTest {
         ArticlePatchDto updateDto = ArticlePatchDto.builder()
                 .title("제목1 변경").content("내용2").prodCategory("카테고리2").build();
 
-        savedArticle.applyPatch(updateDto, List.of(articleCategory));
+        savedArticle.applyPatch("", updateDto, List.of(articleCategory));
         String userEmail = "test@gmail.com";
 
         // when
-        Article foundArticle = articleService.updateArticle(userEmail, updateDto);
+        Article foundArticle = articleService.updateArticle(null, userEmail, updateDto);
 
         // then
         assertThat(foundArticle.getTitle()).isNotEqualTo(title);
@@ -161,9 +166,10 @@ public class ArticleServiceTest {
     @Test
     void deleteArticle() throws IOException {
         // given
+        HttpServletRequest httpServletRequest = null;
         ArticlePostDto reqDto = saveArticle();
         List<MultipartFile> imageFiles = new ArrayList<>();
-        articleService.createArticle(reqDto, imageFiles);
+        articleService.createArticle(httpServletRequest, reqDto, imageFiles);
 
         Long articleId = 1L;
         String userName = "test@gmail.com";
@@ -186,7 +192,7 @@ public class ArticleServiceTest {
 
         List<Category> categoryList = List.of(category);
         when(categoryService.getCategory(any())).thenReturn(categoryList);
-        when(articleMapper.articlePostDtoToArticle(any())).thenReturn(articleIndiv);
+        when(articleMapper.articlePostDtoToArticle(any(), any())).thenReturn(articleIndiv);
         when(imageService.uploadImages(any(), any())).thenReturn(articleIndiv.getArticleImages());
         when(articleRepository.save(any())).thenReturn(articleIndiv);
         when(articleCategoryRepository.save(any())).thenReturn(articleCategory);
