@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.EXPIRED_JWT;
@@ -36,29 +37,43 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     // shouldNotFilter()는 OncePerRequestFilter의 상위 클래스에 정의된 메서드, 필터로 체크하지 않을 경로나 메서드 등을 지정하기 위해서 사용
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        List<String> excludePatterns;
 
         // Preflight(Ajax 통신 실제 요청을 보내기 전에 OPTIONS 메서드를 사용하여 서버에 대한 정보를 요청) 요청은 체크하지 않음
         if (request.getMethod().equals("OPTIONS")) {
             return true;
         }
-        String[] excludePath = {
-                // 로그인 경로의 호출은 체크하지 않음
-                "/api/users/login",
-                // 이메일중복체크 경로의 호출은 체크하지 않음
-                "/api/users/register/checkEmail",
-                // 닉네임중복체크 경로의 호출은 체크하지 않음
-                "/api/users/register/checkNickname",
-                // 기관회원가입 경로의 호출은 체크하지 않음
-                "/api/users/register/institution",
-                // 개인회원가입 경로의 호출은 체크하지 않음
-                "/api/users/register/individual",
-                // 이메일 링크 인증 경로의 호출은 체크하지 않음
-                "/api/users/confirm-email",
-        };
 
-        String path = request.getRequestURI();
+        if (request.getMethod().equals("GET")) {
+            excludePatterns = List.of(
+                    // 아티클 목록 조회, 단일 조회의 경우 필터에서 체크하지 않음
+                    "/api/articles/**",
+                    // 커뮤니티 목록 조회, 단일 조회의 경우 필터에서 체크하지 않음
+                    "/api/communities/**",
+                    // 이메일 링크 인증 경로의 호출은 체크하지 않음
+                    "/api/users/confirm-email"
+            );
+            return excludePatterns.stream().anyMatch(path::startsWith);
+        }
 
-        return Arrays.stream(excludePath).anyMatch(path::startsWith);
+        if (request.getMethod().equals("POST")) {
+            excludePatterns = List.of(
+                    // 로그인 경로의 호출은 체크하지 않음.
+                    "/api/users/login",
+                    // 이메일중복체크 경로의 호출은 체크하지 않음.
+                    "/api/users/register/checkEmail",
+                    // 닉네임중복체크 경로의 호출은 체크하지 않음
+                    "/api/users/register/checkNickname",
+                    // 기관회원가입 경로의 호출은 체크하지 않음
+                    "/api/users/register/institution",
+                    // 개인회원가입 경로의 호출은 체크하지 않음
+                    "/api/users/register/individual"
+            );
+            return excludePatterns.stream().anyMatch(path::startsWith);
+        }
+
+        return false;
     }
 
     @Override
