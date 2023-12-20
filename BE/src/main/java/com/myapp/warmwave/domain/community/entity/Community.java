@@ -13,7 +13,6 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Table(name="TB_COMMUNITY")
 @Entity
 @Builder
@@ -21,6 +20,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
+@EqualsAndHashCode(callSuper = true)
 public class Community extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
