@@ -3,7 +3,9 @@ package com.myapp.warmwave.domain.article.repository;
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.config.JpaConfig;
 import com.myapp.warmwave.config.QuerydslConfig;
+import com.myapp.warmwave.domain.article.dto.ArticlePatchDto;
 import com.myapp.warmwave.domain.article.entity.Article;
+import com.myapp.warmwave.domain.article.entity.ArticleCategory;
 import com.myapp.warmwave.domain.article.entity.ArticleType;
 import com.myapp.warmwave.domain.article.entity.Status;
 import com.myapp.warmwave.domain.user.entity.Individual;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -193,7 +196,37 @@ public class ArticleRepositoryTest {
     }
 
     // UPDATE
-    // TODO 전체적인 로직 손봐야할 필요 있음 -> Mapper 쓰는 방향 말고 DTO 에서 바로 변환하는 방식?
+    @Test
+    @DisplayName("게시글 수정")
+    void updateArticle() {
+        // given
+        Article article = articleRepository.save(articleIndividual());
+        String userIp = "123.123.123.123";
+        ArticlePatchDto dto = ArticlePatchDto.builder()
+                .articleId(1L)
+                .userEmail("test@gmail.com")
+                .articleType(ArticleType.DONATION)
+                .originalImageUrls(new ArrayList<>())
+                .files(new ArrayList<>())
+                .title("제목 수정 123")
+                .content("내용 수정 123")
+                .prodCategory("카테고리 변경")
+                .build();
+
+        List<ArticleCategory> articleCategories = new ArrayList<>();
+
+        String originalTitle = article.getTitle();
+
+        article.applyPatch(userIp, dto, articleCategories);
+        articleRepository.save(article);
+
+        // when
+        Optional<Article> foundArticle = articleRepository.findByTitle(dto.getTitle());
+
+        // then
+        assertThat(foundArticle).isPresent();
+        assertThat(foundArticle.get().getTitle()).isNotEqualTo(originalTitle);
+    }
 
     // DELETE
     @DisplayName("게시물 삭제")
