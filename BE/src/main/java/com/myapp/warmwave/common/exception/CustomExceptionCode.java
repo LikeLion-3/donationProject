@@ -23,6 +23,7 @@ public enum CustomExceptionCode {
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "지원되지 않는 토큰입니다."),
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     ILLEGAL_ARGUMENT_JWT(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
+    NEED_EMAIL_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "이메일 인증이 필요합니다."),
     /*
      * 403
      */

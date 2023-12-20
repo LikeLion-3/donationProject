@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myapp.warmwave.common.Role;
 import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.common.exception.CustomExceptionCode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -43,6 +44,16 @@ public class Utils {
             } catch (JsonProcessingException e) {
                 return Collections.emptyMap();
             }
+        }
+    }
+
+    public static class userIp {
+        public static String getUserIP(HttpServletRequest request) {
+            String xfHeader = request.getHeader("X-Forwarded-For");
+            if (xfHeader == null) {
+                return request.getRemoteAddr();
+            }
+            return xfHeader.split(",")[0];
         }
     }
 }

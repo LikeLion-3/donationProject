@@ -10,6 +10,7 @@ import com.myapp.warmwave.domain.chat.service.ChatRoomService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,7 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthFilter.class})
 })
 @WithMockUser(roles = "USER")
-public class ChatRoomControllerTest {
+@AutoConfigureRestDocs
+class ChatRoomControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -56,9 +59,11 @@ public class ChatRoomControllerTest {
         mockMvc.perform(post("/api/chatRoom")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("chat/채팅방 생성"));
     }
 
     @DisplayName("채팅방 목록 조회 확인")
@@ -77,9 +82,11 @@ public class ChatRoomControllerTest {
         // then
         mockMvc.perform(get("/api/chatRoom")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("chat/채팅방 목록 조회"));
     }
 
     @DisplayName("채팅방 삭제 확인")
@@ -93,8 +100,10 @@ public class ChatRoomControllerTest {
         // then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/chatRoom/" + roomId)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("chat/채팅방 삭제"));
     }
 }

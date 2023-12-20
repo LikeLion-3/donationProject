@@ -9,6 +9,7 @@ import com.myapp.warmwave.domain.favorite_inst.service.FavoriteInstService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthFilter.class})
 })
 @WithMockUser(roles = "USER")
-public class FavoriteInstControllerTest {
+@AutoConfigureRestDocs
+class FavoriteInstControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -52,9 +55,11 @@ public class FavoriteInstControllerTest {
         // then
         mockMvc.perform(post("/api/users/" + institutionId + "/favorite")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("favoriteInst/관심기관 등록"));
     }
 
     @DisplayName("관심 기관 목록 확인")
@@ -75,9 +80,11 @@ public class FavoriteInstControllerTest {
         // then
         mockMvc.perform(get("/api/users/" + individualId + "/favorite")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("favoriteInst/관심기관 목록 조회"));
     }
 
     @DisplayName("관심 기관 삭제 확인")
@@ -92,8 +99,10 @@ public class FavoriteInstControllerTest {
         // then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/" + institutionId + "/favorite")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("favoriteInst/관심기관 삭제"));
     }
 }

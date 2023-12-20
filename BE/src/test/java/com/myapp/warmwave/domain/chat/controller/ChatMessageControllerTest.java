@@ -7,6 +7,7 @@ import com.myapp.warmwave.domain.chat.service.ChatMessageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,13 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class, JwtAuthFilter.class})
 })
 @WithMockUser(roles = "USER")
-public class ChatMessageControllerTest {
+@AutoConfigureRestDocs
+class ChatMessageControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private ChatMessageService chatMessageService;
-    
+
     @DisplayName("채팅 메시지 저장 확인")
     @Test
     void saveChatMessage() throws Exception {
@@ -45,15 +48,17 @@ public class ChatMessageControllerTest {
         );
 
         List<ResponseChatMessageDto> dtoList = List.of(resDto);
-        
+
         // when
         when(chatMessageService.getAllChatMessages(any())).thenReturn(dtoList);
 
         // then
         mockMvc.perform(get("/api/chatMessages/" + roomId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
+                        .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("chat/채팅 메시지 저장"));
     }
 }

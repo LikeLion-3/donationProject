@@ -1,11 +1,10 @@
 package com.myapp.warmwave.domain.chat.repository;
 
+import com.myapp.warmwave.TestConfig;
 import com.myapp.warmwave.common.Role;
-import com.myapp.warmwave.config.JpaConfig;
-import com.myapp.warmwave.config.QuerydslConfig;
 import com.myapp.warmwave.domain.article.entity.Article;
-import com.myapp.warmwave.domain.article.entity.Status;
 import com.myapp.warmwave.domain.article.entity.ArticleType;
+import com.myapp.warmwave.domain.article.entity.Status;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.chat.entity.ChatMessage;
 import com.myapp.warmwave.domain.chat.entity.ChatRoom;
@@ -26,9 +25,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({JpaConfig.class, QuerydslConfig.class})
+@Import(TestConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ChatMessageRepositoryTest {
+class ChatMessageRepositoryTest {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 

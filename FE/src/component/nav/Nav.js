@@ -1,8 +1,11 @@
 import {Link, NavLink, Outlet} from "react-router-dom";
 import {useSelector, useDispatch} from "react-redux";
-import { logout } from "../slices/loginSlice"
+import { logout } from "../slices/loginSlice";
+import useToast from '../hooks/useToast';
 
 function Nav() {
+    const { showToast } = useToast();
+    
     const loginState = useSelector(state => state.loginSlice);
     console.log( loginState );
     const dispatch = useDispatch();
@@ -10,7 +13,7 @@ function Nav() {
     const handleLogout = (e) => {
         e.preventDefault();
         dispatch(logout());
-        alert("로그아웃되었습니다.");
+        showToast("로그아웃되었습니다.");
     };
 
     return (
@@ -32,7 +35,7 @@ function Nav() {
                                     <li><NavLink to="/community">Community</NavLink></li>
                                     {!loginState.id ?
                                         <>
-                                            <li><NavLink to="/signup">SigUp</NavLink></li>
+                                            <li><NavLink to="/signup">SignUp</NavLink></li>
                                             <li><NavLink to="/user/login">LogIn</NavLink></li>
                                         </>
                                         :

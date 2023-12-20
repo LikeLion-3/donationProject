@@ -1,9 +1,12 @@
 package com.myapp.warmwave.domain.comment.repository;
 
+import com.myapp.warmwave.common.exception.CustomException;
+import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.domain.comment.dto.CommentProjectionDto;
 import com.myapp.warmwave.domain.comment.dto.CommentResponseDto;
 import com.myapp.warmwave.domain.user.dto.CacheUserDto;
-import com.myapp.warmwave.domain.user.service.UserService;
+import com.myapp.warmwave.domain.user.entity.User;
+import com.myapp.warmwave.domain.user.repository.UserRepository;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -25,7 +28,7 @@ import static com.myapp.warmwave.domain.user.entity.QUser.user;
 public class CommentListRepositoryImpl implements CommentListRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-    private final UserService userService;
+    private final UserRepository<User> userRepository;
 
     @Override
     public Page<CommentResponseDto> findComments(Pageable pageable, String sort, Long communityId) {
@@ -54,7 +57,10 @@ public class CommentListRepositoryImpl implements CommentListRepository {
 
         List<CommentResponseDto> result = new ArrayList<>();
         for (CommentProjectionDto projection : projections) {
-            CacheUserDto userCacheDTO = userService.findUserCacheDtoById(projection.getUserId());
+            CacheUserDto userCacheDTO = userRepository.findById(projection.getId())
+                    .map(usr1 -> new CacheUserDto(usr1.getId(), usr1.getName()))
+                    .orElseThrow(() -> new CustomException(CustomExceptionCode.NOT_FOUND_USER));
+
             String writer = userCacheDTO.getName();
             result.add(new CommentResponseDto(
                     projection.getId(),

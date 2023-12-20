@@ -11,6 +11,7 @@ import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.community.repository.CommunityRepository;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_USER;
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_MATCH_WRITER;
+import static com.myapp.warmwave.common.util.Utils.userIp.getUserIP;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,7 +32,8 @@ public class CommentService {
     private final UserRepository<User> userRepository;
 
     @Transactional
-    public CommentResponseDto createComment(CommentRequestDto dto, Long communityId, String userEmail) {
+    public CommentResponseDto createComment(CommentRequestDto dto, Long communityId, String userEmail, HttpServletRequest request) {
+
         Community community = validateCommunityId(communityId);
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
@@ -38,6 +42,7 @@ public class CommentService {
                 .contents(dto.getContents())
                 .community(community)
                 .user(user)
+                .userIp(getUserIP(request))
                 .build();
 
        Comment savedComment = commentRepository.save(comment);
@@ -49,9 +54,12 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto updateComment(CommentRequestDto dto, Long commentId, Long communityId) {
+    public CommentResponseDto updateComment(CommentRequestDto dto, Long commentId, Long communityId, String userEmail) {
         Comment originComment = validateCommunityAndComment(commentId, communityId);
 
+        if(!originComment.getUser().getEmail().equals(userEmail)) {
+            throw new CustomException(NOT_MATCH_WRITER);
+        }
         originComment.updateComment(dto.getContents());
         commentRepository.save(originComment);
 

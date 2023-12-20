@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginPost } from "../user/userApi";
+import { loginPost } from "../user/signup&login/userApi";
 import { getCookie, setCookie, removeCookie } from "../util/cookieUtil";
 
 const initState = {

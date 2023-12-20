@@ -133,10 +133,6 @@ public class ImageService {
 
     public void deleteImagesByCommunityId(Long communityId) {
         List<Image> imagesToDelete = imageRepository.findByCommunityId(communityId);
-        if(imagesToDelete.isEmpty()){
-            System.out.println("이미지 없음");
-            throw new CustomException(CustomExceptionCode.NOT_FOUND_IMAGE);
-        }
 
         for (Image image : imagesToDelete) {
             String fileName = image.getImgName();

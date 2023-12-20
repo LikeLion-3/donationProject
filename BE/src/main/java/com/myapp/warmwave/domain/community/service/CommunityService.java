@@ -8,22 +8,22 @@ import com.myapp.warmwave.domain.community.dto.CommunityResponseDto;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.community.mapper.CommunityMapper;
 import com.myapp.warmwave.domain.community.repository.CommunityRepository;
-import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.image.service.ImageService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_MATCH_WRITER;
+import static com.myapp.warmwave.common.util.Utils.userIp.getUserIP;
 
 @Service
 @RequiredArgsConstructor
@@ -56,10 +56,14 @@ public class CommunityService {
 //    }
 
     @Transactional
-    public CommunityResponseDto updateCommunity(Long communityId, CommunityPatchDto dto, List<MultipartFile> images) throws IOException {
+    public CommunityResponseDto updateCommunity(Long communityId, CommunityPatchDto dto, List<MultipartFile> images, String userEmail, HttpServletRequest request) throws IOException {
         System.out.println("images(service) : " + images); // null
 
         Community originCommunity = getCommunity(communityId);
+
+        if(!originCommunity.getUser().getEmail().equals(userEmail)) {
+            throw new CustomException(NOT_MATCH_WRITER);
+        }
 
         // 사진 지우고, 새로 등록하고, dto 데이터들로 업데이트 하고 세이브
         if(!CollectionUtils.isEmpty(images)) {
@@ -68,6 +72,7 @@ public class CommunityService {
         }
         communityMapper.updateCommunity(originCommunity, dto);
         originCommunity.getImages().addAll(imageService.uploadImagesForCommunity(originCommunity, images));
+        originCommunity.setUserIp(getUserIP(request));
 
         Community updatedCommunity = saveCommunity(originCommunity);
         return communityMapper.communityToCommunityResponseDto(updatedCommunity);
@@ -76,6 +81,9 @@ public class CommunityService {
     @Transactional
     public void deleteCommunity(Long communityId) {
         communityRepository.delete(getCommunity(communityId));
+
+        if(communityRepository.existsById(communityId))
+            throw new CustomException(CustomExceptionCode.FAILED_TO_REMOVE);
     }
 
     private List<String> filterImageUrls(List<String> originUrls, List<String> updatedUrls) {

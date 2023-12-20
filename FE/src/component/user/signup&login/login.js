@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import {Link} from "react-router-dom";
-import useCustomLogin from "../hooks/useCustomLogin"
+import useCustomLogin from "../../hooks/useCustomLogin"
 // import KakaoLogin from "./KakaoLogin"
+import useToast from "../../hooks/useToast";
 // nodejs library that concatenates classes
 import classnames from "classnames";
 
@@ -22,6 +23,8 @@ import {
 } from "reactstrap";
 
 function Login() {
+    const { showToast } = useToast();
+
     const [focused, setFocused] = useState({"passwordFocused": false, "emailFocused": false})
 
     const initState = {
@@ -44,9 +47,9 @@ function Login() {
                 console.log(data)
                 
                 if (data.error) {
-                    alert("이메일과 패스워드를 다시 확인하세요")
+                    showToast("이메일과 패스워드를 다시 확인하세요", 'warning')
                 } else {
-                    alert("로그인 성공")
+                    showToast("로그인 성공", 'success')
                     moveToPath("/") // 뒤로 가기 했을 때 로그인 화면을 볼 수 없도록
                 }
             })

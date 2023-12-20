@@ -2,8 +2,8 @@ package com.myapp.warmwave.domain.comment.controller;
 
 import com.myapp.warmwave.domain.comment.dto.CommentRequestDto;
 import com.myapp.warmwave.domain.comment.dto.CommentResponseDto;
-import com.myapp.warmwave.domain.comment.entity.Comment;
 import com.myapp.warmwave.domain.comment.service.CommentService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,9 +24,10 @@ public class CommentController {
     @PostMapping()
     public ResponseEntity<CommentResponseDto> createComment(@PathVariable("communityId") Long communityId,
                                                             @RequestBody CommentRequestDto dto,
-                                                            @AuthenticationPrincipal UserDetails userDetails) {
+                                                            @AuthenticationPrincipal UserDetails userDetails,
+                                                            HttpServletRequest request) {
         String userEmail = userDetails.getUsername();
-        return new ResponseEntity<>(commentService.createComment(dto, communityId, userEmail), HttpStatus.CREATED);
+        return new ResponseEntity<>(commentService.createComment(dto, communityId, userEmail, request), HttpStatus.CREATED);
 
     }
 
@@ -39,8 +40,10 @@ public class CommentController {
 
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@RequestBody CommentRequestDto dto,
-                                                            @PathVariable("commentId") Long commentId, @PathVariable Long communityId) {
-        return new ResponseEntity<>(commentService.updateComment(dto, commentId, communityId), HttpStatus.OK);
+                                                            @PathVariable("commentId") Long commentId, @PathVariable Long communityId,
+                                                            @AuthenticationPrincipal UserDetails userDetails) {
+        String userEmail = userDetails.getUsername();
+        return new ResponseEntity<>(commentService.updateComment(dto, commentId, communityId, userEmail), HttpStatus.OK);
     }
 
     @DeleteMapping("/{commentId}")

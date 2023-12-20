@@ -7,6 +7,7 @@ import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.service.UserService;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -17,16 +18,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class RequestInstitutionJoinDto {
 
     @NotBlank(message = "email은 필수 입력입니다.")
-    @Email
+    @Email(message = "email 형식으로 입력해주세요.")
     private String email;
 
     @NotBlank(message = "password는 필수 입력입니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9]{8,16}$", message = "비밀번호는 대소문자 구분 없이 영문과 숫자 8~16자여야 합니다.")
     private String password;
 
     @NotBlank(message = "기관이름은 필수 입력입니다.")
     private String institutionName;
 
     @NotBlank(message = "사업자 등록번호는 필수 입력입니다.")
+    @Pattern(regexp = "\\d{10}", message = "사업자 등록번호는 10자리 숫자로 입력해야 합니다.")
     private String registerNum;
 
     // 전체 주소

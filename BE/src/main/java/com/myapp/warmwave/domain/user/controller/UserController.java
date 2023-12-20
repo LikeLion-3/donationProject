@@ -7,21 +7,41 @@ import com.myapp.warmwave.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-@Slf4j
 public class UserController {
     private final UserService userService;
+
+    // 이메일 중복여부 확인
+    @GetMapping("/register/checkEmail")
+    public ResponseEntity<Boolean> checkUserDuplicate (@RequestParam String email){
+
+        return ResponseEntity.ok(userService.checkUserDuplicate(email));
+    }
+
+    // 닉네임 중복여부 확인
+    @GetMapping("/register/checkNickname")
+    public ResponseEntity<Boolean> checkNicknameDuplicate (@RequestParam String nickname){
+
+        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
+    }
+
+    // 이메일 인증
+    @GetMapping("/confirm-email")   //인증 URL이 담긴 이메일을 전송받은 사용자가 URL 클릭 시 해당 URI로 매핑
+    public RedirectView confirmEmail(@ModelAttribute RequestEmailAuthDto requestDto) {
+        userService.confirmEmail(requestDto);
+        return new RedirectView("/user/login");
+    }
 
     // 기관회원가입
     @PostMapping("/register/institution")
@@ -33,13 +53,6 @@ public class UserController {
     @PostMapping("/register/individual")
     public ResponseEntity<ResponseUserJoinDto> signup(@Valid @RequestBody RequestIndividualJoinDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.joinIndividual(dto));
-    }
-
-    // 이메일 인증
-    @GetMapping("/confirm-email")   //인증 URL이 담긴 이메일을 전송받은 사용자가 URL 클릭 시 해당 URI로 매핑
-    public ResponseEntity<String> confirmEmail(@ModelAttribute RequestEmailAuthDto requestDto) {
-        userService.confirmEmail(requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body("인증이 완료되었습니다.");
     }
 
     // 일반 로그인
@@ -67,7 +80,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllByIsApproveTrue());
     }
 
-    // 아직 승인되지 않은 기관 리스트 조회
+    // 미승인 기관 리스트 조회
     @GetMapping("/unapproved")
     public ResponseEntity<List<ResponseUserDto>> findAllInstitutionByUnapproved() {
         return ResponseEntity.ok(userService.findAllByIsApproveFalse());

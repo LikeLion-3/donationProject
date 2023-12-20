@@ -8,6 +8,7 @@ import com.myapp.warmwave.domain.community.mapper.CommunityMapper;
 import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_USER;
+import static com.myapp.warmwave.common.util.Utils.userIp.getUserIP;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +31,12 @@ public class CommunityFacadeService {
 
     // refactor : return Entity 말고 DTO로!
     @Transactional
-    public CommunityResponseDto createCommunity(CommunityPostDto dto, List<MultipartFile> images, String userEmail) throws IOException {
+    public CommunityResponseDto createCommunity(CommunityPostDto dto, List<MultipartFile> images, String userEmail, HttpServletRequest request) throws IOException {
         // refactor : 파라미터 dto -> 매핑 로직이 facade 따위에 의존함 + setter
         Community community = communityMapper.communityPostDtoToCommunity(dto);
         community.setUser(userRepository.findByEmail(userEmail).orElseThrow(() -> new CustomException(NOT_FOUND_USER)));
+        community.setUserIp(getUserIP(request));
+
         Community createdCommunity = communityService.saveCommunity(community);
         createdCommunity.setImages(imageService.uploadImagesForCommunity(createdCommunity, images));
         return communityMapper.communityToCommunityResponseDto(createdCommunity);

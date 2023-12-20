@@ -44,22 +44,22 @@ public class UserRepositoryTest {
     private Individual individual() {
         return Individual.builder()
                 .id(1L)
-                .email("email1")
-                .password("1234")
+                .email("email1@gmail.com")
+                .password("a1234567")
                 .role(Role.INDIVIDUAL)
                 .address(savedAddress1)
                 .temperature(0F)
                 .profileImg("이미지1")
                 .emailAuth(emailAuth1)
-                .nickname("닉네임1")
+                .nickname("닉네임")
                 .build();
     }
 
     private Institution institution() {
         return Institution.builder()
                 .id(2L)
-                .email("email2")
-                .password("12345")
+                .email("email2@gmail.com")
+                .password("a1234567")
                 .role(Role.INSTITUTION)
                 .address(savedAddress2)
                 .temperature(0F)
@@ -67,7 +67,7 @@ public class UserRepositoryTest {
                 .isApprove(false)
                 .institutionName("기관1")
                 .emailAuth(emailAuth2)
-                .registerNum("123456789")
+                .registerNum("1234567890")
                 .build();
     }
 
@@ -337,7 +337,7 @@ public class UserRepositoryTest {
         String originalNickname = savedUser.getNickname();
 
         savedUser.getAddress().update("서울 성북구 OO동", "서울", "성북구", "상세주소3");
-        savedUser.updateIndiInfo("변경된 닉네임", "12341234", addressRepository.save(savedUser.getAddress()));
+        savedUser.updateIndiInfo("변경된닉네임", "a12341234", addressRepository.save(savedUser.getAddress()));
 
         Individual updateIndividual = userRepository.save(savedUser);
 
@@ -357,8 +357,8 @@ public class UserRepositoryTest {
         String originalPassword = savedUser.getPassword();
         String originalFullAddress = savedUser.getAddress().getFullAddr();
 
-        savedUser.getAddress().update("서울 강남구 OO동", "서울", "강남구", "상세주소4");
-        savedUser.updateUserInfo("123456", addressRepository.save(savedUser.getAddress()));
+        savedUser.getAddress().update("서울 강남구 대치동", "서울", "강남구", "대치동");
+        savedUser.updateUserInfo("b1234567", addressRepository.save(savedUser.getAddress()));
 
         Institution updatedInstitution = userRepository.save(savedUser);
 

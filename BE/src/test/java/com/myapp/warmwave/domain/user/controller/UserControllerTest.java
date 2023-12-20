@@ -10,6 +10,7 @@ import com.myapp.warmwave.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,16 +18,17 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,8 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 JwtAuthFilter.class
         })
 })
+@AutoConfigureRestDocs
 @WithMockUser(roles = "USER")
-public class UserControllerTest {
+class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -48,11 +51,11 @@ public class UserControllerTest {
     void addIndiv() throws Exception {
         // given
         RequestIndividualJoinDto reqDto = new RequestIndividualJoinDto(
-                "test1@gmail.com", "1234", "개인1", "서울 강남구 OO동", "서울", "강남구", "OO동"
+                "test1@gmail.com", "a1234567", "개인", "서울 강남구 OO동", "서울", "강남구", "OO동"
         );
 
         ResponseUserJoinDto resDto = new ResponseUserJoinDto(
-                1L, "test1@gmail.com", "qqqqq"
+                1L, "test1@gmail.com", "z1234"
         );
 
         // when
@@ -64,7 +67,8 @@ public class UserControllerTest {
                         .content(new ObjectMapper().writeValueAsString(reqDto))
                         .with(csrf()))
                 .andExpect(status().isCreated())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/회원가입/개인"));
     }
 
     @DisplayName("기관 회원가입 확인")
@@ -72,11 +76,11 @@ public class UserControllerTest {
     void addInst() throws Exception {
         // given
         RequestInstitutionJoinDto reqDto = new RequestInstitutionJoinDto(
-                "test1@gmail.com", "1234", "기관1", "12345", "서울 강남구 OO동", "서울", "강남구", "OO동"
+                "test1@gmail.com", "a1234567", "기관1", "1234567890", "서울 강남구 OO동", "서울", "강남구", "OO동"
         );
 
         ResponseUserJoinDto resDto = new ResponseUserJoinDto(
-                2L, "test2@gmail.com", "wwwww"
+                2L, "test2@gmail.com", "z1234"
         );
 
         // when
@@ -88,15 +92,17 @@ public class UserControllerTest {
                         .content(new ObjectMapper().writeValueAsString(reqDto))
                         .with(csrf()))
                 .andExpect(status().isCreated())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/회원가입/기관"));
     }
 
     @DisplayName("이메일 인증 확인")
     @Test
+    @WithMockUser
     void checkEmail() throws Exception {
         // given
         RequestEmailAuthDto reqDto = new RequestEmailAuthDto(
-                "test1@gmail.com", "qqqqq"
+                "test1@gmail.com", "z1234"
         );
 
         // when
@@ -106,8 +112,9 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
                         .with(csrf()))
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andExpect(status().is3xxRedirection())
+                .andDo(print())
+                .andDo(document("user/이메일 인증"));
     }
 
     @DisplayName("로그인 확인")
@@ -115,7 +122,7 @@ public class UserControllerTest {
     void login() throws Exception {
         // given
         RequestUserLoginDto reqDto = new RequestUserLoginDto(
-                "test1@gmail.com", "1234"
+                "test1@gmail.com", "a1234567"
         );
 
         ResponseUserLoginDto resDto = new ResponseUserLoginDto(
@@ -123,7 +130,7 @@ public class UserControllerTest {
         );
 
         // when
-        when(userService.loginUser(any())).thenReturn(resDto);
+        when(userService.loginUser(any(), any())).thenReturn(resDto);
 
         // then
         mockMvc.perform(post("/api/users/login")
@@ -131,7 +138,8 @@ public class UserControllerTest {
                         .content(new ObjectMapper().writeValueAsString(reqDto))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/로그인"));
     }
 
     @DisplayName("개인 전체 조회 확인")
@@ -139,7 +147,7 @@ public class UserControllerTest {
     void readAllIndiv() throws Exception {
         // given
         ResponseUserDto resDto = new ResponseUserDto(
-                1L, "개인1", "test1@gmail.com", Role.INDIVIDUAL, 0F, true, "주소", 0, 0
+                1L, "개인", "test1@gmail.com", Role.INDIVIDUAL, 0F, true, "주소", 0, 0
         );
 
         List<ResponseUserDto> dtoList = List.of(resDto);
@@ -149,11 +157,12 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/individual")
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(dtoList))
-                        .with(csrf()))
+                        .content(new ObjectMapper().writeValueAsString(dtoList)))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/전체 조회/개인"));
     }
 
     @DisplayName("기관 전체 조회 확인")
@@ -171,11 +180,12 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/institution")
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(dtoList))
-                        .with(csrf()))
+                        .content(new ObjectMapper().writeValueAsString(dtoList)))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/전체 조회/기관"));
     }
 
     @DisplayName("유저 조회 확인")
@@ -185,7 +195,7 @@ public class UserControllerTest {
         Long userId = 1L;
 
         ResponseUserDto resDto = new ResponseUserDto(
-                1L, "개인1", "test1@gmail.com", Role.INDIVIDUAL, 0F, null, "주소", 0, 0
+                1L, "개인", "test1@gmail.com", Role.INDIVIDUAL, 0F, null, "주소", 0, 0
         );
 
         // when
@@ -193,10 +203,11 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf()))
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/단일 조회"));
     }
 
     @DisplayName("개인 단일 조회 확인")
@@ -206,7 +217,7 @@ public class UserControllerTest {
         Long userId = 1L;
 
         ResponseUserDto resDto = new ResponseUserDto(
-                1L, "개인1", "test1@gmail.com", Role.INDIVIDUAL, 0F, true, "주소", 0, 0
+                1L, "개인", "test1@gmail.com", Role.INDIVIDUAL, 0F, true, "주소", 0, 0
         );
 
         // when
@@ -214,10 +225,11 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/" + userId + "/individual")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf()))
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/단일 조회/개인"));
     }
 
     @DisplayName("기관 단일 조회 확인")
@@ -235,10 +247,11 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/" + userId + "/institution")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf()))
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/단일 조회/기관"));
     }
 
     @DisplayName("개인 정보 수정 확인")
@@ -247,7 +260,7 @@ public class UserControllerTest {
         // given
         Long userId = 1L;
         RequestIndividualUpdateDto reqDto = new RequestIndividualUpdateDto(
-                "12345", "개인 변경1", "서울 성북구 XX동", "서울", "성북구", "XX동"
+                "b1234567", "개인변경", "서울 성북구 XX동", "서울", "성북구", "XX동"
         );
 
         // when
@@ -255,11 +268,13 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/users/" + userId + "/individual")
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/정보 수정/개인"));
     }
 
     @DisplayName("기관 정보 수정 확인")
@@ -268,7 +283,7 @@ public class UserControllerTest {
         // given
         Long userId = 2L;
         RequestInstitutionUpdateDto reqDto = new RequestInstitutionUpdateDto(
-                "12345", "서울 성북구 XX동", "서울", "성북구", "XX동"
+                "b1234567", "서울 성북구 XX동", "서울", "성북구", "XX동"
         );
 
         // when
@@ -276,11 +291,13 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/users/" + userId + "/institution")
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/정보 수정/기관"));
     }
 
     @DisplayName("기관 가입 승인")
@@ -296,7 +313,8 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/기관 가입 승인"));
     }
 
     @DisplayName("회원탈퇴 확인")
@@ -308,11 +326,13 @@ public class UserControllerTest {
         // when
 
         // then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/" + userId)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/users/" + userId)
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/회원 탈퇴"));
     }
 
     @DisplayName("접속한 유저 근방 기관 조회")
@@ -332,9 +352,10 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/users/adjacent")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf()))
+                        .header("Authorization", "Bearer $(ACCESS TOKEN)")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andDo(document("user/전체 조회/지역 기반"));
     }
 }

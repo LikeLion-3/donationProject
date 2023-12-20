@@ -10,6 +10,7 @@ function Comment({ communityId }) {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const limit = 10;
+  const [newComment, setNewComment] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState("");
 
@@ -55,6 +56,30 @@ function Comment({ communityId }) {
     setComments([]);
     fetchComments();
   }, [communityId]);
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim()) {
+      alert("댓글을 입력해주세요.");
+      return;
+    }
+    try {
+      const commentData = {
+        contents: newComment
+      };
+
+      const response = await jwtAxios.post(`${API_SERVER_HOST}/api/communities/${communityId}/comments`, commentData);
+
+      console.log('Server response:', response);
+      const data = response.data;
+
+      setComments(prevComments => [...prevComments, data]);
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
+    setNewComment('');
+  };
+
 
   const handleEditClick = (comment) => {
     setEditingCommentId(comment.id);
@@ -128,20 +153,60 @@ function Comment({ communityId }) {
             display: block;
             border-bottom: 1px solid #E2E2E2;
           }
-        `}
+          .comment-submission-form {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+          }
+          .comment-submission-form textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 2px solid #E2E2E2;
+            box-sizing: border-box;
+            min-height: 40px;
+            resize: vertical;
+            transition: border-color 0.3s;
+            margin-right: 10px; // 여백 추가
+          }
+          .comment-submission-form button {
+            padding: 10px 15px;
+            background-color: #E2E2E2;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+          .comment-submission-form button:hover {
+            color: black;
+            background-color: #B0B0B0;
+         `}
       </style>
+      <div className="comment-submission-form" style={{ marginBottom: '20px' }}>
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="댓글 작성하기"
+        />
+        <button
+          onClick={handleSubmitComment}
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#999999', color: "#999999", marginRight: '10px' }}
+        >
+          작성
+        </button>
+      </div>
       <InfiniteScroll
         dataLength={comments.length}
         next={fetchComments}
         hasMore={hasMore}
-        loader={<h4>Loading...</h4>} // 댓글이 없으면 로더를 표시하지 않음
+        loader={loading && <h4>Loading...</h4>}
         endMessage={
-          <p style={{ textAlign: 'center' }}>
-            <p>마지막 댓글</p>
-          </p>
+          !hasMore && (
+            <p style={{ textAlign: 'center' }}>
+              <b>마지막 댓글</b>
+            </p>
+          )
         }
       >
-        {comments.length === 0 ? (
+        {comments.length === 0 && !loading ? (
           <p>댓글 없음</p>
         ) : (
           comments.map((comment, index) => (

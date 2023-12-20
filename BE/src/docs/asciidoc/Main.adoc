@@ -1,0 +1,18 @@
+= MAIN API 명세서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 메인 통계 API
+
+=== Request
+include::{snippets}/main/통계/http-request.adoc[]
+
+=== Response
+include::{snippets}/main/통계/http-response.adoc[]
