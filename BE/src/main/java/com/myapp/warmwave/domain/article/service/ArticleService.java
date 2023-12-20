@@ -98,6 +98,7 @@ public class ArticleService {
                 .collect(Collectors.toList());
 
         deleteImageUrls.removeAll(parsingOriginalUrls);
+        imageService.deleteImagesByUrls(deleteImageUrls);
         findArticle.applyPatch(userIp, dto, articleCategoryRepository.findByArticleId(findArticle.getId()));
         findArticle.setArticleImages(imageService.uploadImages(findArticle, dto.getFiles()));
 

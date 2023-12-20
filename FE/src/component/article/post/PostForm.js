@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import Cookies from 'js-cookie';
 import './PostForm.css';
-import jwtAxios from '../../util/jwtUtil';
+import jwtAxios, { API_SERVER_HOST } from '../../util/jwtUtil';
 
 const PostForm = () => {
   const navigate = useNavigate();
@@ -20,7 +19,7 @@ const PostForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await jwtAxios.get('http://localhost:8080/api/categories');
+        const response = await jwtAxios.get(`${API_SERVER_HOST}/api/categories`);
         const data = response.data;
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);
@@ -89,7 +88,7 @@ const PostForm = () => {
       formData.append('prodCategories', JSON.stringify(selectedCategories));
       formData.append('articleType', getSelectedType());
 
-      const response = await jwtAxios.post('http://localhost:8080/api/articles', formData);
+      const response = await jwtAxios.post(`${API_SERVER_HOST}/api/articles`, formData);
 
       const data = await response.data;
       console.log('Server response:', data);

@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Cookies from 'js-cookie';
 import './PostForm.css';
-import jwtAxios from '../../util/jwtUtil';
+import jwtAxios, { API_SERVER_HOST } from '../../util/jwtUtil';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 const PatchForm = () => {
@@ -18,6 +18,17 @@ const PatchForm = () => {
   const [verificationTypeSelected, setVerificationTypeSelected] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [originalImageUrls, setOriginalImageUrls] = useState();
+
+  const formData = new FormData();
+
+  useEffect(() => {
+    const originalImageUrls = (location.state && location.state.article && location.state.article.images)
+      ? location.state.article.images.map((image) => image.imgUrl)
+      : [];
+    setOriginalImageUrls(JSON.stringify(originalImageUrls));
+  }, [])
+
 
   useEffect(() => {
     const { article } = location.state || {};
@@ -33,7 +44,7 @@ const PatchForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await jwtAxios.get('http://localhost:8080/api/categories');
+        const response = await jwtAxios.get(`${API_SERVER_HOST}/api/categories`);
         const data = await response.data;
         const categoryNames = data.content.map(category => category.name);
         setCategories(categoryNames);
@@ -53,9 +64,32 @@ const PatchForm = () => {
   const handleRemoveImage = (index) => {
     setImages((prevImages) => {
       const newImages = [...prevImages];
-      newImages.splice(index, 1); // 선택한 인덱스의 이미지를 제거
+      const removedImage = newImages.splice(index, 1)[0]; // 선택한 인덱스의 이미지를 제거
       return newImages;
     });
+  };
+
+  const handleRemoveArticleImage = (index) => {
+    setImages((prevImages) => {
+      const newImages = [...prevImages];
+      newImages.splice(index, 1); // 배열 비구조화 할당을 사용하여 첫 번째 요소만 얻기
+      console.log('Initial Images:', newImages); // 이미지 배열 확인
+
+      const imageUrls = newImages.map((image) => image?.imgUrl);
+
+      setOriginalImageUrls(JSON.stringify(imageUrls));
+
+      return newImages;
+    });
+  };
+
+  const handleRemoveImageAndArticleImage = (index) => {
+    // 이미지 삭제
+    handleRemoveImage(index);
+    // Article 이미지 삭제
+    handleRemoveArticleImage(index);
+
+    console.log('handleRemoveImageAndArticleImage called'); // 로그 추가
   };
 
   const handleCategoryChange = (selectedCategory) => {
@@ -89,7 +123,6 @@ const PatchForm = () => {
     event.preventDefault();
 
     try {
-      const formData = new FormData();
       // 이미지가 존재하는 경우에만 FormData에 추가
       if (images.length > 0) {
         images.forEach((image, index) => {
@@ -97,16 +130,15 @@ const PatchForm = () => {
         });
       }
 
-      const originalImageUrls = (location.state && location.state.article && location.state.article.images)
-        ? location.state.article.images.map((image) => image.imgUrl)
-        : [];
-      formData.append('originalImageUrls', JSON.stringify(originalImageUrls));
       formData.append('title', title);
       formData.append('content', content);
       formData.append('prodCategories', JSON.stringify(selectedCategories));
       formData.append('articleType', getSelectedType());
+      formData.append('originalImageUrls', originalImageUrls);
 
-      const response = await jwtAxios.put(`http://localhost:8080/api/articles/${params.articleId}`, formData);
+      console.log(formData.get('originalImageUrls'))
+
+      const response = await jwtAxios.put(`${API_SERVER_HOST}/api/articles/${params.articleId}`, formData);
 
       const data = await response.data;
       console.log('Server response:', data);
@@ -207,13 +239,13 @@ const PatchForm = () => {
                         <button
                           type="button"
                           className="btn btn-danger btn-remove-image position-absolute top-0 end-0"
-                          onClick={() => handleRemoveImage(index)}
+                          onClick={() => handleRemoveImageAndArticleImage(index)}
                           style={{
-                            padding: '0.2rem 0.4rem', // 크기 조정
-                            backgroundColor: '#a9a9a9', // 연한 회색 배경색
-                            borderColor: '#a9a9a9', // 연한 회색 테두리 색
-                            color: '#fff', // 흰색 글자색
-                            fontSize: '0.8rem', // 폰트 크기 조정
+                            padding: '0.2rem 0.4rem',
+                            backgroundColor: '#a9a9a9',
+                            borderColor: '#a9a9a9',
+                            color: '#fff',
+                            fontSize: '0.8rem',
                           }}
                         >
                           X

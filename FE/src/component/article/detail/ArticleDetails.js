@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import jwtAxios from '../../util/jwtUtil';
+import jwtAxios, { API_SERVER_HOST } from '../../util/jwtUtil';
 import axios from 'axios';
 import { getCookie } from '../../util/cookieUtil';
 
@@ -12,7 +12,7 @@ const ArticleDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/articles/${params.articleId}`)
+    axios.get(`${API_SERVER_HOST}/api/articles/${params.articleId}`)
       .then(response => {
         setArticle(response.data);
       })
@@ -70,7 +70,7 @@ const ArticleDetails = () => {
     const parsedToken = userToken ? JSON.parse(decodeURIComponent(userToken)) : null;
 
     try {
-      await jwtAxios.delete(`http://localhost:8080/api/articles/${params.articleId}`);
+      await jwtAxios.delete(`${API_SERVER_HOST}/api/articles/${params.articleId}`);
 
       // 삭제 후 목록 페이지로 이동
       navigate('/donate');

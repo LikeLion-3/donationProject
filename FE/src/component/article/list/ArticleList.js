@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
-import jwtAxios from '../../util/jwtUtil';
 import axios from 'axios';
-
-
+import { API_SERVER_HOST } from '../../util/jwtUtil';
 
 const ArticleList = () => {
   const formatDate = (dateString) => {
@@ -87,7 +85,7 @@ const ArticleList = () => {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios('http://localhost:8080/api/articles?page=1&size=10');
+          const response = await axios(`${API_SERVER_HOST}/api/articles?page=1&size=10`);
           const data = await response.data;
           setProducts(data.content);
         } catch (error) {
