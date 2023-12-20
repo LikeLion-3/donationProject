@@ -36,7 +36,7 @@ const ArticleList = () => {
     }
   };
 
-  const ProductCard = ({ articleId, title, articleType, images, writer, categories, postDate }) => {
+  const ProductCard = ({ articleId, title, articleType, images, address, writer, categories, postDate }) => {
     const imageUrl = images.length > 0 ? images[0].imgUrl : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
     const badgeStyle = getArticleTypeBadgeStyle(articleType);
 
@@ -64,7 +64,7 @@ const ArticleList = () => {
                 <span key={index} className="badge bg-secondary mx-1" style={{ backgroundColor: '#ffa500' }}>{category}</span>
               ))}
               <p className="mb-1" style={{ color: '#212529', marginBottom: '1px' }}><strong>게시일 :</strong> {formatDate(postDate)}</p>
-              <p className="mb-1" style={{ color: '#212529', marginBottom: '10px' }}><strong>기부지역 :</strong> 서울시 송파구 백제고분로 7777-77</p>
+              <p className="mb-1" style={{ color: '#212529', marginBottom: '10px' }}><strong>기부지역 :</strong> {address}</p>
             </div>
             <br />
           </div>
@@ -108,6 +108,7 @@ const ArticleList = () => {
                 title={product.title}
                 categories={product.prodCategories}
                 images={product.images}
+                address={product.address}
                 writer={product.writer}
                 tags={product.articleStatus}
                 postDate={product.createdAt}

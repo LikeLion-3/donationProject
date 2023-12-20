@@ -66,6 +66,7 @@ public class ArticleMapper {
                 .articleType(article.getArticleType().getType())
                 .articleStatus(article.getArticleStatus().getStatus())
                 .images(article.getArticleImages())
+                .address(article.getUser().getAddress().parseAddressToString())
                 .createdAt(article.getCreatedAt())
                 .modifiedAt(article.getModifiedAt())
                 .build();

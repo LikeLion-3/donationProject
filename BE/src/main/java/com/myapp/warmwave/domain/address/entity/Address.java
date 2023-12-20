@@ -36,4 +36,8 @@ public class Address {
         this.sggName = sggName;
         this.details = details;
     }
+
+    public String parseAddressToString() {
+        return sdName + " " + sggName + " " + fullAddr;
+    }
 }

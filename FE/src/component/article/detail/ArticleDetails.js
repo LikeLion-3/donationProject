@@ -192,7 +192,7 @@ const ArticleDetails = () => {
             <hr style={{ borderColor: '#212529', marginTop: '1rem', marginBottom: '1rem' }} />
             <div className="d-flex justify-content-between align-items-center mb-3">
               <p className="mb-4" style={{ fontSize: '20px', color: '#212529' }}>
-                <span className="me-2" style={{ fontSize: '19px', color: '#212529', fontWeight: 'normal' }}>기부지역 :</span> 서울시 송파구 백제고분로 777-7777
+                <span className="me-2" style={{ fontSize: '19px', color: '#212529', fontWeight: 'normal' }}>기부지역 :</span> {article?.address || '로딩 중...'}
               </p>
               <button
                 className="btn"

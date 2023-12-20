@@ -31,6 +31,8 @@ public class ArticleResponseDto {
 
     private List<Image> images;
 
+    private String address;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
