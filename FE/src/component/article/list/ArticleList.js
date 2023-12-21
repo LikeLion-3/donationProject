@@ -42,14 +42,14 @@ const ArticleList = () => {
 
     return (
       <div className="col mb-4">
-        <div className="card h-100" style={{ width: '110%' }}>
+        <div className="card h-100" style={{ width: '105%'}}>
           <img
             className="card-img-top"
             src={imageUrl}
             alt="Product"
             style={{ maxWidth: '450px', height: '250px', objectFit: 'cover' }}
           />
-          <div className="card-body p-4 mb-2">
+          <div className="card-body p-4 mb-2" style={{ height: '250px' }}>
             <div className="text-left">
               <div className="badge position-absolute" style={{ top: '0.3rem', right: '0.3rem', padding: '0.5rem', ...badgeStyle }}>
                 {getArticleTypeText(articleType)}
@@ -85,7 +85,7 @@ const ArticleList = () => {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios(`${API_SERVER_HOST}/api/articles?page=1&size=10`);
+          const response = await axios(`${API_SERVER_HOST}/api/articles?page=1&size=50`);
           const data = await response.data;
           setProducts(data.content);
         } catch (error) {
@@ -97,9 +97,9 @@ const ArticleList = () => {
     }, []);
 
     return (
-      <section className="py-5">
+      <section className="py-5" style={{ marginTop: '30px' }}>
         <div className="container-fluid px-4 px-lg-5 mt-5">
-          <div className="row gx-4 gx-lg-5 row-cols-4" style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className="row gx-4 gx-lg-5 row-cols-5" style={{ display: 'flex', flexWrap: 'wrap' }}>
             {products.map(product => (
               <ProductCard
                 key={product.articleId}

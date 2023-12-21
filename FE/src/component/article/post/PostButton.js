@@ -9,7 +9,7 @@ const PostButton = () => {
   const shouldRenderButton = location.pathname === '/' || location.pathname === '/donate';
 
   return shouldRenderButton ? (
-    <Link to="/write" className="write-button" style={{ backgroundColor: '#faba96', borderColor: '#faba96' }}>
+    <Link to="/write" className="write-button" style={{ backgroundColor: '#E79873FF', borderColor: '#E79873FF' }}>
       게시글 작성
     </Link>
   ) : null;

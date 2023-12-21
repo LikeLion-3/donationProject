@@ -254,7 +254,7 @@ const PatchForm = () => {
                           src={image.imgUrl ? image.imgUrl : URL.createObjectURL(image)}
                           alt={`Preview-${index}`}
                           className="img-preview me-2 mb-2 col-lg-3 col-md-4 col-sm-6"
-                          style={{ width: '139px', height: '150px', objectFit: 'cover' }}
+                          style={{ width: '131px', height: '150px', objectFit: 'cover' }}
                         />
                       </div>
                     ))}
