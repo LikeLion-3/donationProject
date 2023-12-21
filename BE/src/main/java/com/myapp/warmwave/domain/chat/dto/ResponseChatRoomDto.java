@@ -26,6 +26,8 @@ public class ResponseChatRoomDto {
 
     private LocalDateTime deletedAt;
 
+    private Long articleId;
+
     public static ResponseChatRoomDto fromEntity(ChatRoom chatRoom) {
         List<ChatMessage> chatMessages = chatRoom.getChatMessageList();
         String lastMessageContent = chatMessages.isEmpty() ? "" : chatMessages.get(chatMessages.size() - 1).getMessage();
@@ -37,6 +39,7 @@ public class ResponseChatRoomDto {
                 .status(chatRoom.getStatus())
                 .lastMessage(lastMessageContent)
                 .deletedAt(chatRoom.getDeletedAt())
+                .articleId(chatRoom.getArticle().getId())
                 .build();
     }
 
