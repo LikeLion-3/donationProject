@@ -17,7 +17,7 @@ const useCustomLogin = () => {
 
         const action = await dispatch(loginPostAsync(loginParam))
 
-        return action.payload
+        return action
     }
 
     const moveToPath = (path) => {  // 페이지 이동

@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import {Link} from "react-router-dom";
+import styled from 'styled-components';
 import useCustomLogin from "../../hooks/useCustomLogin"
 // import KakaoLogin from "./KakaoLogin"
 import useToast from "../../hooks/useToast";
 // nodejs library that concatenates classes
 import classnames from "classnames";
+import { ReactComponent as Google } from "../../../assets/images/social/google.svg"
+import Kakao from "../../../assets/images/social/kakao.png"
+import Naver from "../../../assets/images/social/naver.png"
 
 // reactstrap components
 import {
@@ -33,7 +37,7 @@ function Login() {
     }
 
     const [loginParam, setLoginParam] = useState({...initState})
-    
+
     const {doLogin, moveToPath} = useCustomLogin()
 
     const handleChange = (e) => {
@@ -45,7 +49,7 @@ function Login() {
         doLogin(loginParam) // loginSlice의 비동기 호출
             .then(data => {
                 console.log(data)
-                
+
                 if (data.error) {
                     showToast("이메일과 패스워드를 다시 확인하세요", 'warning')
                 } else {
@@ -54,6 +58,7 @@ function Login() {
                 }
             })
     }
+
 
     return (
         <div>
@@ -74,10 +79,16 @@ function Login() {
                             <div className="transform-perspective-right">
                                 <Card className="bg-secondary shadow border-0">
                                     <CardHeader className="bg-white pb-5">
-                                        <div className="text-muted text-center mb-3">
+                                        <div className="text-muted text-center mb-3" style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
                                             <small>SNS 로그인</small>
+                                            <SSocialBox>
+                                                <NaverImg/>
+                                                <KakaoImg/>
+                                                <GoogleSVG
+                                                    viewBox="4 4 38 38"
+                                                />
+                                            </SSocialBox>
                                         </div>
-                                        {/*<KakaoLogin/>*/}
                                     </CardHeader>
                                     <CardBody className="px-lg-5 py-lg-5">
                                         <div className="text-center text-muted mb-4">
@@ -193,5 +204,42 @@ function Login() {
         </div>
     );
 }
+const SSocialBox = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 80%;
+  margin-left: auto;  
+  margin-right: auto;
+  margin-top: 30px;
+`;
 
+const NaverImg = styled.img.attrs({
+    src: Naver,
+})`
+  height: 40px;
+  width: 40px;
+  border: 1px solid black;
+  border-radius: 100%;
+  cursor: pointer;
+`;
+
+const KakaoImg = styled.img.attrs({
+    src: Kakao,
+})`
+  height: 40px;
+  width: 40px;
+  padding: 8px 6px 6px 7px;
+  border: 1px solid black;
+  border-radius: 100%;
+  cursor: pointer;
+`;
+
+const GoogleSVG = styled(Google)`
+  height: 40px;
+  width: 40px;
+  border: 1px solid black;
+  border-radius: 100%;
+  cursor: pointer;
+`;
 export default Login;

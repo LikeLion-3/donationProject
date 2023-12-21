@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
 import Logo from './logo.png';
@@ -28,7 +28,8 @@ const schema = yup.object().shape({
     registerNum: yup
         .string()
         .matches(/^\d{10}$/,'공백을 제외한 숫자만 입력해주세요')
-        .required('사업자등록번호를 입력해주세요')
+        .required('사업자등록번호를 입력해주세요'),
+    agreeTerms: yup.bool().oneOf([true], '서비스 이용약관에 동의해주세요').required()
 });
 
 const Institution_signup = () => {
@@ -39,6 +40,7 @@ const Institution_signup = () => {
     const [registerNumValid, setRegisterNumValid] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
+    const uploadRef = useRef();
 
     const {
         register,
@@ -86,7 +88,7 @@ const Institution_signup = () => {
 
         // 사업자등록번호 칸이 비어 있는지 확인
         if (!data || data.trim() === '') {
-            showToast('사업자등록번호를 입력해주세요.','warning');
+            showToast('사업자등록번호를 입력해주세요.', 'warning');
             return;
         }
 
@@ -95,7 +97,7 @@ const Institution_signup = () => {
             const res = await BusinessValidate(data);
             // 납세자상태(명칭) 01: 계속사업자,02: 휴업자, 03: 폐업자
             if (res.data && res.data.length > 0 && res.data[0].b_stt_cd === '01') {
-                showToast('사업자등록번호가 확인되었습니다.','success')
+                showToast('사업자등록번호가 확인되었습니다.', 'success')
                 setRegisterNumValid(true);
             } else if (res.data && res.data.length > 0) {
                 showToast('유효하지 않은 사업자입니다.', 'warning');
@@ -105,10 +107,10 @@ const Institution_signup = () => {
                 setRegisterNumValid(false);
             }
         } catch (error) {
-            showToast('에러가 발생했습니다.','error')
+            showToast('에러가 발생했습니다.', 'error')
         }
     }
-    
+
     const [isDaumPostOpen, setDaumPostOpen] = useState(false);
     const [addressObj, setAddressObj] = useState({});
 
@@ -139,28 +141,50 @@ const Institution_signup = () => {
         setIsModalOpen(false);
     };
 
-    const signUp = async (data) => {
+    const onSubmit = async (e) => {
 
-        const {email, password, institutionName, registerNum, agreeTerms} = data;
+        // FormData 객체 생성
+        const formData = new FormData();
 
-        if (!email && !password || !institutionName || !registerNum || !address1 || !address2 || !address3 || !agreeTerms || !emailValid || !registerNumValid) {
-            showToast('모든 항목을 입력하고 중복체크, 약관에 동의해야 회원가입이 가능합니다.', 'error');
-            return;
-        }
-
-        const auth = {
-            email: data.email,
-            password: data.password,
-            institutionName: data.institutionName,
-            registerNum: data.registerNum,
+        // 'dto' 파트 - JSON 데이터를 문자열로 변환하여 추가
+        const {email, password, institutionName, registerNum, agreeTerms} = e;
+        const dtoData = JSON.stringify({
+            email: e.email,
+            password: e.password,
+            institutionName: e.institutionName,
+            registerNum: e.registerNum,
             fullAddr: `${address1} ${address2} ${address3}`,
             sdName: address1,
             sggName: address2,
-            details: address3,
-        };
+            details: address3
+        });
+
+        formData.append('dto', new Blob([dtoData], {type: "application/json"}));
+
+        // 'file' 파트 - 이미지 파일
+        const file = uploadRef.current.files[0];
+        formData.append("file", file);
+
+        // 유효성 검사
+        if (!emailValid) {
+            showToast('이메일 중복체크를 해주세요.', 'error');
+            return;
+        }
+        if (!registerNumValid) {
+            showToast('사업자등록번호를 확인해주세요.', 'error');
+            return;
+        }
+        if (!uploadRef.current?.files[0]) {
+            showToast('사업자등록증 이미지를 업로드해주세요.', 'error');
+            return;
+        }
+        if (!getValues('agreeTerms')) {
+            showToast('서비스 이용약관에 동의해주세요.', 'error');
+            return;
+        }
 
         try {
-            const res = await authAPI.SignUpInstitution(auth);
+            const res = await authAPI.SignUpInstitution(formData);
             if (res.status === 200 || res.status === 201) {
                 showToast(
                     '이메일로 인증링크가 발송되었습니다. 링크로 인증시 회원가입이 완료됩니다.',
@@ -171,6 +195,11 @@ const Institution_signup = () => {
         } catch (error) {
             showToast('회원가입에 실패했습니다. 관리자에게 문의해주세요', 'error');
         }
+    };
+
+    const onError = (errors, e) => {
+        // 폼 제출 실패 시
+        showToast('모든 항목을 입력하고 중복체크, 조회, 사진등록, 약관동의해야 회원가입이 가능합니다.', 'error');
     };
 
     useEffect(() => {
@@ -185,7 +214,7 @@ const Institution_signup = () => {
             clearErrors('email', {type: 'custom'});
         }
     }, [emailValid]);
-    
+
     useEffect(() => {
         const registerNum = getValues('registerNum');
         if (!registerNum || registerNum.trim() === '') {
@@ -207,8 +236,9 @@ const Institution_signup = () => {
                             <img src={Logo} alt="logo"/>
                         </StLogo>
                     </Top>
+                    <br/><br/><br/>
                     <Main>
-                        <form onSubmit={handleSubmit(signUp)}>
+                        <form onSubmit={handleSubmit(onSubmit, onError)}>
                             <Title>복지기관 회원가입</Title>
                             <StLabel>
                                 <label>이메일</label>
@@ -222,6 +252,7 @@ const Institution_signup = () => {
                                     {...register('email', {required: true})}
                                 />
                                 <StButton
+                                    type="button"
                                     disabled={!getValues('email') || errors.email}
                                     className="emailBtn"
                                     onClick={checkEmailDuplicated}
@@ -268,6 +299,7 @@ const Institution_signup = () => {
                                     {...register('registerNum', {required: true})}
                                 />
                                 <StButton
+                                    type="button"
                                     disabled={!getValues('registerNum') || errors.registerNum}
                                     className="registerNumBtn"
                                     onClick={handleBusinessValidation}
@@ -276,6 +308,18 @@ const Institution_signup = () => {
                                 </StButton>
                             </InputBox>
                             <Typography>{errors.registerNum?.message}</Typography>
+                            <StLabel>
+                                <label htmlFor="uploadImage">사업자등록증 이미지 추가</label>
+                            </StLabel>
+                            <InputBox>
+                                <StInput
+                                    ref={uploadRef}
+                                    name="uploadImage"
+                                    className="uploadImage"
+                                    type={'file'}
+                                    multiple={false}
+                                />
+                            </InputBox>
                             <AddressGroup>
                                 <StAddressLabel>
                                     <label>시/도</label>
@@ -354,8 +398,8 @@ const StLayout = styled.div`
 `;
 
 const StContainer = styled.div`
-  max-width: 450px;
-  min-height: 992px;
+  max-width: 500px;
+  height: 100%;
   width: 100%;
   margin: 0 auto;
   display: flex;

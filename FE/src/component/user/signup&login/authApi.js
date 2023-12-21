@@ -30,9 +30,9 @@ const useAuthAPI = () => {
         }
     };
 
-    const SignUpInstitution = async (auth) => {
+    const SignUpInstitution = async (formData) => {
         try {
-            const response = await instance.post(`/api/users/register/institution`, auth);
+            const response = await instance.post(`/api/users/register/institution`, formData);
             return response;
         } catch (error) {
             showToast('에러가 발생했습니다');

@@ -31,7 +31,8 @@ const schema = yup.object().shape({
         .matches(
             /^(?=.*[가-힣])[^\s]*$/,
             "공백을 제외한 한글만 입력해주세요"
-        )
+        ),
+    agreeTerms: yup.bool().oneOf([true], '서비스 이용약관에 동의해주세요').required()
 });
 
 const Individual_signup = () => {
@@ -140,14 +141,9 @@ const Individual_signup = () => {
         setIsModalOpen(false);
     };
 
-    const signUp = async (data) => {
+    const onSubmit = async (data) => {
 
         const {email, password, nickname, agreeTerms} = data;
-
-        if (!email && !password || !nickname || !address1 || !address2 || !address3 || !agreeTerms || !emailValid || !nicknameValid) {
-            showToast('모든 항목을 입력하고 중복체크, 약관에 동의해야 회원가입이 가능합니다.', 'error');
-            return;
-        }
 
         const auth = {
             email: data.email,
@@ -158,6 +154,16 @@ const Individual_signup = () => {
             sggName: address2,
             details: address3,
         };
+
+        // 유효성 검사
+        if (!emailValid) {
+            showToast('이메일 중복체크를 해주세요.', 'error');
+            return;
+        }
+        if (!getValues('agreeTerms')) {
+            showToast('서비스 이용약관에 동의해주세요.', 'error');
+            return;
+        }
 
         try {
             const res = await authAPI.SignUpIndividual(auth);
@@ -171,6 +177,11 @@ const Individual_signup = () => {
         } catch (error) {
             showToast('회원가입에 실패했습니다. 관리자에게 문의해주세요', 'error');
         }
+    };
+
+    const onError = (errors, e) => {
+        // 폼 제출 실패 시
+        showToast('모든 항목을 입력하고 중복체크, 조회, 사진등록, 약관동의해야 회원가입이 가능합니다.', 'error');
     };
 
     useEffect(() => {
@@ -209,7 +220,7 @@ const Individual_signup = () => {
                         </StLogo>
                     </Top>
                     <Main>
-                        <form onSubmit={handleSubmit(signUp)}>
+                        <form onSubmit={handleSubmit(onSubmit, onError)}>
                             <Title>회원가입</Title>
                             <StLabel>
                                 <label>이메일</label>
@@ -223,6 +234,7 @@ const Individual_signup = () => {
                                     {...register('email', {required: true})}
                                 />
                                 <StButton
+                                    type="button"
                                     disabled={!getValues('email') || errors.email}
                                     className="emailBtn"
                                     onClick={checkEmailDuplicated}
@@ -257,6 +269,7 @@ const Individual_signup = () => {
                                     {...register('nickname', {required: true})}
                                 />
                                 <StButton
+                                    type="button"
                                     disabled={!getValues('nickname') || errors.nickname}
                                     className="nicknameBtn"
                                     onClick={checkNicknameDuplicated}
