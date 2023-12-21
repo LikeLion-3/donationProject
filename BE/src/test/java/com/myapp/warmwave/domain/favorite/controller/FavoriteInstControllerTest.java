@@ -59,7 +59,7 @@ class FavoriteInstControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("favoriteInst/관심기관 등록"));
+                .andDo(document("favoriteInst/관심기관_등록"));
     }
 
     @DisplayName("관심 기관 목록 확인")
@@ -84,7 +84,7 @@ class FavoriteInstControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("favoriteInst/관심기관 목록 조회"));
+                .andDo(document("favoriteInst/관심기관_목록_조회"));
     }
 
     @DisplayName("관심 기관 삭제 확인")
@@ -103,6 +103,6 @@ class FavoriteInstControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("favoriteInst/관심기관 삭제"));
+                .andDo(document("favoriteInst/관심기관_삭제"));
     }
 }

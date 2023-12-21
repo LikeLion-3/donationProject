@@ -69,7 +69,7 @@ class CategoryControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("category/카테고리 생성"));
+                .andDo(document("category/카테고리_생성"));
     }
 
     @DisplayName("카테고리 목록 조회")
@@ -88,7 +88,7 @@ class CategoryControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("category/카테고리 목록 조회"));
+                .andDo(document("category/카테고리_목록_조회"));
     }
 
     @DisplayName("카테고리 삭제")
@@ -107,6 +107,6 @@ class CategoryControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("category/카테고리 삭제"));
+                .andDo(document("category/카테고리_삭제"));
     }
 }

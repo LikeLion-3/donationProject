@@ -59,6 +59,6 @@ class ChatMessageControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("chat/채팅 메시지 저장"));
+                .andDo(document("chat/채팅_메시지_저장"));
     }
 }

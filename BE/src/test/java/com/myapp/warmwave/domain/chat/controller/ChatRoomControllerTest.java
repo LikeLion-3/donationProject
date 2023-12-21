@@ -88,7 +88,7 @@ class ChatRoomControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("chat/채팅방 목록 조회"));
+                .andDo(document("chat/채팅방_목록_조회"));
     }
 
     @DisplayName("채팅방 삭제 확인")
@@ -106,6 +106,6 @@ class ChatRoomControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("chat/채팅방 삭제"));
+                .andDo(document("chat/채팅방_삭제"));
     }
 }

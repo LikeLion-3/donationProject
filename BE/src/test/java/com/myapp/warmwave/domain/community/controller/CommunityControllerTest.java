@@ -175,6 +175,6 @@ class CommunityControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("article/게시글_삭제"));
+                .andDo(document("community/게시글_삭제"));
     }
 }

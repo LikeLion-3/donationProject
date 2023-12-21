@@ -122,7 +122,7 @@ class UserControllerTest {
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andDo(print())
-                .andDo(document("user/이메일 인증"));
+                .andDo(document("user/이메일_인증"));
     }
 
     @DisplayName("로그인 확인")
@@ -170,7 +170,7 @@ class UserControllerTest {
                         .content(new ObjectMapper().writeValueAsString(dtoList)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/전체 조회/개인"));
+                .andDo(document("user/전체_조회/개인"));
     }
 
     @DisplayName("기관 전체 조회 확인")
@@ -193,7 +193,7 @@ class UserControllerTest {
                         .content(new ObjectMapper().writeValueAsString(dtoList)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/전체 조회/기관"));
+                .andDo(document("user/전체_조회/기관"));
     }
 
     @DisplayName("유저 조회 확인")
@@ -215,7 +215,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/단일 조회"));
+                .andDo(document("user/단일_조회"));
     }
 
     @DisplayName("개인 단일 조회 확인")
@@ -237,7 +237,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/단일 조회/개인"));
+                .andDo(document("user/단일_조회/개인"));
     }
 
     @DisplayName("기관 단일 조회 확인")
@@ -259,7 +259,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/단일 조회/기관"));
+                .andDo(document("user/단일_조회/기관"));
     }
 
     @DisplayName("개인 정보 수정 확인")
@@ -282,7 +282,7 @@ class UserControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/정보 수정/개인"));
+                .andDo(document("user/정보_수정/개인"));
     }
 
     @DisplayName("기관 정보 수정 확인")
@@ -305,7 +305,7 @@ class UserControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/정보 수정/기관"));
+                .andDo(document("user/정보_수정/기관"));
     }
 
     @DisplayName("기관 가입 승인")
@@ -322,7 +322,7 @@ class UserControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("user/기관 가입 승인"));
+                .andDo(document("user/기관_가입_승인"));
     }
 
     @DisplayName("회원탈퇴 확인")
@@ -340,7 +340,7 @@ class UserControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("user/회원 탈퇴"));
+                .andDo(document("user/회원_탈퇴"));
     }
 
     @DisplayName("접속한 유저 근방 기관 조회")
@@ -364,6 +364,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/전체 조회/지역 기반"));
+                .andDo(document("user/전체_조회/지역_기반"));
     }
 }

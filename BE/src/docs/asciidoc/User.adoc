@@ -28,10 +28,10 @@ include::{snippets}/user/회원가입/기관/http-response.adoc[]
 == 이메일 인증
 
 === Request
-include::{snippets}/user/이메일 인증/http-request.adoc[]
+include::{snippets}/user/이메일_인증/http-request.adoc[]
 
 === Response
-include::{snippets}/user/이메일 인증/http-response.adoc[]
+include::{snippets}/user/이메일_인증/http-response.adoc[]
 
 == 로그인
 
@@ -44,87 +44,87 @@ include::{snippets}/user/로그인/http-response.adoc[]
 == 개인 전체 조회
 
 === Request
-include::{snippets}/user/전체 조회/개인/http-request.adoc[]
+include::{snippets}/user/전체_조회/개인/http-request.adoc[]
 
 === Response
-include::{snippets}/user/전체 조회/개인/http-response.adoc[]
+include::{snippets}/user/전체_조회/개인/http-response.adoc[]
 
 == 기관 전체 조회
 
 === Request
-include::{snippets}/user/전체 조회/기관/http-request.adoc[]
+include::{snippets}/user/전체_조회/기관/http-request.adoc[]
 
 === Response
-include::{snippets}/user/전체 조회/기관/http-response.adoc[]
+include::{snippets}/user/전체_조회/기관/http-response.adoc[]
 
 == 지역 기반 기관 전체 조회
 
 === Request
-include::{snippets}/user/전체 조회/지역 기반/http-request.adoc[]
+include::{snippets}/user/전체_조회/지역_기반/http-request.adoc[]
 
 === Response
-include::{snippets}/user/전체 조회/지역 기반/http-response.adoc[]
+include::{snippets}/user/전체_조회/지역_기반/http-response.adoc[]
 
 == 단일 조회
 
 === Request
-include::{snippets}/user/단일 조회/http-request.adoc[]
+include::{snippets}/user/단일_조회/http-request.adoc[]
 
 === Response
-include::{snippets}/user/단일 조회/http-response.adoc[]
+include::{snippets}/user/단일_조회/http-response.adoc[]
 
 == 단일 조회 (개인)
 
 === Request
-include::{snippets}/user/단일 조회/개인/http-request.adoc[]
+include::{snippets}/user/단일_조회/개인/http-request.adoc[]
 
 === Response
-include::{snippets}/user/단일 조회/개인/http-response.adoc[]
+include::{snippets}/user/단일_조회/개인/http-response.adoc[]
 
 == 단일 조회 (기관)
 
 === Request
-include::{snippets}/user/단일 조회/기관/http-request.adoc[]
+include::{snippets}/user/단일_조회/기관/http-request.adoc[]
 
 === Response
-include::{snippets}/user/단일 조회/기관/http-response.adoc[]
+include::{snippets}/user/단일_조회/기관/http-response.adoc[]
 
 == 정보 수정 (개인)
 
 === Request
-include::{snippets}/user/정보 수정/개인/http-request.adoc[]
+include::{snippets}/user/정보_수정/개인/http-request.adoc[]
 
 === Response
-include::{snippets}/user/정보 수정/개인/http-response.adoc[]
+include::{snippets}/user/정보_수정/개인/http-response.adoc[]
 
 == 정보 수정 (기관)
 
 === Request
-include::{snippets}/user/정보 수정/기관/http-request.adoc[]
+include::{snippets}/user/정보_수정/기관/http-request.adoc[]
 
 === Response
-include::{snippets}/user/정보 수정/기관/http-response.adoc[]
+include::{snippets}/user/정보_수정/기관/http-response.adoc[]
 
 == 기관 가입 승인
 
 === Request
-include::{snippets}/user/기관 가입 승인/http-request.adoc[]
+include::{snippets}/user/기관_가입_승인/http-request.adoc[]
 
 === Response
-include::{snippets}/user/기관 가입 승인/http-response.adoc[]
+include::{snippets}/user/기관_가입_승인/http-response.adoc[]
 
 == 기관 가입 승인
 
 === Request
-include::{snippets}/user/기관 가입 승인/http-request.adoc[]
+include::{snippets}/user/기관_가입_승인/http-request.adoc[]
 
 === Response
-include::{snippets}/user/기관 가입 승인/http-response.adoc[]
+include::{snippets}/user/기관_가입_승인/http-response.adoc[]
 
 == 회원 탈퇴
 
 === Request
-include::{snippets}/user/회원 탈퇴/http-request.adoc[]
+include::{snippets}/user/회원_탈퇴/http-request.adoc[]
 
 === Response
-include::{snippets}/user/회원 탈퇴/http-response.adoc[]
+include::{snippets}/user/회원_탈퇴/http-response.adoc[]
