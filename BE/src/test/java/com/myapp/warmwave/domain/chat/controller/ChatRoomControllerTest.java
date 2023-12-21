@@ -73,7 +73,7 @@ class ChatRoomControllerTest {
     void readAllChatroom() throws Exception {
         // given
         ResponseChatRoomDto resDto = new ResponseChatRoomDto(
-                1L, "기부자1", "수여자1", "제목", "상태", "메시지", null
+                1L, "기부자1", "수여자1", "제목", "상태", "메시지", null, 1L
         );
 
         List<ResponseChatRoomDto> chatRoomDtoList = List.of(resDto);
