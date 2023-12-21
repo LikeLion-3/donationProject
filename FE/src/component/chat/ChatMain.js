@@ -25,26 +25,36 @@ function ChatMain() {
   const [messageInputValue, setMessageInputValue] = useState("");
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [stompClient, setStompClient] = useState(null);
-  const [selectedConversation, setSelectedConversation] = useState({}); // Initialize as an empty object
-
-  const stompRef = useRef(null);
+  const socket = useRef(null);
+  const stompClient = useRef(null);
+  const [selectedConversation, setSelectedConversation] = useState({});
 
   const cookieValue = Cookies.get("user");
   const userObject = JSON.parse(cookieValue);
   const userId = userObject.id;
   const userName = userObject.name;
 
+  const connectToWebSocket = () => {
+    if (!stompClient.current) {
+      socket.current = new SockJS(`${API_SERVER_HOST}/ws`);
+      stompClient.current = Stomp.over(socket.current);
+
+      stompClient.current.connect({}, () => {
+        // 연결 후 추가 로직이 필요한 경우에 추가합니다.
+      });
+    }
+  };
+
   const subscribeToTopic = (id) => {
-    if (stompClient) {
+    if (stompClient.current) {
       if (userId) {
-        stompClient.subscribe(`/topic/messages/${id}`, (message) => {
+        stompClient.current.subscribe(`/topic/messages/${id}`, (message) => {
           console.log(message.body);
           const receivedMessage = JSON.parse(message.body);
           setMessages((prevMessages) => [...prevMessages, receivedMessage]);
         });
 
-        setSelectedConversation({ ...selectedConversation, id }); // Update the id in the selectedConversation object
+        setSelectedConversation({ ...selectedConversation, id });
       } else {
         console.error("Access token not found or undefined in the user cookie.");
       }
@@ -52,7 +62,7 @@ function ChatMain() {
   };
 
   useEffect(() => {
-    // Fetch data using Axios when the component mounts
+    // Axios를 사용하여 데이터를 가져옵니다.
     jwtAxios
       .get(`${API_SERVER_HOST}/api/chatRoom`)
       .then((response) => {
@@ -62,27 +72,22 @@ function ChatMain() {
         console.error("Error fetching data:", error);
       });
 
-    // Connect to WebSocket if not already connected
-    if (!stompRef.current) {
-      const socket = new SockJS(`${API_SERVER_HOST}/ws`);
-      const stomp = Stomp.over(socket);
-
-      stomp.connect({}, () => {
-        setStompClient(stomp);
-      });
-
-      stompRef.current = stomp; // Store the stomp instance in the ref
-    }
+    // WebSocket에 연결합니다.
+    connectToWebSocket();
 
     return () => {
-      // Disconnect on unmount
-      if (stompRef.current && stompRef.current.connected) {
-        stompRef.current.disconnect();
+      // 언마운트 시 연결을 끊습니다.
+      if (stompClient.current && stompClient.current.connected) {
+        stompClient.current.disconnect();
       }
     };
   }, []);
 
   const handleConversationClick = (conversation) => {
+    if (conversation.id === selectedConversation.id) {
+      return; // 이미 선택된 채팅방인 경우 처리 중단
+    }
+
     setSelectedConversation(conversation);
     subscribeToTopic(conversation.id);
 
@@ -101,7 +106,7 @@ function ChatMain() {
   };
 
   const sendMessage = (id) => {
-    if (stompClient && userId) {
+    if (stompClient.current && userId) {
       const messageObject = {
         roomId: id,
         userId: userId,
@@ -109,10 +114,8 @@ function ChatMain() {
         content: messageInputValue,
       };
 
-      // Send the message to the server
-      stompClient.send(`/app/chat/${id}`, {}, JSON.stringify(messageObject));
+      stompClient.current.send(`/app/chat/${id}`, {}, JSON.stringify(messageObject));
 
-      // Update the state only after the message has been sent
       setMessageInputValue("");
     } else {
       console.error("WebSocket connection not yet established or user ID is missing.");
@@ -124,18 +127,15 @@ function ChatMain() {
       console.log("Sending request with payload:", { articleStatus, conversationId });
 
       if (conversationId) {
-        // Check if conversationId has a value before making the API call
         const response = await jwtAxios.put(`${API_SERVER_HOST}/api/articles/status/${conversationId}?articleStatus=${articleStatus}`, {
           articleStatus: articleStatus,
         });
 
-        // Handle the API response as needed
         console.log("API Response:", response.data);
       } else {
         console.error("No conversationId available.");
       }
     } catch (error) {
-      // Handle errors
       console.error("API Error:", error);
     }
   };
@@ -175,7 +175,7 @@ function ChatMain() {
                     position: "single",
                   }}
                 >
-                  {msg.sender !== userName && <Avatar src={require("../../assets/images/p.png")} name={msg.sender} />} {/* Replace with the appropriate property */}
+                  {msg.sender !== userName && <Avatar src={require("../../assets/images/p.png")} name={msg.sender} />}
                 </Message>
               ))}
             </MessageList>
@@ -183,7 +183,7 @@ function ChatMain() {
               placeholder="Type message here"
               value={messageInputValue}
               onChange={(val) => setMessageInputValue(val)}
-              onSend={() => selectedConversation?.id && sendMessage(selectedConversation.id)} // Check if id exists
+              onSend={() => selectedConversation?.id && sendMessage(selectedConversation.id)}
             />
           </ChatContainer>
         </MainContainer>
@@ -191,7 +191,7 @@ function ChatMain() {
           {selectedConversation?.id && (
             <>
               <button onClick={() => handleArticleStatusButtonClick("완료", selectedConversation.id)}>기부완료</button>
-              <button onClick={() => handleArticleStatusButtonClick("기본", selectedConversation.id)}>기부중단 </button>
+              <button onClick={() => handleArticleStatusButtonClick("기본", selectedConversation.id)}>기부중단</button>
             </>
           )}
         </div>
