@@ -46,10 +46,6 @@ spring:
           starttls:
             enable: true
           auth: true
-
-image:
-  upload:
-    path: file:/Users/wook/Desktop/project/donationProject/FE/public/images
 custom:
   jwt:
     access:

@@ -7,6 +7,8 @@ import com.myapp.warmwave.domain.community.dto.CommunityResponseDto;
 import com.myapp.warmwave.domain.community.service.CommunityFacadeService;
 import com.myapp.warmwave.domain.community.service.CommunityService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +35,7 @@ public class CommunityController {
         this.communityService = communityService;
     }
     @PostMapping("")
-    public ResponseEntity<CommunityResponseDto> createCommunity(@ModelAttribute CommunityPostDto dto,
+    public ResponseEntity<CommunityResponseDto> createCommunity(@Valid @ModelAttribute CommunityPostDto dto,
                                                                 List<MultipartFile> images,
                                                                 @AuthenticationPrincipal UserDetails userDetails,
                                                                 HttpServletRequest request) throws IOException {
@@ -43,8 +45,8 @@ public class CommunityController {
     }
 
     @PutMapping("/{communityId}")
-    public ResponseEntity<CommunityResponseDto> updateCommunity(@PathVariable("communityId") Long communityId,
-                                                                @ModelAttribute CommunityPatchDto dto,
+    public ResponseEntity<CommunityResponseDto> updateCommunity(@Min(1) @PathVariable("communityId") Long communityId,
+                                                                @Valid @ModelAttribute CommunityPatchDto dto,
                                                                 List<MultipartFile> images,
                                                                 @AuthenticationPrincipal UserDetails userDetails,
                                                                 HttpServletRequest request) throws IOException {
@@ -62,14 +64,8 @@ public class CommunityController {
         return new ResponseEntity<>(communityService.getAllCommunities(pageable, sort), HttpStatus.OK);
     }
 
-//    JPA
-//    @GetMapping("")
-//    public ResponseEntity<Slice<CommunityResponseDto>> getCommunities(@PageableDefault(size=10) Pageable pageable) {
-//        return new ResponseEntity<>(communityService.findAll(pageable), HttpStatus.OK);
-//    }
-
     @DeleteMapping("/{communityId}")
-    public ResponseEntity deleteMapping(@PathVariable("communityId") Long communityId) {
+    public ResponseEntity deleteMapping(@Min(1) @PathVariable("communityId") Long communityId) {
         communityFacadeService.deleteCommunity(communityId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -18,9 +18,11 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -78,18 +80,24 @@ class UserControllerTest {
         RequestInstitutionJoinDto reqDto = new RequestInstitutionJoinDto(
                 "test1@gmail.com", "a1234567", "기관1", "1234567890", "서울 강남구 OO동", "서울", "강남구", "OO동"
         );
+        MockMultipartFile jsonFile = new MockMultipartFile(
+                "dto", "", "application/json", new ObjectMapper().writeValueAsBytes(reqDto)
+        );
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "file", "test-image.jpg", "image/jpeg", "Test Image Content".getBytes()
+        );
 
         ResponseUserJoinDto resDto = new ResponseUserJoinDto(
                 2L, "test2@gmail.com", "z1234"
         );
 
         // when
-        when(userService.joinInstitution(any())).thenReturn(resDto);
+        when(userService.joinInstitution((any(RequestInstitutionJoinDto.class)), any(MultipartFile.class))).thenReturn(resDto);
 
         // then
-        mockMvc.perform(post("/api/users/register/institution")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(reqDto))
+        mockMvc.perform(multipart("/api/users/register/institution")
+                        .file(jsonFile)
+                        .file(imageFile)
                         .with(csrf()))
                 .andExpect(status().isCreated())
                 .andDo(print())

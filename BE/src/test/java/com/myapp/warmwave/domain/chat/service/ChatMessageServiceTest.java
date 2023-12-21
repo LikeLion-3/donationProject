@@ -79,7 +79,7 @@ public class ChatMessageServiceTest {
         ChatMessageDto reqDto = saveChatMessage();
 
         // when
-        ResponseChatMessageDto resDto = chatMessageService.saveMessage(reqDto, roomId, email);
+        ResponseChatMessageDto resDto = chatMessageService.saveMessage(reqDto);
 
         // then
         assertThat(resDto).isNotNull();
@@ -92,7 +92,7 @@ public class ChatMessageServiceTest {
         String roomId = "1";
         String email = "test@gmail.com";
         ChatMessageDto reqDto = saveChatMessage();
-        chatMessageService.saveMessage(reqDto, roomId, email);
+        chatMessageService.saveMessage(reqDto);
 
         List<ChatMessage> messageList = List.of(chatMessage);
         when(chatMessageRepository.findAllByChatroomId(any())).thenReturn(messageList);
@@ -105,7 +105,7 @@ public class ChatMessageServiceTest {
     }
 
     private ChatMessageDto saveChatMessage() {
-        ChatMessageDto reqDto = new ChatMessageDto("내용1", "보낸 사람");
+        ChatMessageDto reqDto = new ChatMessageDto(1L,2L,"내용1", "보낸 사람");
 
         // Authentication 은 어떻게 검증해야하지? 이렇게 하는거 맞나..?!
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(

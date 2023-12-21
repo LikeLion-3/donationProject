@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import './CommunityList.css';
+import { CommunityCategoryStyles } from '../CommunityCategoryStyles';
 import Pagination from "react-js-pagination";
 import { useSelector } from 'react-redux';
 import jwtAxios from '../../util/jwtUtil';
@@ -88,7 +89,7 @@ const CommunityList = () => {
 						<div className="mb-3">
 							<div className="d-flex justify-content-between align-items-center mb-3">
 								<div>
-									<button className="btn " onClick={() => handleSort('recent')} style={{ backgroundColor: '#FABA96', borderColor: '#fff', color: "#FFFFFF", marginRight: '8px'}}>최신순</button>
+									<button className="btn " onClick={() => handleSort('recent')} style={{ backgroundColor: '#FABA96', borderColor: '#fff', color: "#FFFFFF", marginRight: '8px' }}>최신순</button>
 									<button className="btn btn-primary" onClick={() => handleSort('popular')} style={{ backgroundColor: '#FABA96', borderColor: '#fff', color: "#FFFFFF" }}>조회순</button>
 									<Pagination
 										activePage={page}
@@ -134,8 +135,19 @@ const CommunityList = () => {
 							<tbody>
 								{posts.map(post => (
 									<tr key={post.id}>
-										<td>{post.category}</td>
-										<td style={{ textAlign: 'center' }}>{post.writer}</td>
+										<td>
+											<span
+												style={{
+													...CommunityCategoryStyles[post.category],
+													cursor: 'pointer',
+													padding: '0.4em 0.6em', // 패딩을 줄여서 뱃지 크기 감소
+													fontSize: '0.8rem', // 폰트 크기 감소
+													borderRadius: '0.25rem' // 둥근 모서리 반경 감소
+												}}
+											>
+												{post.category}
+											</span>
+										</td>										<td style={{ textAlign: 'center' }}>{post.writer}</td>
 										<td><Link to={`/community/${post.id}`} className="black-link">{post.title}</Link></td>
 										<td style={{ textAlign: 'center' }}>{formatDate(post.createdAt)}</td>
 										<td style={{ textAlign: 'center' }}>{post.hit}</td>

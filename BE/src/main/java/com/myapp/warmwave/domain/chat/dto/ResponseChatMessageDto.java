@@ -19,7 +19,7 @@ public class ResponseChatMessageDto {
     public static ResponseChatMessageDto fromEntity(ChatMessage chatMessage) {
         return ResponseChatMessageDto.builder()
                 .id(chatMessage.getId())
-                .sender(chatMessage.getChatroom().getDonor().getNickname())
+                .sender(chatMessage.getSender().getName())
                 .content(chatMessage.getMessage())
                 .build();
     }

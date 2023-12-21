@@ -24,12 +24,12 @@ public class ChatMessageService {
     private final UserRepository<User> userRepository;
 
     @Transactional
-    public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto, String roomId, String email) {
+    public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findById(chatMessageDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다"));
 
-        ChatRoom chatRoom = chatRoomRepository.findById(Long.valueOf(roomId))
+        ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다"));
 
         ChatMessage chatMessage = ChatMessage.builder().chatroom(chatRoom).sender(user).message(chatMessageDto.getContent()).timestamp((new Date())).build();

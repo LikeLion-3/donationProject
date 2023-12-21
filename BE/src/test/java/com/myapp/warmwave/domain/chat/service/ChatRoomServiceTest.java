@@ -75,7 +75,7 @@ public class ChatRoomServiceTest {
         ChatRoomDto reqDto = saveChatRoom();
 
         // when
-        ResponseCreateChatRoomDto resDto = chatRoomService.createChatRoom(reqDto);
+        ResponseCreateChatRoomDto resDto = chatRoomService.createChatRoom(reqDto,1L);
 
         // then
         assertThat(resDto).isNotNull();
@@ -86,7 +86,7 @@ public class ChatRoomServiceTest {
     void readAllChatroom() {
         // given
         ChatRoomDto reqDto = saveChatRoom();
-        chatRoomService.createChatRoom(reqDto);
+        chatRoomService.createChatRoom(reqDto,1L);
 
         List<ChatRoom> chatRoomList = List.of(chatRoom);
         when(chatRoomRepository.findAll()).thenReturn(chatRoomList);
@@ -103,7 +103,7 @@ public class ChatRoomServiceTest {
     void deleteChatroom() {
         // given
         ChatRoomDto reqDto = saveChatRoom();
-        chatRoomService.createChatRoom(reqDto);
+        chatRoomService.createChatRoom(reqDto,1L);
 
         Long roomId = 1L;
         when(chatRoomRepository.findById(any())).thenReturn(Optional.of(chatRoom));
@@ -116,7 +116,7 @@ public class ChatRoomServiceTest {
     }
 
     private ChatRoomDto saveChatRoom() {
-        ChatRoomDto reqDto = new ChatRoomDto(1L, 1L, 2L);
+        ChatRoomDto reqDto = new ChatRoomDto(1L, 1L);
 
         when(userRepository.findById(2L)).thenReturn(Optional.of(institution));
         when(userRepository.findById(1L)).thenReturn(Optional.of(individual));

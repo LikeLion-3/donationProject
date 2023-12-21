@@ -12,8 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -45,8 +47,9 @@ public class UserController {
 
     // 기관회원가입
     @PostMapping("/register/institution")
-    public ResponseEntity<ResponseUserJoinDto> register(@RequestBody RequestInstitutionJoinDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.joinInstitution(dto));
+    public ResponseEntity<ResponseUserJoinDto> register(@RequestPart("dto") RequestInstitutionJoinDto dto, @RequestPart("file")MultipartFile file) throws IOException {
+        ResponseUserJoinDto response = userService.joinInstitution(dto, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 개인회원가입

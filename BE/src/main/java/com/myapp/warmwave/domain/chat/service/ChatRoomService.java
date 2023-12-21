@@ -7,8 +7,6 @@ import com.myapp.warmwave.domain.chat.dto.ResponseChatRoomDto;
 import com.myapp.warmwave.domain.chat.dto.ResponseCreateChatRoomDto;
 import com.myapp.warmwave.domain.chat.entity.ChatRoom;
 import com.myapp.warmwave.domain.chat.repository.ChatRoomRepository;
-import com.myapp.warmwave.domain.user.entity.Individual;
-import com.myapp.warmwave.domain.user.entity.Institution;
 import com.myapp.warmwave.domain.user.entity.User;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +24,16 @@ public class ChatRoomService {
     private final ArticleRepository articleRepository;
 
     @Transactional
-    public ResponseCreateChatRoomDto createChatRoom(ChatRoomDto requestDto) {
-        Institution recipient = userRepository.findById(requestDto.getRecipientId())
-                .map(Institution.class::cast)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재 하지 않습니다"));
+    public ResponseCreateChatRoomDto createChatRoom(ChatRoomDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
 
-        Individual doner = userRepository.findById(requestDto.getDonerId())
-                .map(Individual.class::cast)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재 하지 않습니다"));
+        User otherUser = userRepository.findById(requestDto.getOtherId())
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
 
         Article article = articleRepository.findById(requestDto.getArticleId()).orElseThrow();
 
-        ChatRoom chatRoom = ChatRoom.builder().donor(doner).recipient(recipient).article(article).build();
+        ChatRoom chatRoom = ChatRoom.builder().donor(user).recipient(otherUser).article(article).build();
 
         return ResponseCreateChatRoomDto.fromEntity(chatRoomRepository.save(chatRoom));
     }

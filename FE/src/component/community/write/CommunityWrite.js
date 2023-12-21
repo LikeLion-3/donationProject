@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { CommunityCategoryStyles } from '../CommunityCategoryStyles';
 import jwtAxios from "../../util/jwtUtil";
 import { API_SERVER_HOST } from "../../util/jwtUtil";
 
@@ -43,8 +44,35 @@ const CommunityWrite = () => {
     }
   };
 
+  const handleRemoveImage = () => {
+    setImages([]);
+    setPreviewImage(null); // 미리보기 이미지 제거
+    // 필요한 경우 추가적인 상태 업데이트
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!title.trim()) {
+      alert('제목을 입력해주세요.');
+      return;
+    }
+    if (!content.trim()) {
+      alert('내용을 입력해주세요.');
+      return;
+    }
+    if (!category.trim()) {
+      alert('카테고리를 선택해주세요.');
+      return;
+    }
+    if (!(title.length >= 5 && title.length <= 1000)) {
+      alert('제목을 5글자 이상 50글자 이하로 입력해주세요.');
+      return;
+    }
+    if (!(content.length >= 10 && content.length <= 1000)) {
+      alert('내용을 10글자 이상 1000글자 이하로 입력해주세요.');
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -58,11 +86,21 @@ const CommunityWrite = () => {
       });
 
       const response = await jwtAxios.post(`${API_SERVER_HOST}/api/communities`, formData);
-  
+
       console.log('Server response:', response);
       const data = response.data;
       navigate(`/community/${data.id}`);
-      
+
+      localStorage.removeItem('postTitle');
+      localStorage.removeItem('postContent');
+      localStorage.removeItem('postCategory');
+
+      setTitle('');
+      setContent('');
+      setCategory('');
+      setImages([]);
+      setPreviewImage(null);
+
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -85,14 +123,13 @@ const CommunityWrite = () => {
                       placeholder="글 제목을 입력해주세요."
                       value={title}
                       onChange={handleTitleChange}
-                    // style={{border: 'none'}}
                     />
                     <label className="form-label" style={{ color: 'dimgray' }}>제목</label>
                   </div>
                 </div>
               </div>
               <div classnames="community-body">
-                <div className="col-md-12" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '402px', marginTop: '30px', marginBottom: '30px' }}>
+                <div className="col-md-12" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '402px', marginTop: '30px', marginBottom: '30px', position: 'relative' }}>
                   <img
                     src={previewImage || '/images/community_default.PNG'} // 미리보기 이미지 또는 기본 이미지
                     alt='사진 등록하기'
@@ -104,6 +141,26 @@ const CommunityWrite = () => {
                     }}
                     onClick={handleImageClick}
                   />
+                  {previewImage && (
+                    <button
+                      onClick={handleRemoveImage}
+                      style={{
+                        // position: 'absolute',
+                        // top: '5px', // 버튼의 상단 위치 조정
+                        // right: '5px', // 버튼의 우측 위치 조정
+                        border: 'grey',
+                        background: 'rgba(255, 255, 255, 0.7)', // 배경 색상과 투명도 추가
+                        marginTop: '10px', // 버튼과 이미지 사이의 간격
+                        color: 'grey',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        padding: '2px 5px', // 패딩 추가
+                        borderRadius: '50%', // 원형 버튼으로 디자인
+                        zIndex: 2 // z-index 추가
+                      }}>
+                      삭제
+                    </button>
+                  )}
                   <input
                     type='file'
                     id='imageUpload'
@@ -116,16 +173,17 @@ const CommunityWrite = () => {
                   {['봉사인증', '봉사모집', '잡다구리'].map((cat) => (
                     <span
                       key={cat}
-                      className={`badge m-1 ${cat === category ? 'selected-badge' : 'unselected-badge'}`}
                       onClick={() => setCategory(cat)}
                       style={{
+                        ...CommunityCategoryStyles[cat],
                         cursor: 'pointer',
-                        border: `1px solid #FABA96`,
-                        color: cat === category ? 'white' : '#FABA96',
-                        backgroundColor: cat === category ? '#FABA96' : 'white',
-                        padding: '0.5em 0.8em', // 세로 및 가로 패딩 조정
-                        fontSize: '1rem', // 글씨 크기 조정
-                        borderRadius: '0.25rem' // 둥근 모서리 조정
+                        padding: '0.5em 0.8em',
+                        fontSize: '1rem',
+                        borderRadius: '0.25rem',
+                        margin: '0 0.5em',
+                        border: `1px solid ${CommunityCategoryStyles[cat].backgroundColor}`,
+                        color: cat === category ? 'white' : CommunityCategoryStyles[cat].backgroundColor,
+                        backgroundColor: cat === category ? CommunityCategoryStyles[cat].backgroundColor : 'white'
                       }}
                     >
                       {cat}
@@ -151,7 +209,7 @@ const CommunityWrite = () => {
               className="btn btn-primary btn-xl"
               type="submit"
               style={{ backgroundColor: '#FABA96', borderColor: '#FABA96' }}>
-              Submit
+              작성하기
             </button>
           </div>
         </form>

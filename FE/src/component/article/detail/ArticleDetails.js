@@ -31,8 +31,6 @@ const ArticleDetails = () => {
     setShowImages(!showImages);
   };
 
-  
-
   const formattedDate = article?.createdAt
     ? new Date(article.createdAt)
       .toLocaleDateString("ko-KR", {

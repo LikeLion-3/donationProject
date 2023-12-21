@@ -8,6 +8,8 @@ import com.myapp.warmwave.domain.address.service.AddressService;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.email.service.EmailService;
+import com.myapp.warmwave.domain.image.entity.Image;
+import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
@@ -23,8 +25,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +37,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -47,6 +52,9 @@ public class UserServiceTest {
 
     @Mock
     private EmailService emailService;
+
+    @Mock
+    private ImageService imageService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -94,6 +102,12 @@ public class UserServiceTest {
                 .userType(Role.INSTITUTION)
                 .build();
 
+        Image institutionImage = Image.builder()
+                .id(1L)
+                .imgName("image_name.jpg")
+                .imgUrl("http://example.com/image_name.jpg")
+                .build();
+
         individual = Individual.builder()
                 .id(1L)
                 .email("test@gmail.com")
@@ -118,6 +132,7 @@ public class UserServiceTest {
                 .profileImg(UserService.DEFAULT_PROFILE_IMG_INST)
                 .registerNum("1234567890")
                 .emailAuth(emailAuth)
+                .institutionImage(institutionImage)
                 .role(Role.INSTITUTION)
                 .articles(new ArrayList<>())
                 .favoriteList(new ArrayList<>())
@@ -170,12 +185,15 @@ public class UserServiceTest {
 
     @DisplayName("기관회원 회원가입 기능 확인")
     @Test
-    void joinInst() {
+    void joinInst() throws IOException {
         // given
         RequestInstitutionJoinDto requestDto = saveInst();
+        MultipartFile imageFile = new MockMultipartFile(
+                "image", "test-image.jpg", "image/jpeg", "Test Image Content".getBytes()
+        );
 
         // when
-        ResponseUserJoinDto responseDto = userService.joinInstitution(requestDto);
+        ResponseUserJoinDto responseDto = userService.joinInstitution(requestDto, imageFile);
 
         // then
         assertThat(responseDto).isNotNull();
@@ -241,10 +259,13 @@ public class UserServiceTest {
 
     @DisplayName("기관 목록 조회 기능 확인")
     @Test
-    void readAllInst() {
+    void readAllInst() throws IOException {
         // given
         RequestInstitutionJoinDto requestDto = saveInst();
-        userService.joinInstitution(requestDto); // save 된 상태
+        MultipartFile imageFile = new MockMultipartFile(
+                "image", "test-image.jpg", "image/jpeg", "Test Image Content".getBytes()
+        );
+        userService.joinInstitution(requestDto, imageFile); // save 된 상태
 
         List<User> userList = List.of(institution);
 
@@ -279,10 +300,13 @@ public class UserServiceTest {
 
     @DisplayName("기관 단일 조회 기능 확인")
     @Test
-    void readInst() {
+    void readInst() throws IOException {
         // given
         RequestInstitutionJoinDto requestDto = saveInst();
-        userService.joinInstitution(requestDto);
+        MultipartFile imageFile = new MockMultipartFile(
+                "image", "test-image.jpg", "image/jpeg", "Test Image Content".getBytes()
+        );
+        userService.joinInstitution(requestDto, imageFile);
 
         Long userId = 2L;
         when(userRepository.findById(any())).thenReturn(Optional.of(institution));
@@ -325,10 +349,13 @@ public class UserServiceTest {
 
     @DisplayName("유저 정보 수정 기능 확인 (기관)")
     @Test
-    void updateInst() {
+    void updateInst() throws IOException {
         // given
         RequestInstitutionJoinDto reqJoinDto = saveInst();
-        userService.joinInstitution(reqJoinDto);
+        MultipartFile imageFile = new MockMultipartFile(
+                "image", "test-image.jpg", "image/jpeg", "Test Image Content".getBytes()
+        );
+        userService.joinInstitution(reqJoinDto, imageFile);
 
         RequestInstitutionUpdateDto updateDto = new RequestInstitutionUpdateDto(
                 "b1234567", "서울 성북구 OO동", "서울", "성북구", "OO동"
@@ -350,10 +377,13 @@ public class UserServiceTest {
 
     @DisplayName("기관 가입 승인 기능 확인")
     @Test
-    void approve() {
+    void approve() throws IOException {
         // given
         RequestInstitutionJoinDto reqJoinDto = saveInst();
-        userService.joinInstitution(reqJoinDto);
+        MultipartFile imageFile = new MockMultipartFile(
+                "image", "test-image.jpg", "image/jpeg", "Test Image Content".getBytes()
+        );
+        userService.joinInstitution(reqJoinDto, imageFile);
 
         Long userId = 2L;
 
@@ -401,7 +431,7 @@ public class UserServiceTest {
     }
 
     // 기관 회원가입 과정 메서드화
-    private RequestInstitutionJoinDto saveInst() {
+    private RequestInstitutionJoinDto saveInst() throws IOException {
         RequestInstitutionJoinDto requestDto = new RequestInstitutionJoinDto(
                 "test@gmail.com", "a1234567", "기관명1",
                 "1234567890", "서울 강남구 테헤란로 123", "서울", "강남구",
@@ -412,7 +442,7 @@ public class UserServiceTest {
                 .thenReturn(address2);
         when(emailService.createEmailAuth(anyString())).thenReturn(emailAuth);
         when(passwordEncoder.encode(anyString())).thenReturn("1234");
-
+        when(imageService.uploadImageForInstitution(any(), any())).thenReturn(institution.getInstitutionImage());
         when(userRepository.save(any())).thenReturn(institution);
         return requestDto;
     }

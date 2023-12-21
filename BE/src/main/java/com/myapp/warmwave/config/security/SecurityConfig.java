@@ -46,7 +46,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/", "/api/users/login", "/api/users/register/**",
                                         "/api/articles/today", "/api/main/count", "/api/users/confirm-email",
-                                        "/ws/**", "/api/user/refresh"
+                                        "/ws/**", "/app/**", "/topic/**",
+                                        "/api/user/refresh"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/articles/**", "/api/communities/**").permitAll()
                                 .anyRequest().authenticated()

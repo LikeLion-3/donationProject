@@ -12,7 +12,8 @@ public enum CustomExceptionCode {
      */
     NOT_MATCH_WRITER(HttpStatus.BAD_REQUEST, "작성자가 아닙니다."),
     ALREADY_LOGOUT_USER(HttpStatus.BAD_REQUEST, "다시 로그인해 주시기 바랍니다."),
-    IMAGE_AMOUNT_OVER(HttpStatus.BAD_REQUEST, "이미지 개수가가 허용된 크기를 초과했습니다.(최대 5개)"),
+    IMAGE_NOT_PROVIDED_OR_EMPTY(HttpStatus.BAD_REQUEST, "이미지 파일이 제공되지 않았거나 비어있습니다."),
+    IMAGE_AMOUNT_OVER(HttpStatus.BAD_REQUEST, "이미지 개수가 허용된 크기를 초과했습니다.(최대 5개)"),
     IMAGE_SIZE_OVER(HttpStatus.BAD_REQUEST, "이미지 크기가 허용된 크기를 초과했습니다.(개당 5mb 이하)"),
     INVALID_IMAGE_URL(HttpStatus.BAD_REQUEST, "유효하지 않은 이미지 url입니다."),
     /*

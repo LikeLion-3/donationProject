@@ -1,10 +1,11 @@
-import {Link, NavLink, Outlet} from "react-router-dom";
+import {Link, NavLink, Outlet, useNavigate} from "react-router-dom";
 import {useSelector, useDispatch} from "react-redux";
 import { logout } from "../slices/loginSlice";
 import useToast from '../hooks/useToast';
 
 function Nav() {
     const { showToast } = useToast();
+    const navigate = useNavigate();
     
     const loginState = useSelector(state => state.loginSlice);
     console.log( loginState );
@@ -14,6 +15,7 @@ function Nav() {
         e.preventDefault();
         dispatch(logout());
         showToast("로그아웃되었습니다.");
+        navigate('/');
     };
 
     return (

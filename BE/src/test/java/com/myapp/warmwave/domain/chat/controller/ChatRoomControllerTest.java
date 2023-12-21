@@ -47,13 +47,13 @@ class ChatRoomControllerTest {
     @Test
     void createChatroom() throws Exception {
         // given
-        ChatRoomDto reqDto = new ChatRoomDto(1L, 1L, 2L);
+        ChatRoomDto reqDto = new ChatRoomDto(1L, 1L);
         ResponseCreateChatRoomDto resDto = new ResponseCreateChatRoomDto(
                 1L, "기부자1", "수여자1", "제목", "상태", "메시지", null
         );
 
         // when
-        when(chatRoomService.createChatRoom(any())).thenReturn(resDto);
+        when(chatRoomService.createChatRoom(any(),1L)).thenReturn(resDto);
 
         // then
         mockMvc.perform(post("/api/chatRoom")

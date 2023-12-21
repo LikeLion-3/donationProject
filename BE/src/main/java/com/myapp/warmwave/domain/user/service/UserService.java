@@ -10,6 +10,8 @@ import com.myapp.warmwave.domain.address.service.AddressService;
 import com.myapp.warmwave.domain.email.dto.RequestEmailAuthDto;
 import com.myapp.warmwave.domain.email.entity.EmailAuth;
 import com.myapp.warmwave.domain.email.service.EmailService;
+import com.myapp.warmwave.domain.image.entity.Image;
+import com.myapp.warmwave.domain.image.service.ImageService;
 import com.myapp.warmwave.domain.user.dto.*;
 import com.myapp.warmwave.domain.user.entity.Individual;
 import com.myapp.warmwave.domain.user.entity.Institution;
@@ -18,7 +20,6 @@ import com.myapp.warmwave.domain.user.repository.IndividualRepository;
 import com.myapp.warmwave.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +48,7 @@ public class UserService {
     private final IndividualRepository individualRepository;
     private final AddressService addressService;
     private final EmailService emailService;
+    private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final CookieManager cookieManager;
@@ -68,7 +72,7 @@ public class UserService {
 
     // 기관 회원가입
     @Transactional
-    public ResponseUserJoinDto joinInstitution(RequestInstitutionJoinDto dto) {
+    public ResponseUserJoinDto joinInstitution(RequestInstitutionJoinDto dto, MultipartFile imageFile) throws IOException {
         checkUserDuplicate(dto.getEmail());
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
@@ -85,9 +89,15 @@ public class UserService {
         EmailAuth emailAuth = emailService.createEmailAuth(dto.getEmail());
 
         Institution institution = dto.toEntity(passwordEncoder, address.get(), emailAuth);
-        userRepository.save(institution);
+        Institution savedInstitution = userRepository.save(institution);
+
+        // 사업자등록증 이미지 업로드 로직 호출
+        Image uploadImage = imageService.uploadImageForInstitution(institution, imageFile);
+        savedInstitution.addInstitutionImage(uploadImage);
+        userRepository.save(savedInstitution);
 
         emailService.send(emailAuth.getEmail(), emailAuth.getAuthToken());
+
         return ResponseUserJoinDto.builder()
                 .id(institution.getId())
                 .email(institution.getEmail())

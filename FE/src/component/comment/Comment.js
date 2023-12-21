@@ -54,12 +54,16 @@ function Comment({ communityId }) {
   useEffect(() => {
     setPage(0);
     setComments([]);
-    fetchComments();
+    // fetchComments();
   }, [communityId]);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) {
       alert("댓글을 입력해주세요.");
+      return;
+    }
+    if(!(newComment.length >= 5 && newComment.length <=1000)){
+      alert('댓글을 10글자 이상 1000글자 이하로 입력해주세요.');
       return;
     }
     try {
@@ -222,13 +226,12 @@ function Comment({ communityId }) {
                     style={{ flex: 1, border: '1px solid #E2E2E2', outline: 'none' }}
                   />
                 ) : (
-                  <p style={{ margin: '0', color: 'black' }}>{comment.contents}</p>
-                )}
+                  <p style={{ fontSize: '0.8rem', color: 'grey', margin: '0' }}>
+                    {formatCreatedAt(comment.createdAt)}
+                  </p>)}
               </div>
               <div className="date-and-buttons">
-                <p style={{ fontSize: '0.8rem', color: 'grey', margin: '0' }}>
-                  {formatCreatedAt(comment.createdAt)}
-                </p>
+                <p style={{ margin: '0', color: 'black' }}>{comment.contents}</p>
                 {loggedInUserId === comment.userId && (
                   <div className="comment-buttons">
                     {editingCommentId === comment.id ? (

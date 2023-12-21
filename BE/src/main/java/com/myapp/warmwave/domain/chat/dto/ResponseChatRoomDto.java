@@ -31,8 +31,8 @@ public class ResponseChatRoomDto {
         String lastMessageContent = chatMessages.isEmpty() ? "" : chatMessages.get(chatMessages.size() - 1).getMessage();
         return ResponseChatRoomDto.builder()
                 .id(chatRoom.getId())
-                .donorName(chatRoom.getDonor().getNickname())
-                .recipientName(chatRoom.getRecipient().getInstitutionName())
+                .donorName(chatRoom.getDonor().getName())
+                .recipientName(chatRoom.getRecipient().getName())
                 .articleTitle(chatRoom.getArticle().getTitle())
                 .status(chatRoom.getStatus())
                 .lastMessage(lastMessageContent)

@@ -26,8 +26,8 @@ public class ResponseCreateChatRoomDto {
     public static ResponseCreateChatRoomDto fromEntity(ChatRoom chatRoom) {
         return ResponseCreateChatRoomDto.builder()
                 .id(chatRoom.getId())
-                .donorName(chatRoom.getDonor().getNickname())
-                .recipientName(chatRoom.getRecipient().getInstitutionName())
+                .donorName(chatRoom.getDonor().getName())
+                .recipientName(chatRoom.getRecipient().getName())
                 .articleTitle(chatRoom.getArticle().getTitle())
                 .status(chatRoom.getStatus())
                 .deletedAt(chatRoom.getDeletedAt())

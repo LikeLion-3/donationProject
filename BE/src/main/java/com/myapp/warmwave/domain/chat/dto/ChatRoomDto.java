@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatRoomDto {
     private Long articleId;
-    private Long donerId;
-    private Long recipientId;
+    private Long otherId;
 }

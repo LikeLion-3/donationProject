@@ -4,11 +4,11 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.myapp.warmwave.common.exception.CustomException;
-import com.myapp.warmwave.common.exception.CustomExceptionCode;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.community.entity.Community;
 import com.myapp.warmwave.domain.image.entity.Image;
 import com.myapp.warmwave.domain.image.repository.ImageRepository;
+import com.myapp.warmwave.domain.user.entity.Institution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -166,5 +166,33 @@ public class ImageService {
             }
         }
         imageRepository.deleteAllByImgUrl(urls);
+    }
+
+    public Image uploadImageForInstitution(Institution institution, MultipartFile imageFile) throws IOException {
+
+        if(imageFile == null && imageFile.isEmpty()) {
+            throw new CustomException(IMAGE_NOT_PROVIDED_OR_EMPTY);
+        }
+
+            String originalFilename = imageFile.getOriginalFilename();
+            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            String fileName = UUID.randomUUID() + "." + fileExtension;
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(imageFile.getSize());
+            metadata.setContentType(imageFile.getContentType());
+
+            String key = "institution/"+fileName;   // 이미지파일이 저장되는 경로
+
+            amazonS3.putObject(bucket, key, imageFile.getInputStream(), metadata);
+
+            Image image = Image.builder()
+                    .imgName(fileName)
+                    .imgUrl(amazonS3.getUrl(bucket, key).toString())
+                    .institution(institution)
+                    .build();
+
+            imageRepository.save(image);
+        return image;
     }
 }
