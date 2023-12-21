@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import Cookies from 'js-cookie';
-import { getCookie } from '../../util/cookieUtil';
 import jwtAxios from '../../util/jwtUtil';
 import { CommunityCategoryStyles } from '../CommunityCategoryStyles';
 
@@ -11,13 +9,12 @@ const CommunityUpdate = () => {
   const navigate = useNavigate();
   const params = useParams();
   const location = useLocation();
-  const { communityId } = useParams();
 
   const [title, setTitle] = useState('');
   const [contents, setContents] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState([]);
-  const [previewImage, setPreviewImage] = useState(''); // 미리보기
+  const [previewImage, setPreviewImage] = useState('');
 
   const community = location.state ? location.state.community : null;
 
@@ -52,8 +49,8 @@ const CommunityUpdate = () => {
     localStorage.setItem('postContent', newContents);
   };
 
-  const handleCategoryChange = (event) => {
-    const newCategory = event.target.innerText;
+  const handleCategoryChange = (newCategory) => {
+    console.log(newCategory);
     setCategory(newCategory);
     setChangedFields({ ...changedFields, category: true });
     localStorage.setItem('postCategory', newCategory);
@@ -64,7 +61,6 @@ const CommunityUpdate = () => {
   };
 
   const handleImageChange = (event) => {
-    // 깃허브Url 등록 -> 이미지 바꿨지만 url 삭제 안 되는 중
     const newImage = event.target.files[0];
     if (newImage) {
       setImage(newImage);
@@ -138,7 +134,6 @@ const CommunityUpdate = () => {
   const handleRemoveImage = () => {
     setImage([]);
     setPreviewImage(null); // 미리보기 이미지 제거
-    // 필요한 경우 추가적인 상태 업데이트
   };
 
   return (
@@ -180,18 +175,15 @@ const CommunityUpdate = () => {
                     <button
                       onClick={handleRemoveImage}
                       style={{
-                        // position: 'absolute',
-                        // top: '5px', // 버튼의 상단 위치 조정
-                        // right: '5px', // 버튼의 우측 위치 조정
                         border: 'grey',
-                        background: 'rgba(255, 255, 255, 0.7)', // 배경 색상과 투명도 추가
-                        marginTop: '10px', // 버튼과 이미지 사이의 간격
+                        background: 'rgba(255, 255, 255, 0.7)',
+                        marginTop: '10px',
                         color: 'grey',
                         fontSize: '0.8rem',
                         cursor: 'pointer',
-                        padding: '2px 5px', // 패딩 추가
-                        borderRadius: '50%', // 원형 버튼으로 디자인
-                        zIndex: 2 // z-index 추가
+                        padding: '2px 5px',
+                        borderRadius: '50%',
+                        zIndex: 2
                       }}>
                       삭제
                     </button>
@@ -208,7 +200,7 @@ const CommunityUpdate = () => {
                   {['봉사인증', '봉사모집', '잡다구리'].map((cat) => (
                     <span
                       key={cat}
-                      onClick={() => setCategory(cat)}
+                      onClick={() => handleCategoryChange(cat)}
                       style={{
                         ...CommunityCategoryStyles[cat],
                         cursor: 'pointer',

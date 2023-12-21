@@ -76,6 +76,32 @@ const PostForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!( donationTypeSelected || needTypeSelected || verificationTypeSelected)) {
+      alert('게시글 유형을 선택해주세요.');
+      return;
+    }
+
+    if (selectedCategories.length === 0) {
+      alert('물품 종류를 선택해주세요.');
+      return;
+    }
+    if (!title.trim()) {
+      alert('제목을 입력해주세요.');
+      return;
+    }
+    if (!content.trim()) {
+      alert('내용을 입력해주세요.');
+      return;
+    }
+    if (!(title.length >= 5 && title.length <= 1000)) {
+      alert('제목을 5글자 이상 50글자 이하로 입력해주세요.');
+      return;
+    }
+    if (!(content.length >= 10 && content.length <= 1000)) {
+      alert('내용을 10글자 이상 1000글자 이하로 입력해주세요.');
+      return;
+    }
+
     try {
       const formData = new FormData();
 
@@ -226,9 +252,8 @@ const PostForm = () => {
                     <div key={category} className="me-2 mb-2">
                       <button
                         type="button"
-                        className={`btn ${
-                          selectedCategories.includes(category) ? 'btn-primary' : 'btn-outline-primary'
-                        }`}
+                        className={`btn ${selectedCategories.includes(category) ? 'btn-primary' : 'btn-outline-primary'
+                          }`}
                         onClick={() => handleCategoryChange(category)}
                         style={{
                           color: selectedCategories.includes(category) ? '#ffffff' : '#ffa500',

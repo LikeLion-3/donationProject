@@ -20,6 +20,8 @@ const CommunityList = () => {
 	const [pageRange, setPageRange] = useState(0);
 	const loginState = useSelector(state => state.loginSlice);
 
+	const noPostImageUrl = "https://warmwave-bucket.s3.ap-northeast-2.amazonaws.com/common/%E1%84%83%E1%85%B3%E1%86%BC%E1%84%85%E1%85%A9%E1%86%A8%E1%84%83%E1%85%AC%E1%86%AB+%E1%84%80%E1%85%A6%E1%84%89%E1%85%B5%E1%84%80%E1%85%B3%E1%86%AF%E1%84%8B%E1%85%B5+%E1%84%8B%E1%85%A5%E1%86%B9%E1%84%89%E1%85%B3%E1%86%B8%E1%84%82%E1%85%B5%E1%84%83%E1%85%A1.jpg";
+
 
 	useEffect(() => {
 		const calculatePageRange = () => {
@@ -156,6 +158,19 @@ const CommunityList = () => {
 								))}
 							</tbody>
 						</table>
+						<div>
+							{posts.length === 0 ? (
+								// 게시글이 없을 때 표시할 이미지
+								<div className="text-center">
+									<img src={noPostImageUrl} alt="No posts available" style={{ maxWidth: '85%', height: 'auto' }} />
+								</div>
+							) : (
+								// 게시글이 있을 때 표시할 내용
+								<table className="table table-hover">
+									{/* 테이블 내용 */}
+								</table>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
