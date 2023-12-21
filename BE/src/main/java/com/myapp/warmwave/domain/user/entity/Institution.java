@@ -11,7 +11,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper=false)
 @ToString
 @DiscriminatorValue("institution")
 public class Institution extends User {
