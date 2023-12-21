@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.chat.service;
 
+import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.repository.ArticleRepository;
 import com.myapp.warmwave.domain.chat.dto.ChatRoomDto;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_USER;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,10 +29,10 @@ public class ChatRoomService {
     @Transactional
     public ResponseCreateChatRoomDto createChatRoom(ChatRoomDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         User otherUser = userRepository.findById(requestDto.getOtherId())
-                .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         Article article = articleRepository.findById(requestDto.getArticleId()).orElseThrow();
 

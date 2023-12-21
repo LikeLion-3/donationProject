@@ -1,5 +1,6 @@
 package com.myapp.warmwave.domain.chat.service;
 
+import com.myapp.warmwave.common.exception.CustomException;
 import com.myapp.warmwave.domain.chat.dto.ChatMessageDto;
 import com.myapp.warmwave.domain.chat.dto.ResponseChatMessageDto;
 import com.myapp.warmwave.domain.chat.entity.ChatMessage;
@@ -15,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_CHATROOM;
+import static com.myapp.warmwave.common.exception.CustomExceptionCode.NOT_FOUND_USER;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,10 +31,10 @@ public class ChatMessageService {
     public ResponseChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
 
         User user = userRepository.findById(chatMessageDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다"));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDto.getRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다"));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_CHATROOM));
 
         ChatMessage chatMessage = ChatMessage.builder().chatroom(chatRoom).sender(user).message(chatMessageDto.getContent()).timestamp((new Date())).build();
         return ResponseChatMessageDto.fromEntity(chatMessageRepository.save(chatMessage));

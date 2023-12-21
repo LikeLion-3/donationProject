@@ -52,7 +52,7 @@ public enum CustomExceptionCode {
     ALREADY_EXIST_CATEGORY(HttpStatus.NOT_FOUND, "이미 존재하는 카테고리입니다."),
     NOT_FOUND_ARTICLETYPE(HttpStatus.NOT_FOUND, "존재하지 않는 게시글종류 입니다."),
     NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "해당 이미지를 찾을 수 없습니다."),
-
+    NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND,"채팅방이 존재하지 않습니다."),
     /*
      * 415
      */
