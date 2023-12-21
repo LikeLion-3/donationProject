@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ChatRoomServiceTest {
@@ -42,17 +42,17 @@ public class ChatRoomServiceTest {
     @InjectMocks
     private ChatRoomService chatRoomService;
 
-    private Individual individual;
-    private Institution institution;
+    private User user;
+    private User otherUser;
     private Article article;
     private ChatRoom chatRoom;
 
     @BeforeEach
     void setup() {
-        individual = Individual.builder()
+        user = Individual.builder()
                 .id(1L).role(Role.INDIVIDUAL).build();
 
-        institution = Institution.builder()
+        otherUser = Institution.builder()
                 .id(2L).role(Role.INSTITUTION).build();
 
         article = Article.builder()
@@ -60,8 +60,8 @@ public class ChatRoomServiceTest {
 
         chatRoom = ChatRoom.builder()
                 .id(1L)
-                .donor(individual)
-                .recipient(institution)
+                .donor(user)
+                .recipient(user)
                 .article(article)
                 .chatMessageList(new ArrayList<>())
                 .status("상태")
@@ -116,10 +116,10 @@ public class ChatRoomServiceTest {
     }
 
     private ChatRoomDto saveChatRoom() {
-        ChatRoomDto reqDto = new ChatRoomDto(1L, 1L);
+        ChatRoomDto reqDto = new ChatRoomDto(1L, 2L);
 
-        when(userRepository.findById(2L)).thenReturn(Optional.of(institution));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(individual));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(otherUser));
         when(articleRepository.findById(any())).thenReturn(Optional.of(article));
 
         when(chatRoomRepository.save(any())).thenReturn(chatRoom);
