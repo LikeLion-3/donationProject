@@ -86,7 +86,7 @@ tasks.named('test') {
 
 bootJar {
     dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}/html5") {
+    from ("src/docs/asciidoc") {
         into 'static/docs'
     }
 }
