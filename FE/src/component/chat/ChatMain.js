@@ -26,7 +26,7 @@ function ChatMain() {
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
   const [stompClient, setStompClient] = useState(null);
-  const [selectedConversationId, setSelectedConversationId] = useState(null);
+  const [selectedConversation, setSelectedConversation] = useState({}); // Initialize as an empty object
 
   const stompRef = useRef(null);
 
@@ -44,12 +44,13 @@ function ChatMain() {
           setMessages((prevMessages) => [...prevMessages, receivedMessage]);
         });
 
-        setSelectedConversationId(id);
+        setSelectedConversation({ ...selectedConversation, id }); // Update the id in the selectedConversation object
       } else {
         console.error("Access token not found or undefined in the user cookie.");
       }
     }
   };
+
   useEffect(() => {
     // Fetch data using Axios when the component mounts
     jwtAxios
@@ -81,16 +82,12 @@ function ChatMain() {
     };
   }, []);
 
-  const handleConversationClick = (id) => {
-    // Set the selected conversation ID
-    setSelectedConversationId(id);
+  const handleConversationClick = (conversation) => {
+    setSelectedConversation(conversation);
+    subscribeToTopic(conversation.id);
 
-    // Subscribe to the WebSocket topic for real-time updates
-    subscribeToTopic(id);
-
-    // Fetch chat messages for the selected conversation
     jwtAxios
-      .get(`${API_SERVER_HOST}/api/chatMessages/${id}`, {})
+      .get(`${API_SERVER_HOST}/api/chatMessages/${conversation.id}`, {})
       .then((response) => {
         setMessages(response.data);
       })
@@ -98,9 +95,8 @@ function ChatMain() {
         console.error("Error fetching chat messages:", error);
       });
 
-    // If there is a message in the input, send it
     if (messageInputValue.trim() !== "") {
-      sendMessage(id);
+      sendMessage(conversation.id);
     }
   };
 
@@ -123,6 +119,27 @@ function ChatMain() {
     }
   };
 
+  const handleArticleStatusButtonClick = async (articleStatus, conversationId) => {
+    try {
+      console.log("Sending request with payload:", { articleStatus, conversationId });
+
+      if (conversationId) {
+        // Check if conversationId has a value before making the API call
+        const response = await jwtAxios.put(`${API_SERVER_HOST}/api/articles/status/${conversationId}?articleStatus=${articleStatus}`, {
+          articleStatus: articleStatus,
+        });
+
+        // Handle the API response as needed
+        console.log("API Response:", response.data);
+      } else {
+        console.error("No conversationId available.");
+      }
+    } catch (error) {
+      // Handle errors
+      console.error("API Error:", error);
+    }
+  };
+
   return (
     <div>
       <div
@@ -135,17 +152,11 @@ function ChatMain() {
           <Sidebar position="left" scrollable={false}>
             <Search placeholder="Search..." />
             <ConversationList>
-              {conversations.map((conversation) => {
-                // Determine the name to display based on the condition
-                const displayUserName = userName !== conversation.donorName ? conversation.donorName : conversation.recipientName;
-
-                // Render Conversation with the determined displayUserName
-                return (
-                  <Conversation key={conversation.id} name={conversation.articleTitle} info={conversation.lastMessage} onClick={() => handleConversationClick(conversation.id)}>
-                    <Avatar src={require("../../assets/images/p.png")} name="Lilly" status="available" />
-                  </Conversation>
-                );
-              })}
+              {conversations.map((conversation) => (
+                <Conversation key={conversation.id} name={conversation.articleTitle} info={conversation.lastMessage} onClick={() => handleConversationClick(conversation)}>
+                  <Avatar src={require("../../assets/images/p.png")} name="Lilly" status="available" />
+                </Conversation>
+              ))}
             </ConversationList>
           </Sidebar>
 
@@ -164,15 +175,29 @@ function ChatMain() {
                     position: "single",
                   }}
                 >
-                  {msg.sender !== userName && <Avatar src={require("../../assets/images/p.png")} name={msg.nickName} />}
+                  {msg.sender !== userName && <Avatar src={require("../../assets/images/p.png")} name={msg.sender} />} {/* Replace with the appropriate property */}
                 </Message>
               ))}
             </MessageList>
-            <MessageInput placeholder="Type message here" value={messageInputValue} onChange={(val) => setMessageInputValue(val)} onSend={() => sendMessage(selectedConversationId)} />
+            <MessageInput
+              placeholder="Type message here"
+              value={messageInputValue}
+              onChange={(val) => setMessageInputValue(val)}
+              onSend={() => selectedConversation?.id && sendMessage(selectedConversation.id)} // Check if id exists
+            />
           </ChatContainer>
         </MainContainer>
+        <div>
+          {selectedConversation?.id && (
+            <>
+              <button onClick={() => handleArticleStatusButtonClick("완료", selectedConversation.id)}>기부완료</button>
+              <button onClick={() => handleArticleStatusButtonClick("기본", selectedConversation.id)}>기부중단 </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
 export default ChatMain;
