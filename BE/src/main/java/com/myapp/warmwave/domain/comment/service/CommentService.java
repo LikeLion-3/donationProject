@@ -46,7 +46,7 @@ public class CommentService {
                 .build();
 
        Comment savedComment = commentRepository.save(comment);
-        return commentMapper.CommentToCommentResponseDto(savedComment);
+        return commentMapper.commentToCommentResponseDto(savedComment);
     }
 
     public Page<CommentResponseDto> getComments(Pageable pageable, String sort, Long communityId) {
@@ -63,7 +63,7 @@ public class CommentService {
         originComment.updateComment(dto.getContents());
         commentRepository.save(originComment);
 
-        return commentMapper.CommentToCommentResponseDto(originComment);
+        return commentMapper.commentToCommentResponseDto(originComment);
     }
 
     @Transactional

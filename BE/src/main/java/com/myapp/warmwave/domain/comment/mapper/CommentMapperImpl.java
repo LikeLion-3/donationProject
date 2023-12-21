@@ -17,7 +17,7 @@ public class CommentMapperImpl implements CommentMapper{
     }
 
     @Override
-    public CommentResponseDto CommentToCommentResponseDto(Comment comment) {
+    public CommentResponseDto commentToCommentResponseDto(Comment comment) {
         return CommentResponseDto.builder()
                 .id(comment.getId())
                 .contents(comment.getContents())
