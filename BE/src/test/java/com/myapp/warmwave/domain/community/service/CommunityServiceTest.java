@@ -119,10 +119,15 @@ class CommunityServiceTest {
 
         Long communityId = 1L;
 
+        CommunityResponseDto resDto = new CommunityResponseDto(
+              1L, "제목", "내용", 1, "작성자", "카테고리", null, null, null
+        );
+
         when(communityRepository.findById(any())).thenReturn(Optional.of(savedCommunity));
+        when(communityMapper.communityToCommunityResponseDto(any())).thenReturn(resDto);
 
         // when
-        Community foundCommunity = communityService.getCommunity(communityId);
+        CommunityResponseDto foundCommunity = communityService.getCommunity(communityId);
 
         // then
         assertThat(foundCommunity).isNotNull();
@@ -191,8 +196,6 @@ class CommunityServiceTest {
         communityService.saveCommunity(community);
 
         Long communityId = 1L;
-
-        when(communityRepository.findById(any())).thenReturn(Optional.of(community));
 
         // when
         communityService.deleteCommunity(communityId);

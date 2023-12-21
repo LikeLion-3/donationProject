@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,8 +151,10 @@ class ArticleServiceTest {
 
         when(articleRepository.findById(any())).thenReturn(Optional.of(articleIndiv));
 
+        List<String> imageUrlList = Collections.singletonList("[]");
+
         ArticlePatchDto updateDto = ArticlePatchDto.builder()
-                .title("제목1 변경").content("내용2").prodCategory("카테고리2").originalImageUrls(List.of("url1", "url2")).build();
+                .title("제목1 변경").content("내용2").prodCategory("카테고리2").originalImageUrls(imageUrlList).build();
 
         savedArticle.applyPatch("", updateDto, List.of(articleCategory));
         String userEmail = "test@gmail.com";

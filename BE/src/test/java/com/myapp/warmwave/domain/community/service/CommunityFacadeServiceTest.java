@@ -108,23 +108,4 @@ class CommunityFacadeServiceTest {
         // then
         assertThat(createdDto).isNotNull();
     }
-
-    @DisplayName("커뮤니티 글 조회 기능 확인")
-    @Test
-    void get() {
-        // given
-        Long communityId = 1L;
-        when(communityService.getCommunity(any())).thenReturn(community());
-
-        CommunityResponseDto resDto = CommunityResponseDto.builder()
-                .id(1L).title("제목").contents("내용").userId(1L).category("카테고리")
-                .writer("작성자").build();
-        when(communityMapper.communityToCommunityResponseDto(any())).thenReturn(resDto);
-
-        // when
-        CommunityResponseDto createdDto = communityFacadeService.getCommunity(communityId);
-
-        // then
-        assertThat(createdDto).isNotNull();
-    }
 }

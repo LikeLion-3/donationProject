@@ -117,7 +117,7 @@ class CommunityControllerTest {
                 .writer("작성자").build();
 
         // when
-        when(communityFacadeService.getCommunity(any())).thenReturn(resDto);
+        when(communityService.getCommunity(any())).thenReturn(resDto);
 
         // then
         mockMvc.perform(get("/api/communities/" + communityId)

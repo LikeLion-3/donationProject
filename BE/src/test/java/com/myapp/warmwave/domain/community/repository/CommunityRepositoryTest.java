@@ -70,7 +70,7 @@ class CommunityRepositoryTest {
         Community community = communityRepository.save(community());
 
         // when
-        Optional<Community> foundCommunity = communityRepository.findById(1L);
+        Optional<Community> foundCommunity = communityRepository.findByTitle(community.getTitle());
 
         // then
         assertThat(foundCommunity).isPresent();
