@@ -1,7 +1,6 @@
-package com.myapp.warmwave.domain.article;
+package com.myapp.warmwave.domain.article.controller;
 
 import com.myapp.warmwave.common.jwt.JwtAuthFilter;
-import com.myapp.warmwave.domain.article.controller.ArticleController;
 import com.myapp.warmwave.domain.article.dto.ArticleResponseDto;
 import com.myapp.warmwave.domain.article.entity.Article;
 import com.myapp.warmwave.domain.article.entity.ArticleType;
@@ -210,7 +209,6 @@ class ArticleControllerTest {
     void deleteArticle() throws Exception {
         // given
         Long articleId = 1L;
-        String email = "test@gmail.com";
 
         // when
 
