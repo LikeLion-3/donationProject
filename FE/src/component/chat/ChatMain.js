@@ -28,7 +28,7 @@ function ChatMain() {
   const socket = useRef(null);
   const stompClient = useRef(null);
   const [selectedConversation, setSelectedConversation] = useState({});
-
+  const [articleId, setArticleId] = useState([]);
   const cookieValue = Cookies.get("user");
   const userObject = JSON.parse(cookieValue);
   const userId = userObject.id;
@@ -45,7 +45,7 @@ function ChatMain() {
     }
   };
 
-  const subscribeToTopic = (id) => {
+  const subscribeToTopic = (id, articleId) => {
     if (stompClient.current) {
       if (userId) {
         stompClient.current.subscribe(`/topic/messages/${id}`, (message) => {
@@ -54,7 +54,8 @@ function ChatMain() {
           setMessages((prevMessages) => [...prevMessages, receivedMessage]);
         });
 
-        setSelectedConversation({ ...selectedConversation, id });
+        // Update selectedConversation with both id and articleId
+        setSelectedConversation({ ...selectedConversation, id, articleId });
       } else {
         console.error("Access token not found or undefined in the user cookie.");
       }
@@ -67,6 +68,7 @@ function ChatMain() {
       .get(`${API_SERVER_HOST}/api/chatRoom`)
       .then((response) => {
         setConversations(response.data);
+        setArticleId(response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -89,7 +91,9 @@ function ChatMain() {
     }
 
     setSelectedConversation(conversation);
-    subscribeToTopic(conversation.id);
+
+    // Pass the articleId to subscribeToTopic function
+    subscribeToTopic(conversation.id, conversation.articleId);
 
     jwtAxios
       .get(`${API_SERVER_HOST}/api/chatMessages/${conversation.id}`, {})
@@ -104,7 +108,6 @@ function ChatMain() {
       sendMessage(conversation.id);
     }
   };
-
   const sendMessage = (id) => {
     if (stompClient.current && userId) {
       const messageObject = {
@@ -122,12 +125,12 @@ function ChatMain() {
     }
   };
 
-  const handleArticleStatusButtonClick = async (articleStatus, conversationId) => {
+  const handleArticleStatusButtonClick = async (articleStatus, articleId) => {
     try {
-      console.log("Sending request with payload:", { articleStatus, conversationId });
+      console.log("Sending request with payload:", { articleStatus, articleId });
 
-      if (conversationId) {
-        const response = await jwtAxios.put(`${API_SERVER_HOST}/api/articles/status/${conversationId}?articleStatus=${articleStatus}`, {
+      if (articleId) {
+        const response = await jwtAxios.put(`${API_SERVER_HOST}/api/articles/status/${articleId}?articleStatus=${articleStatus}`, {
           articleStatus: articleStatus,
         });
 
@@ -144,7 +147,7 @@ function ChatMain() {
     <div>
       <div
         style={{
-          height: "600px",
+          height: "650px",
           position: "relative",
         }}
       >
@@ -178,7 +181,34 @@ function ChatMain() {
                   {msg.sender !== userName && <Avatar src={require("../../assets/images/p.png")} name={msg.sender} />}
                 </Message>
               ))}
+              <div>
+                <button
+                  className="btn btn-secondary me-2"
+                  type="button"
+                  onClick={() => handleArticleStatusButtonClick("완료", selectedConversation.articleId)}
+                  style={{
+                    backgroundColor: "#ffffff",
+                    borderColor: "#999999",
+                    color: "#999999",
+                  }}
+                >
+                  기부완료
+                </button>
+                <button
+                  className="btn btn-secondary me-2"
+                  type="button"
+                  onClick={() => handleArticleStatusButtonClick("기본", selectedConversation.articleId)}
+                  style={{
+                    backgroundColor: "#ffffff",
+                    borderColor: "#999999",
+                    color: "#999999",
+                  }}
+                >
+                  기부중단
+                </button>
+              </div>
             </MessageList>
+
             <MessageInput
               placeholder="Type message here"
               value={messageInputValue}
@@ -187,14 +217,6 @@ function ChatMain() {
             />
           </ChatContainer>
         </MainContainer>
-        <div>
-          {selectedConversation?.id && (
-            <>
-              <button onClick={() => handleArticleStatusButtonClick("완료", selectedConversation.id)}>기부완료</button>
-              <button onClick={() => handleArticleStatusButtonClick("기본", selectedConversation.id)}>기부중단</button>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );
