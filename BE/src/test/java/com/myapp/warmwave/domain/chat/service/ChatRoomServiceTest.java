@@ -61,7 +61,7 @@ public class ChatRoomServiceTest {
         chatRoom = ChatRoom.builder()
                 .id(1L)
                 .donor(user)
-                .recipient(user)
+                .recipient(otherUser)
                 .article(article)
                 .chatMessageList(new ArrayList<>())
                 .status("상태")

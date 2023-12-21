@@ -1,6 +1,7 @@
 package com.myapp.warmwave.domain.chat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.myapp.warmwave.WithMockCustomUser;
 import com.myapp.warmwave.common.jwt.JwtAuthFilter;
 import com.myapp.warmwave.config.security.SecurityConfig;
 import com.myapp.warmwave.domain.chat.dto.ChatRoomDto;
@@ -45,6 +46,7 @@ class ChatRoomControllerTest {
 
     @DisplayName("채팅방 생성 확인")
     @Test
+    @WithMockCustomUser
     void createChatroom() throws Exception {
         // given
         ChatRoomDto reqDto = new ChatRoomDto(1L, 1L);
@@ -53,7 +55,7 @@ class ChatRoomControllerTest {
         );
 
         // when
-        when(chatRoomService.createChatRoom(any(),1L)).thenReturn(resDto);
+        when(chatRoomService.createChatRoom(any(), any())).thenReturn(resDto);
 
         // then
         mockMvc.perform(post("/api/chatRoom")
@@ -63,7 +65,7 @@ class ChatRoomControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("chat/채팅방 생성"));
+                .andDo(document("chat/채팅방_생성"));
     }
 
     @DisplayName("채팅방 목록 조회 확인")

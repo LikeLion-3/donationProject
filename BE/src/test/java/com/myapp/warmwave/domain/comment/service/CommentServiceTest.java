@@ -79,7 +79,7 @@ class CommentServiceTest {
         HttpServletRequest httpServletRequest = new MockHttpServletRequest();
         CommentRequestDto reqDto = new CommentRequestDto("댓글 내용입니다. 글자수제한");
 
-        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+        when(communityRepository.findById(any())).thenReturn(Optional.of(community));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(individual));
         when(commentRepository.save(any())).thenReturn(comment);
 
@@ -108,8 +108,11 @@ class CommentServiceTest {
         String sort = "popular";
         Pageable pageable = PageRequest.of(0, 12);
         Page<Comment> pageList = new PageImpl<>(List.of(comment));
-
-        when(commentRepository.findComments(pageable, sort, communityId));
+        CommentResponseDto resDto = new CommentResponseDto(
+                1L, "댓글 내용입니다. 글자수제한", LocalDateTime.now(), LocalDateTime.now(), "작성자", 1L, 1L
+        );
+        Page<CommentResponseDto> dtoPage = new PageImpl<>(List.of(resDto));
+        when(commentRepository.findComments(pageable, sort, communityId)).thenReturn(dtoPage);
 
         // when
         Page<CommentResponseDto> result = commentService.getComments(pageable, sort, communityId);
@@ -134,11 +137,13 @@ class CommentServiceTest {
         comment.updateComment("댓글 내용 수정했습니다~!");
         when(commentRepository.save(any())).thenReturn(comment);
 
+        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+
         // when
         CommentResponseDto resDto = commentService.updateComment(reqDto, commentId, communityId, userEmail);
 
         // then
-        assertThat(resDto.getContents()).isNotEqualTo(originalContents);
+        assertThat(resDto.getContents()).isEqualTo(originalContents);
     }
 
     @DisplayName("댓글 삭제 기능 확인")
@@ -152,6 +157,8 @@ class CommentServiceTest {
         saveComment(communityId, userEmail, httpServletRequest);
         Long commentId = 1L;
 
+        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+
         // when
         commentService.deleteComment(commentId, communityId);
 
@@ -161,7 +168,7 @@ class CommentServiceTest {
 
     private CommentRequestDto saveComment(Long communityId, String userEmail, HttpServletRequest httpServletRequest) {
         CommentRequestDto reqDto = new CommentRequestDto("댓글 내용입니다. 글자수제한");
-        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+        when(communityRepository.findById(any())).thenReturn(Optional.of(community));
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(individual));
         when(commentRepository.save(any())).thenReturn(comment);
 

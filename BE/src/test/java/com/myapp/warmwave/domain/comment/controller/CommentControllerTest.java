@@ -67,7 +67,7 @@ class CommentControllerTest {
         when(commentService.createComment(reqDto, communityId, userEmail, request)).thenReturn(resDto);
 
         // then
-        mockMvc.perform(post("/api/" + communityId + "/comments")
+        mockMvc.perform(post("/api/communities/" + communityId + "/comments")
                         .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
@@ -93,7 +93,7 @@ class CommentControllerTest {
         when(commentService.getComments(any(), anyString(), any())).thenReturn(dtoPage);
 
         // then
-        mockMvc.perform(get("/api/" + communityId + "/comments")
+        mockMvc.perform(get("/api/communities/" + communityId + "/comments")
                         .param("sort", sort)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -118,7 +118,7 @@ class CommentControllerTest {
         when(commentService.updateComment(reqDto, commentId, communityId, userEmail)).thenReturn(resDto);
 
         // then
-        mockMvc.perform(put("/api/" + communityId + "/comments/" + commentId)
+        mockMvc.perform(put("/api/communities/" + communityId + "/comments/" + commentId)
                         .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(reqDto))
@@ -138,7 +138,7 @@ class CommentControllerTest {
         // when
 
         // then
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/" + communityId + "/comments/" + commentId)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/communities/" + communityId + "/comments/" + commentId)
                         .header("Authorization", "Bearer $(ACCESS TOKEN)")
                         .with(csrf()))
                 .andExpect(status().isNoContent())

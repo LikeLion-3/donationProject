@@ -18,9 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,8 +71,6 @@ public class ChatMessageServiceTest {
     @Test
     void createMessage() {
         // given
-        String roomId = "1";
-        String email = "test@gmail.com";
         ChatMessageDto reqDto = saveChatMessage();
 
         // when
@@ -90,7 +85,6 @@ public class ChatMessageServiceTest {
     void readAllMessage() {
         // given
         String roomId = "1";
-        String email = "test@gmail.com";
         ChatMessageDto reqDto = saveChatMessage();
         chatMessageService.saveMessage(reqDto);
 
@@ -107,16 +101,7 @@ public class ChatMessageServiceTest {
     private ChatMessageDto saveChatMessage() {
         ChatMessageDto reqDto = new ChatMessageDto(1L,2L,"내용1", "보낸 사람");
 
-        // Authentication 은 어떻게 검증해야하지? 이렇게 하는거 맞나..?!
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                "test@gmail.com", "1234", null
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(token);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(individual));
+        when(userRepository.findById(any())).thenReturn(Optional.of(individual));
         when(chatRoomRepository.findById(any())).thenReturn(Optional.of(chatRoom));
 
         when(chatMessageRepository.save(any())).thenReturn(chatMessage);
