@@ -1,14 +1,11 @@
 import React from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
-import Logo from './logo.png';
 import { ReactComponent as Google } from "../../../assets/images/social/google.svg"
 import {API_SERVER_HOST} from "../../util/jwtUtil"
-import Kakao from "../../../assets/images/social/kakao.png"
-import Naver from "../../../assets/images/social/naver.png"
 
 const NaverImg = styled.img.attrs({
-    src: Naver,
+    src: "naver.png",
 })`
   height: 40px;
   width: 40px;
@@ -18,7 +15,7 @@ const NaverImg = styled.img.attrs({
 `;
 
 const KakaoImg = styled.img.attrs({
-    src: Kakao,
+    src: "kakao.png",
 })`
   height: 40px;
   width: 40px;

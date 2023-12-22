@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
-import Logo from './logo.png';
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -224,7 +223,7 @@ const Individual_signup = () => {
                 <StRegister>
                     <Top>
                         <StLogo>
-                            <img src={Logo} alt="logo"/>
+                            <img src="logo.png" style={{width:"110px"}} alt="true"/>
                         </StLogo>
                     </Top>
                     <Main>
