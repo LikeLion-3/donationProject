@@ -15,7 +15,7 @@ public class CookieManager {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .maxAge(expiration)
                 .path("/")
-//                .secure(true)
+                .secure(true)
                 .httpOnly(true)
                 .build();
         res.addHeader("Set-Cookie", cookie.toString());
