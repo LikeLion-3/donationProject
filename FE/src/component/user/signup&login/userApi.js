@@ -1,4 +1,5 @@
 import axios from "axios"
+
 const host = process.env.REACT_APP_HOST
 
 export const loginPost = async (loginParam) => {   // 사용자가 로그인을 시도할 때 호출
@@ -9,7 +10,7 @@ export const loginPost = async (loginParam) => {   // 사용자가 로그인을 
         password: loginParam.password
     }
 
-    //  'axios.post'를 사용하여 서버에 로그인 요청 전송, 첫 번째 인자는 요청 URL, 두 번째 인자는 요청 본문, 세 번째 인자는 요청 config
-    const res = await axios.post(`${host}/api/users/login`, loginData)
-    return res.data
+    const res = await axios.post(`${host}/api/users/login`, loginData, { withCredentials: true }) //  'axios.post'를 사용하여 서버에 로그인 요청 전송, 첫 번째 인자는 요청 URL, 두 번째 인자는 요청 본문, 세 번째 인자는 요청 config
+
+    return res.data // 서버로부터 받은 응답의 데이터를 반환
 }
